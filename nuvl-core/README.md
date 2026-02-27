@@ -128,7 +128,7 @@ The design can be implemented in any programming language or execution environme
 ## Running the Reference
 
 ```bash
-python3 NUVL.py
+python3 nuvl.py
 ```
 ---
 
