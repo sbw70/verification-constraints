@@ -205,10 +205,8 @@ The architecture permits ledger participation without introducing new verificati
 
 ## License
 
-The neutral core implementation (`nuvl-core/`) and explicitly designated files are released under the Apache License 2.0.
+This module is not released under the Apache 2.0 license applied to the repository root.
 
-Modules located under `/modules/` may be subject to separate proprietary licensing terms as indicated within those directories.
+Commercial licensing terms apply.
 
-Commercial licensing inquiries may be directed to the repository owner.
-
-Non-commercial research licensing may be available upon request.
+Non-commercial research evaluation may be available upon request.
