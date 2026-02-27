@@ -2,44 +2,51 @@
 
 ## Overview
 
-The Multi-Provider Distributed Execution Framework extends the Neutral Unified Verification Layer (NUVL) model into environments involving multiple independent provider-controlled systems.
+The Multi-Provider Distributed Execution Framework demonstrates
+distributed execution confirmation across multiple independent,
+provider-controlled systems operating behind a NUVL-like stateless intermediary.
 
-Each provider evaluates verification artifacts using provider-selected logic and determines authorization independently.
+The intermediary forwards artifacts and disengages.
 
-Execution authority remains exclusively within each provider-controlled system.
+Each provider independently evaluates artifacts using provider-defined logic.
 
-This repository provides a minimal executable reference implementation in Python demonstrating three independent providers and a non-authoritative association component.
+Execution authority remains exclusively within each provider boundary.
 
-The architectural constraints are language-agnostic.
+This repository provides a minimal executable Python reference demonstrating:
+
+- Multiple independent providers
+- Provider-controlled execution initiation
+- Provider-generated boundary signals
+- A non-authoritative association component
+
+The architecture is language-agnostic.
 
 ---
 
 ## Design Goals
 
-The framework is designed to:
-
-- Preserve exclusive authorization authority within each provider-controlled system
-- Enable independent execution initiation across multiple providers
-- Prevent migration of authorization logic into intermediaries or association layers
-- Allow distributed lifecycle confirmation without centralized control
-- Maintain structural separation between evaluation, execution, and boundary association
+- Preserve exclusive authorization authority within each provider
+- Allow independent execution initiation across multiple providers
+- Prevent migration of authorization logic into intermediaries
+- Enable distributed lifecycle confirmation without centralized control
+- Maintain strict separation between execution and boundary association
 
 ---
 
 ## Non-Goals
 
-The framework does not:
+This framework does not:
 
 - Centralize authorization evaluation
 - Share execution state between providers
-- Require cross-provider policy synchronization
+- Synchronize provider policies
 - Introduce shared signing keys
-- Interpret execution semantics within association components
-- Enforce identity propagation across providers
+- Interpret execution semantics within the association layer
 - Replace provider security controls
 - Protect against denial-of-service conditions
 
-The framework constrains authority boundaries. It does not standardize provider logic.
+The framework constrains authority boundaries.
+It does not standardize provider logic.
 
 ---
 
@@ -47,25 +54,22 @@ The framework constrains authority boundaries. It does not standardize provider 
 
 ### Execution Flow
 
-Requester → NUVL → Provider A  
-                     → Provider B  
-                     → Provider C  
+Requester → Stateless Intermediary → Provider A
+                                     → Provider B
+                                     → Provider C
 
-Provider A → Association  
-Provider B → Association  
-Provider C → Association  
+Provider A → Association
+Provider B → Association
+Provider C → Association
 
-1. A requester submits an opaque operation request to NUVL.
-2. NUVL derives a non-reversible request representation.
-3. NUVL applies a deterministic provider-defined binding transform.
-4. NUVL constructs a verification artifact.
-5. NUVL forwards the artifact to multiple provider-controlled systems.
-6. NUVL disengages and returns a constant HTTP 204 response.
-7. Each provider independently evaluates the artifact.
-8. Each provider determines whether to initiate execution.
-9. Upon initiation, each provider generates execution boundary signals.
-10. Boundary signals are emitted to a non-authoritative association component.
-11. Association links boundary values without interpreting execution semantics.
+1. A requester submits an operation request.
+2. The intermediary forwards artifacts to multiple providers.
+3. The intermediary disengages (no execution authority retained).
+4. Each provider independently evaluates the artifact.
+5. Each provider determines whether to initiate execution.
+6. Upon initiation, the provider generates execution boundary signals.
+7. Boundary signals are emitted to a non-authoritative association component.
+8. The association component links boundary signals without interpreting semantics.
 
 Authorization decisions are not shared between providers.
 
@@ -73,12 +77,11 @@ Authorization decisions are not shared between providers.
 
 ## Authority Boundaries
 
-### NUVL
+### Stateless Intermediary
 
-- Holds no signing keys
-- Maintains no authorization policy
+- Forwards artifacts
+- Retains no authorization state
 - Executes no decision logic
-- Retains no cross-request state
 - Does not initiate operations
 - Does not evaluate execution outcomes
 
@@ -86,20 +89,18 @@ Authorization decisions are not shared between providers.
 
 Each provider:
 
-- Defines binding semantics
-- Holds its own signing material (if any)
-- Evaluates verification artifacts independently
-- Determines whether to initiate operations
-- Generates execution boundary representations
+- Evaluates artifacts independently
+- Determines whether to initiate execution
+- Generates execution boundary signals
 - Maintains exclusive authority over its execution lifecycle
 
-Compromise of one provider does not confer authority over another provider.
+Compromise of one provider does not confer authority over another.
 
 ### Association Component
 
-- Receives boundary representations
-- Records boundary values
-- Computes deterministic linkage values
+- Receives boundary signals
+- Records boundary presence
+- Computes deterministic linkage
 - Confirms distributed completion based on boundary presence
 
 The association component:
@@ -107,33 +108,33 @@ The association component:
 - Does not authorize
 - Does not evaluate policy
 - Does not interpret execution logic
-- Does not modify provider decisions
+- Does not override provider decisions
 
 ---
 
 ## Execution Boundary Model
 
-Upon authorization and initiation of execution, each provider generates:
+Upon authorization and initiation, each provider generates:
 
-- A START boundary representation
-- A COMPLETE boundary representation
+- A START boundary signal
+- A COMPLETE boundary signal
 
-Boundary values are:
+Boundary signals are:
 
 - Provider-generated
 - Provider-controlled
-- Cryptographically derivable (in this reference)
 - Opaque outside the provider boundary
 
-Distributed confirmation is derived from boundary presence and deterministic linkage, not centralized authorization.
+Distributed confirmation derives from boundary presence and deterministic linkage,
+not centralized authorization.
 
 ---
 
-## Stateless Intermediary Operation
+## Stateless Operation
 
-NUVL processes each request independently.
+The intermediary processes each request independently.
 
-No shared execution state is maintained between providers.
+No shared execution state is maintained across providers.
 
 Association state records boundary presence but does not confer authority.
 
@@ -141,33 +142,32 @@ Association state records boundary presence but does not confer authority.
 
 ## Language-Agnostic Architecture
 
-The reference implementation is written in Python for portability and zero-dependency execution.
+The reference implementation is written in Python for portability.
 
-The architecture itself requires only:
+The architectural model requires only:
 
-- Receipt of opaque request bytes
-- Deterministic mechanical binding
 - Artifact forwarding to multiple providers
 - Independent provider evaluation
-- Provider-controlled boundary generation
+- Provider-controlled execution initiation
+- Provider-generated boundary signaling
 - Non-authoritative boundary association
 
-The design can be implemented in any programming language or execution environment.
+The design may be implemented in any programming language or environment.
 
 ---
 
 ## Running the Reference
 
-```bash
+Command:
 python3 MPBS.py
-```
---
+
+---
 
 ## Expected Behavior
 
 - The requester receives HTTP 204.
-- Each provider independently prints INITIATED when authorization conditions are satisfied.
-- Execution boundaries are generated inside each provider boundary.
+- Each provider independently initiates execution when conditions are satisfied.
+- Execution boundary signals are generated inside provider boundaries.
 - The association component confirms distributed completion based solely on boundary linkage.
 - No authorization decision is returned to the requester.
 - No provider receives authorization state from another provider.
@@ -185,192 +185,6 @@ Authorization authority is provider-scoped.
 - The association component cannot authorize or override provider decisions.
 
 The architecture enforces authority isolation rather than shared enforcement.
-
----
-
-# Provider-Controlled Artifact Exchange and Boundary Signaling 
-
-## Overview
-
-The Provider-Controlled Verification Artifact Exchange Framework defines a model for conveying verification artifacts associated with operation requests while preserving exclusive authorization authority within provider-controlled systems.
-
-Intermediaries participate solely in artifact conveyance.  
-They do not interpret verification semantics, enforce authorization policy, or determine execution outcomes.
-
-Authorization is realized exclusively through provider-side initiation of execution.
-
-This repository provides a minimal executable reference implementation in Python.
-
-The architectural constraints are language-agnostic.
-
----
-
-## Design Goals
-
-The framework is designed to:
-
-- Preserve exclusive authorization authority within provider-controlled systems
-- Prevent migration of verification semantics into intermediaries
-- Allow verification artifacts to traverse heterogeneous infrastructure
-- Enable explicit execution boundary signaling under provider control
-- Separate artifact conveyance from authorization determination
-
----
-
-## Non-Goals
-
-The framework does not:
-
-- Centralize authorization logic
-- Require intermediaries to evaluate verification artifacts
-- Share provider-internal policy logic
-- Enforce identity propagation
-- Require shared policy frameworks
-- Replace provider security controls
-- Protect against denial-of-service conditions
-
-The framework constrains authority boundaries. It does not prescribe provider policy implementation.
-
----
-
-## Architectural Model
-
-### Execution Flow
-
-Requester → Intermediary → Provider-Controlled System
-
-1. A requester generates an operation request.
-2. One or more verification artifacts are associated with the request.
-3. An intermediary conveys the request and artifact.
-4. The intermediary does not interpret or evaluate the artifact.
-5. The provider-controlled system receives the artifact.
-6. The provider evaluates the artifact using provider-selected logic.
-7. If authorized, the provider initiates execution.
-8. The provider generates execution boundary signals.
-
-Authorization is realized by provider-side initiation of execution.  
-Absence of initiation constitutes non-authorization.
-
----
-
-## Authority Boundaries
-
-### Intermediary
-
-- Conveys verification artifacts
-- Does not evaluate authorization semantics
-- Does not initiate operations
-- Does not enforce policy
-- Does not generate execution boundaries
-
-The intermediary may generate transport-level correlation handles.  
-Such handles are non-authoritative.
-
-### Provider-Controlled System
-
-- Defines verification artifact structure
-- Evaluates artifacts using provider-selected logic
-- Determines whether to initiate execution
-- Generates execution boundary signals
-- Retains exclusive control over execution lifecycle
-
-Authorization authority does not migrate outside the provider boundary.
-
----
-
-## Verification Artifact Model
-
-Verification artifacts may include:
-
-- Request-derived elements
-- Provider-controlled elements
-- Deterministic binding transforms
-- Cryptographic material
-- Opaque tokens
-
-Artifact structure is provider-defined.
-
-Intermediaries treat artifacts as opaque data.
-
----
-
-## Execution Boundary Signaling
-
-Upon authorization and initiation, the provider-controlled system may generate:
-
-- An initiation boundary signal
-- One or more intermediate boundary signals
-- A completion boundary signal
-
-Boundary signals are:
-
-- Generated under provider control
-- Cryptographically or logically associated with the operation
-- Independent of intermediary interpretation
-- Opaque outside the provider boundary
-
-Boundary signaling enables lifecycle representation without externalizing authorization logic.
-
----
-
-## Stateless Conveyance
-
-Intermediaries may be stateless or stateful at the transport layer.
-
-They do not:
-
-- Maintain authorization state
-- Interpret artifact semantics
-- Modify provider evaluation logic
-
-Authorization decisions remain exclusively provider-controlled.
-
----
-
-## Language-Agnostic Architecture
-
-The reference implementation is written in Python for portability.
-
-The architectural model requires only:
-
-- Association of an operation request with one or more verification artifacts
-- Conveyance through an intermediary
-- Provider-side evaluation
-- Provider-side execution initiation
-- Provider-controlled boundary generation
-
-The framework can be implemented in any programming language or deployment environment.
-
----
-
-## Running the Reference
-
-```bash
-python3 AEBS.py
-```
---
-
-## Expected Behavior
-
-- The requester receives HTTP 204.
-- The intermediary does not emit authorization outcomes.
-- The provider independently evaluates the verification artifact.
-- Execution occurs only if the provider initiates execution.
-- Execution boundary signals are generated only within the provider boundary.
-
----
-
-## Security Model
-
-Authorization authority is provider-scoped.
-
-- Intermediaries do not hold signing material.
-- Intermediaries do not evaluate verification semantics.
-- Authorization is realized exclusively by provider-side initiation.
-- Execution boundary signals are provider-generated.
-- Absence of provider initiation constitutes non-authorization.
-
-The architecture enforces structural separation between artifact conveyance and authorization control.
 
 ---
 
