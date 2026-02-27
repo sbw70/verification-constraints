@@ -184,7 +184,10 @@ The architecture enforces structural separation between artifact conveyance and 
 
 ---
 
-## License
+## Licensing
 
-Proprietary. All rights reserved.
-Commercial licensing available.
+This module is not released under the Apache 2.0 license applied to the repository root.
+
+Commercial licensing terms apply.
+
+Non-commercial research evaluation may be available upon request.
