@@ -26,7 +26,7 @@ import urllib.request
 from typing import Dict, Any, List, Tuple
 
 # ============================================================
-# CONFIG (benchmark-grade defaults; Replit-friendly)
+# CONFIG (benchmark-grade defaults)
 # ============================================================
 
 TOTAL_REQUESTS = int(os.getenv("TOTAL_REQUESTS", "100"))
