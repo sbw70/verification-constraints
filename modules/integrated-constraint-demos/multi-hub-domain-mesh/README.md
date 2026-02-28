@@ -162,7 +162,7 @@ Provider outcomes are separate observability signals.
 
 Run:
 
-    python3 <file-name>.py
+    python3 multi-hub-domain-mesh.py
 
 Default ports:
 
