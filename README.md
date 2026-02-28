@@ -136,7 +136,7 @@ They collectively define a constraint-oriented verification architecture for dis
 
 The neutral core implementation (`nuvl-core/`) and explicitly designated files are released under the Apache License 2.0.
 
-Modules located under `/modules/` may be subject to separate proprietary licensing terms as indicated in the /modules-licenses-notice/ folder.
+Modules located under `/modules/` may be subject to separate proprietary licensing terms as indicated in the /module-license-notice/ folder.
 
 Commercial licensing inquiries may be directed to the repository owner.
 
