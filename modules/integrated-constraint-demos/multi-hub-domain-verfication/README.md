@@ -1,4 +1,4 @@
-# Demo — Multi-Hub / Multi-Domain Mesh  
+# Demo — Multi-Hub / Multi-Domain Verification  
 ## Mechanical Routing • Provider-Controlled Initiation • Hub-Relayed Outcome Signals
 
 ---
