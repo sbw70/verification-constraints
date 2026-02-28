@@ -133,4 +133,9 @@ The structural separation between artifact conveyance and authorization control 
 
 ## License
 
-Each demo is licensed as specified within its directory.
+
+These integrated modules are not released under the Apache 2.0 license applied to the repository root.
+
+Commercial licensing terms apply.
+
+Non-commercial research evaluation may be available upon request.
