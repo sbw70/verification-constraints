@@ -219,7 +219,7 @@ Environment variables:
 - `WORKER_COUNT`
 - `POST_QUEUE_MAX`
 
-Defaults are benchmark-friendly and Replit-safe.
+Defaults are benchmark-friendly.
 
 ---
 
