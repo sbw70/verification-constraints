@@ -1,29 +1,59 @@
-# Demo- Multi-Provider Initiation  
+# Demo — Multi-Provider Initiation  
 ## Multi-Provider • Adaptive Thresholds • Deterministic Byzantine • 2-of-3 Quorum
 
 ---
 
 ## Overview
 
-This integration demo composes the NUVL core with:
+This demo composes the NUVL core with a multi-provider execution mesh and an external quorum auditor.
 
-- Three independent provider-controlled execution boundaries  
-- Provider-side adaptive decision logic (domain-scoped thresholds)  
-- Deterministic Byzantine behavior (one provider flips outcomes after a configured threshold)  
-- A non-authoritative quorum auditor (2-of-3 rule)  
-- Transport-level chaos (drop + delay) at the intermediary layer  
+The system includes:
+
+- One stateless NUVL intermediary
+- Three independent provider-controlled execution boundaries
+- Provider-side adaptive threshold evaluation
+- Deterministic Byzantine behavior (one provider flips after a configured threshold)
+- A non-authoritative 2-of-3 quorum auditor
+- Optional transport-level chaos at the intermediary
 
 NUVL remains strictly mechanical:
 
-- Derives a non-reversible request representation (SHA-256 in this reference)
+- Derives a non-reversible request representation
 - Computes deterministic binding
 - Constructs verification artifacts
-- Fans out artifacts to multiple providers
-- Returns constant HTTP 204 and disengages
+- Fans out artifacts to providers
+- Returns constant HTTP 204
 
-NUVL does not evaluate provider policy, interpret execution state, or aggregate quorum.
+NUVL does not interpret execution state, evaluate policy, or aggregate quorum.
 
-All initiation authority remains inside provider boundaries.
+Execution authority remains exclusively inside provider boundaries.
+
+---
+
+## Design Goals
+
+This demo is designed to:
+
+- Demonstrate distributed provider-side authority
+- Demonstrate adaptive provider evaluation independent of the intermediary
+- Demonstrate deterministic Byzantine behavior without collapsing authority
+- Demonstrate quorum aggregation without centralizing execution control
+- Demonstrate intermediary fail-closed transport behavior
+- Provide measurable stress characteristics under mixed request conditions
+
+---
+
+## Non-Goals
+
+This demo does not:
+
+- Provide production-grade persistence or retries
+- Provide secure transport (TLS)
+- Provide centralized authorization
+- Provide cross-provider consensus enforcement
+- Make NUVL or the auditor authoritative decision engines
+
+This demo demonstrates authority separation, not enterprise deployment hardening.
 
 ---
 
@@ -31,19 +61,22 @@ All initiation authority remains inside provider boundaries.
 
 ### NUVL (Stateless Intermediary)
 
+NUVL:
+
 - Accepts opaque request bytes
-- Derives request representation
-- Applies deterministic binding transform
+- Computes request representation
+- Applies deterministic binding
 - Constructs artifact
 - Fans out to all providers
-- Returns constant HTTP 204
+- Returns constant 204 and disengages
 
 NUVL does not:
 
-- Inspect provider outcomes
-- Validate quorum
-- Store execution state
 - Hold provider secrets
+- Inspect provider scores
+- Validate provider signatures
+- Evaluate quorum
+- Store execution state
 
 ---
 
@@ -51,68 +84,67 @@ NUVL does not:
 
 Each provider independently:
 
-- Verifies binding integrity
+- Validates mechanical binding
 - Computes provider-controlled adaptive score
 - Applies domain-specific threshold table
-- Determines initiated = True or False
-- Signs boundary signals internally
+- Determines `initiated = True | False`
+- Optionally generates provider-boundary signatures
 - Reports outcome to auditor
 
-One designated provider flips its initiation signal deterministically after a configured request count.
+One configured provider flips its initiation bit deterministically after a threshold to simulate Byzantine behavior.
 
-Execution authority never leaves the provider boundary.
+Execution authority never leaves provider boundaries.
 
 ---
 
-### Auditor (Non-Authoritative)
+### Auditor (Observational Quorum)
 
 The auditor:
 
-- Receives provider outcome messages
-- Aggregates 2-of-3 quorum on provider_initiated
-- Tracks statistics per domain
+- Receives provider outcome signals
+- Aggregates 2-of-3 quorum on `provider_initiated`
+- Tracks per-domain statistics
 - Does not initiate execution
 - Does not inform NUVL
-- Does not override providers
+- Does not override provider authority
 
 Quorum is observational, not authoritative.
 
 ---
 
+## Evaluation Model
+
+Provider decision logic combines:
+
+- Binding integrity validation
+- Provider-only adaptive scoring
+- Domain-scoped threshold tables
+
+Domains influence provider policy but remain opaque to NUVL.
+
+The intermediary remains blind to provider evaluation semantics.
+
+---
+
 ## Failure & Adversarial Controls
 
-### Transport-Level (NUVL)
+### Intermediary (Transport Layer)
 
-- Probabilistic forward drop (providers never see artifact)
-- Probabilistic forward delay (jitter)
-- Bounded forward queue to prevent thread explosion
+- Probabilistic forward drop
+- Probabilistic forward delay
+- Bounded forward queue
 
-NUVL still returns constant 204 in all cases.
+NUVL always returns constant HTTP 204.
 
 ---
 
-### Provider-Side
+### Provider Layer
 
-- Domain threshold tables control acceptance rates
-- Provider-only HMAC seeds shape adaptive scoring
-- Deterministic Byzantine provider flips decision after threshold
+- Adaptive scoring per provider
+- Domain threshold configuration
+- Deterministic Byzantine provider flip
 
 This tests quorum resilience without centralizing authority.
-
----
-
-## Domain-Scoped Policy
-
-Requests carry an X-Domain header:
-
-- payments
-- identity
-- storage
-- compute
-
-Providers apply domain-specific thresholds independently.
-
-NUVL treats domain as opaque.
 
 ---
 
@@ -122,13 +154,13 @@ Run:
 
     python3 multi-provider-initiation.py
 
-Default ports:
+Default services:
 
-- NUVL: 127.0.0.1:8080  
-- Auditor: 127.0.0.1:7070  
-- Provider A: 127.0.0.1:9090  
-- Provider B: 127.0.0.1:9091  
-- Provider C: 127.0.0.1:9092  
+- NUVL: 127.0.0.1:8080
+- Auditor: 127.0.0.1:7070
+- Provider A: 127.0.0.1:9090
+- Provider B: 127.0.0.1:9091
+- Provider C: 127.0.0.1:9092
 
 ---
 
@@ -136,29 +168,42 @@ Default ports:
 
 Requester:
 
-- TOTAL_REQUESTS  
-- CONCURRENCY  
-- PROGRESS_EVERY  
-- RANDOM_SEED  
+- TOTAL_REQUESTS
+- CONCURRENCY
+- RANDOM_SEED
 
-NUVL Chaos:
+Intermediary Chaos:
 
-- P_DROP_FORWARD  
-- P_DELAY_FORWARD  
-- DELAY_MS_RANGE  
+- P_DROP_FORWARD
+- P_DELAY_FORWARD
+- DELAY_MS_RANGE
 
 Provider Adversarial:
 
-- BYZANTINE_PROVIDER_ID  
-- BYZANTINE_AT  
+- BYZANTINE_PROVIDER_ID
+- BYZANTINE_AT
 
 Auditor:
 
-- QUORUM_K  
+- QUORUM_K
 
 Provider Policy:
 
-- DOMAIN_THRESHOLDS  
+- DOMAIN_THRESHOLDS
+
+---
+
+## Output
+
+The demo prints:
+
+- Requester transport timing
+- Provider initiation counts
+- Binding failure counts
+- Quorum successes and failures
+- Per-domain aggregation statistics
+
+All outputs are observational and do not affect execution authority.
 
 ---
 
@@ -166,11 +211,12 @@ Provider Policy:
 
 Across all execution paths:
 
-- NUVL holds no provider keys.
-- NUVL does not validate provider signatures.
+- NUVL holds no provider secrets.
+- NUVL does not evaluate provider logic.
 - Providers do not consult each other.
 - Auditor does not initiate execution.
-- Transport chaos does not alter authority boundaries.
+- Byzantine behavior does not migrate authority.
+- Quorum does not centralize execution.
 - Execution authority remains exclusively scoped to provider-controlled systems.
 
 ---
@@ -179,6 +225,6 @@ Across all execution paths:
 
 This demo incorporates Apache-2.0 licensed components derived from the NUVL core.
 
-Except for Apache-2.0 licensed NUVL core components, all orchestration, failover, quorum, adversarial, and integration logic contained in this file is proprietary.
+Except for Apache-2.0 licensed NUVL core components, all orchestration, quorum logic, adversarial simulation, adaptive evaluation, and integration code contained in this file is proprietary.
 
 Commercial deployment, redistribution, or integration of proprietary portions requires a separate written license agreement.
