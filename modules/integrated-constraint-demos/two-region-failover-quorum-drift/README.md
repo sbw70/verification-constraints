@@ -170,7 +170,7 @@ This tests quorum robustness without collapsing authority into aggregation layer
 
 Run:
 
-    python3 multi-hub-domain-audit.py
+    python3 two-region-failover-quorum-drift.py
 
 Default ports:
 
