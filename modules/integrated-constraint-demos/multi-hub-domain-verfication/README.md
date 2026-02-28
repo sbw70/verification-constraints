@@ -124,7 +124,7 @@ Provider outcomes are separate observability signals.
 
 Run:
 
-    python3 multi-hub-domain-mesh.py
+    python3 multi-hub-domain-verification.py
 
 Replit-friendly controls via environment variables:
 
