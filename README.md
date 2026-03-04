@@ -1,5 +1,30 @@
 # Provider-Controlled Verification Constraint Architectures
 
+## Abstract
+
+Authorization authority migrates. In distributed systems, intermediaries,
+coordination layers, ledgers, and analytics systems accumulate interpretive
+power through proximity to execution — not by design, but by default.
+Existing authentication protocols authenticate; they do not constrain where
+authorization logic resides.
+
+This repository defines structural constraint architectures that formally
+prevent authority migration. The core invariant: no external system may
+independently derive, elevate, amplify, or substitute for execution authority
+scoped to a provider-controlled boundary. Observation does not confer
+authorization. Representation is not verification.
+
+The reference implementation — NUVL (Neutral Unified Verification Layer) —
+is a stateless intermediary that is structurally incapable of authorization.
+It holds no signing material, evaluates no policy, and cannot relay provider
+decisions. Compromise of the intermediary does not confer authorization
+capability.
+
+Eight constraint modules address distinct authority-migration vectors across
+distributed, hardware-constrained, ledger-connected, and air-gapped
+environments. All modules are implementation-agnostic and designed for
+independent citation and application.
+
 ## Overview
 
 This repository defines architectural constraint frameworks for distributed computing systems in which authorization, verification, and execution semantics remain exclusively scoped to provider-controlled execution environments.
