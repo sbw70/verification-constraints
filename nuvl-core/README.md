@@ -51,8 +51,8 @@ Requester → NUVL → Provider
 
 1. A requester submits an opaque operation request to NUVL.
 2. NUVL derives a non-reversible request representation (SHA-256 in this reference).
-3. NUVL applies a provider-defined binding transform.
-4. NUVL constructs a verification artifact.
+3. NUVL derives a request representation (SHA-256 in this reference).
+4. NUVL constructs a verification artifact containing provider-defined elements.
 5. NUVL forwards the artifact to a provider-controlled system.
 6. NUVL disengages and returns a constant HTTP 204 response.
 
