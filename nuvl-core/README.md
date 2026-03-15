@@ -49,12 +49,11 @@ NUVL constrains authority location. It does not replace provider security contro
 
 Requester → NUVL → Provider
 
-1. A requester submits an opaque operation request to NUVL.
-2. NUVL derives a non-reversible request representation (SHA-256 in this reference).
-3. NUVL derives a request representation (SHA-256 in this reference).
-4. NUVL constructs a verification artifact containing provider-defined elements.
-5. NUVL forwards the artifact to a provider-controlled system.
-6. NUVL disengages and returns a constant HTTP 204 response.
+1. Requester submits an opaque operation request to NUVL.
+2. NUVL derives a request representation (SHA-256 in this reference).
+3. NUVL constructs a verification artifact.
+4. NUVL forwards the artifact to a provider-controlled system.
+5. NUVL disengages and returns HTTP 204.
 
 The provider independently evaluates the artifact and determines whether to initiate an operation.
 
