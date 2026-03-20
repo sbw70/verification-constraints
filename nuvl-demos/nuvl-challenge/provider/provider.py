@@ -16,18 +16,19 @@ nonce_lock = threading.Lock()
 stats_lock = threading.Lock()
 
 _start_time = time.time()
-_run_started_iso = datetime.now(timezone.utc).isoformat()
+_run_started_iso = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 _process = psutil.Process(os.getpid())
-_process.cpu_percent(interval=None)  # prime cpu monitor
+_process.cpu_percent(interval=None)
 
 _total_response_ms = 0.0
 _stop_writer = threading.Event()
 
+LOOPBACK_ONLY = {"127.0.0.1", "::1"}
+
 stats = {
     "run_started": _run_started_iso,
     "last_updated": "",
-
     "total_attempts": 0,
     "initiated": 0,
     "denied": 0,
@@ -40,14 +41,17 @@ stats = {
         "expired": 0,
         "bad_signature": 0,
         "replay": 0,
+        "non_local_source": 0,
     },
-
     "avg_response_ms": 0.0,
     "requests_per_second": 0.0,
     "uptime_seconds": 0.0,
     "peak_cpu_pct": 0.0,
     "peak_ram_mb": 0.0,
 }
+
+def now_iso():
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 def update_system_stats_locked():
     global _total_response_ms
@@ -75,7 +79,7 @@ def update_system_stats_locked():
 def write_stats_snapshot():
     with stats_lock:
         update_system_stats_locked()
-        stats["last_updated"] = datetime.now(timezone.utc).isoformat()
+        stats["last_updated"] = now_iso()
         snapshot = json.dumps(stats, indent=2)
 
     with open("stats.json", "w", encoding="utf-8") as f:
@@ -100,7 +104,7 @@ def record_attempt(elapsed_ms, initiated=False, denial_reason=None):
             if denial_reason in stats["denied_breakdown"]:
                 stats["denied_breakdown"][denial_reason] += 1
             else:
-                stats["denied_breakdown"]["bad_json"] += 1  # fallback
+                stats["denied_breakdown"]["bad_json"] += 1
 
 def sign(r, c, n, e):
     msg = f"{r}|{c}|{n}|{e}".encode()
@@ -131,8 +135,18 @@ class Provider(BaseHTTPRequestHandler):
         self.send_response(status_code)
         self.end_headers()
 
+    def _reject_non_local(self, t0):
+        source_ip = self.client_address[0]
+        if source_ip not in LOOPBACK_ONLY:
+            self._finish_request(403, t0, initiated=False, denial_reason="non_local_source")
+            return True
+        return False
+
     def do_POST(self):
         t0 = time.time()
+
+        if self._reject_non_local(t0):
+            return
 
         if self.path != "/ingest":
             self._finish_request(404, t0, initiated=False, denial_reason="missing_fields")
