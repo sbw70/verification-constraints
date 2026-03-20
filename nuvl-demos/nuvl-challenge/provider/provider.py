@@ -1,5 +1,3 @@
-# provider.py (challenge version)
-
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import base64
 import hashlib
@@ -9,9 +7,8 @@ import time
 import threading
 import psutil
 import os
+from datetime import datetime, timezone
 
-# NOTE:
-# Secret is intentionally NOT exposed elsewhere in the demo.
 SECRET = b"provider-secret-key"
 
 used_nonces = {}
@@ -19,13 +16,18 @@ nonce_lock = threading.Lock()
 stats_lock = threading.Lock()
 
 _start_time = time.time()
+_run_started_iso = datetime.now(timezone.utc).isoformat()
+
 _process = psutil.Process(os.getpid())
-_process.cpu_percent(interval=None)
+_process.cpu_percent(interval=None)  # prime cpu monitor
 
 _total_response_ms = 0.0
 _stop_writer = threading.Event()
 
 stats = {
+    "run_started": _run_started_iso,
+    "last_updated": "",
+
     "total_attempts": 0,
     "initiated": 0,
     "denied": 0,
@@ -39,11 +41,12 @@ stats = {
         "bad_signature": 0,
         "replay": 0,
     },
-    "peak_cpu_pct": 0.0,
-    "peak_ram_mb": 0.0,
+
     "avg_response_ms": 0.0,
     "requests_per_second": 0.0,
     "uptime_seconds": 0.0,
+    "peak_cpu_pct": 0.0,
+    "peak_ram_mb": 0.0,
 }
 
 def update_system_stats_locked():
@@ -57,7 +60,7 @@ def update_system_stats_locked():
             stats["peak_cpu_pct"] = round(cpu, 2)
         if ram_mb > stats["peak_ram_mb"]:
             stats["peak_ram_mb"] = round(ram_mb, 2)
-    except:
+    except Exception:
         pass
 
     uptime = time.time() - _start_time
@@ -72,9 +75,10 @@ def update_system_stats_locked():
 def write_stats_snapshot():
     with stats_lock:
         update_system_stats_locked()
+        stats["last_updated"] = datetime.now(timezone.utc).isoformat()
         snapshot = json.dumps(stats, indent=2)
 
-    with open("stats.json", "w") as f:
+    with open("stats.json", "w", encoding="utf-8") as f:
         f.write(snapshot)
 
 def stats_writer():
@@ -95,9 +99,10 @@ def record_attempt(elapsed_ms, initiated=False, denial_reason=None):
             stats["denied"] += 1
             if denial_reason in stats["denied_breakdown"]:
                 stats["denied_breakdown"][denial_reason] += 1
+            else:
+                stats["denied_breakdown"]["bad_json"] += 1  # fallback
 
 def sign(r, c, n, e):
-    # verification only
     msg = f"{r}|{c}|{n}|{e}".encode()
     return hmac.new(SECRET, msg, hashlib.sha256).hexdigest()
 
@@ -111,31 +116,35 @@ def decode_token(token):
     e = obj["e"]
     s = obj["s"]
 
+    if not all(isinstance(x, str) for x in (rr, cc, n, e, s)):
+        raise ValueError("bad token fields")
+
     return rr, cc, n, e, s
 
 class Provider(BaseHTTPRequestHandler):
     def log_message(self, *args):
-        return
+        pass
 
-    def _finish(self, code, t0, initiated=False, reason=None):
+    def _finish_request(self, status_code, t0, initiated=False, denial_reason=None):
         elapsed_ms = (time.time() - t0) * 1000.0
-        record_attempt(elapsed_ms, initiated, reason)
-        self.send_response(code)
+        record_attempt(elapsed_ms, initiated=initiated, denial_reason=denial_reason)
+        self.send_response(status_code)
         self.end_headers()
 
     def do_POST(self):
         t0 = time.time()
 
         if self.path != "/ingest":
-            self._finish(404, t0, False, "missing_fields")
+            self._finish_request(404, t0, initiated=False, denial_reason="missing_fields")
             return
 
+        size = int(self.headers.get("Content-Length", 0))
+
         try:
-            size = int(self.headers.get("Content-Length", 0))
             raw = self.rfile.read(size)
             data = json.loads(raw)
-        except:
-            self._finish(400, t0, False, "bad_json")
+        except Exception:
+            self._finish_request(400, t0, initiated=False, denial_reason="bad_json")
             return
 
         r = data.get("request_repr")
@@ -143,41 +152,56 @@ class Provider(BaseHTTPRequestHandler):
         token = data.get("provider_token")
 
         if not all(isinstance(x, str) and x for x in (r, c, token)):
-            self._finish(403, t0, False, "missing_fields")
+            self._finish_request(403, t0, initiated=False, denial_reason="missing_fields")
             return
 
         try:
             rr, cc, n, e, s = decode_token(token)
+        except Exception:
+            self._finish_request(403, t0, initiated=False, denial_reason="malformed_token")
+            return
+
+        try:
             exp = int(e)
-        except:
-            self._finish(403, t0, False, "malformed_token")
+        except Exception:
+            self._finish_request(403, t0, initiated=False, denial_reason="bad_expiry")
             return
 
         now = int(time.time())
 
         if rr != r or cc != c:
-            self._finish(403, t0, False, "mismatch")
+            self._finish_request(403, t0, initiated=False, denial_reason="mismatch")
             return
 
         if now > exp:
-            self._finish(403, t0, False, "expired")
+            self._finish_request(403, t0, initiated=False, denial_reason="expired")
             return
 
         if s != sign(rr, cc, n, e):
-            self._finish(403, t0, False, "bad_signature")
+            self._finish_request(403, t0, initiated=False, denial_reason="bad_signature")
             return
 
         with nonce_lock:
+            expired_nonces = [k for k, v in used_nonces.items() if int(v) <= now]
+            for k in expired_nonces:
+                del used_nonces[k]
+
             if n in used_nonces:
-                self._finish(403, t0, False, "replay")
+                self._finish_request(403, t0, initiated=False, denial_reason="replay")
                 return
+
             used_nonces[n] = e
 
-        self._finish(200, t0, True)
+        self._finish_request(200, t0, initiated=True)
 
-# background stats writer
-threading.Thread(target=stats_writer, daemon=True).start()
+writer_thread = threading.Thread(target=stats_writer, daemon=True)
+writer_thread.start()
 
 print("Provider listening on 127.0.0.1:9090")
+write_stats_snapshot()
 
-ThreadingHTTPServer(("127.0.0.1", 9090), Provider).serve_forever()
+try:
+    ThreadingHTTPServer(("127.0.0.1", 9090), Provider).serve_forever()
+finally:
+    _stop_writer.set()
+    write_stats_snapshot()
