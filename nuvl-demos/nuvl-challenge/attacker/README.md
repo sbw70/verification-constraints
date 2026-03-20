@@ -117,7 +117,7 @@ Across 15+ million requests using all strategies above:
 - peak_ram_mb: 26.75  
 - avg_response_ms: 0.103  
 - requests_per_second: 161.58  
-- uptime_seconds: 79731.3  
+- uptime_seconds: 79731.3 (22+ hrs)
 
 The provider boundary held under all attempted strategies.
 
