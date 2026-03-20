@@ -108,11 +108,27 @@ This tool exists to:
 
 ---
 
+## Results
+
+Across 15+ million requests using all strategies above:
+
+- unauthorized initiations: 0  
+- peak_cpu_pct (local machine): 43.6  
+- peak_ram_mb: 26.75  
+- avg_response_ms: 0.103  
+- requests_per_second: 161.58  
+- uptime_seconds: 79731.3  
+
+The provider boundary held under all attempted strategies.
+
+---
+
 ## Notes
 
 - This is not a proof-of-concept exploit  
 - It does not contain the provider signing key  
 - All requests still pass through NUVL  
-- Successful bypass requires causing the provider to print:
+
+Successful bypass requires causing the provider to print:
 
 `INITIATED`
