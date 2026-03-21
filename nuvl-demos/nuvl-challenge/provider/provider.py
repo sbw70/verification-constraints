@@ -9,7 +9,10 @@ import psutil
 import os
 from datetime import datetime, timezone
 
-SECRET = b"provider-secret-key"
+_secret_str = os.environ.get("PROVIDER_SECRET")
+if not _secret_str:
+    raise RuntimeError("PROVIDER_SECRET env var not set")
+SECRET = _secret_str.encode()
 
 used_nonces = {}
 nonce_lock = threading.Lock()
