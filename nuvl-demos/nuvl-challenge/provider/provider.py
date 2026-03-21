@@ -113,11 +113,6 @@ def sign(r, c, n, e):
     msg = f"{r}|{c}|{n}|{e}".encode()
     return hmac.new(SECRET, msg, hashlib.sha256).hexdigest()
 
-def make_token(r, c, n, e):
-    s = sign(r, c, n, e)
-    payload = json.dumps({"r": r, "c": c, "n": n, "e": e, "s": s}).encode()
-    return base64.urlsafe_b64encode(payload).decode()
-
 def decode_token(token):
     raw = base64.urlsafe_b64decode(token.encode())
     obj = json.loads(raw.decode())
@@ -154,30 +149,6 @@ class Provider(BaseHTTPRequestHandler):
         t0 = time.time()
 
         if self._reject_non_local(t0):
-            return
-
-        if self.path == "/sign":
-            size = int(self.headers.get("Content-Length", 0))
-            try:
-                data = json.loads(self.rfile.read(size))
-                r = data["request_repr"]
-                c = data["context"]
-                n = data["nonce"]
-                e = data["expiry"]
-                if not all(isinstance(x, str) and x for x in (r, c, n, e)):
-                    raise ValueError("bad fields")
-                int(e)
-            except Exception:
-                self.send_response(400)
-                self.end_headers()
-                return
-            token = make_token(r, c, n, e)
-            body = json.dumps({"token": token}).encode()
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json")
-            self.send_header("Content-Length", str(len(body)))
-            self.end_headers()
-            self.wfile.write(body)
             return
 
         if self.path != "/ingest":
@@ -238,7 +209,6 @@ class Provider(BaseHTTPRequestHandler):
 
             used_nonces[n] = e
 
-        print(f"INITIATED r={r[:16]}... ctx={c}")
         self._finish_request(200, t0, initiated=True)
 
 writer_thread = threading.Thread(target=stats_writer, daemon=True)
