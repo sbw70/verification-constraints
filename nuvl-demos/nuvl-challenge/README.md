@@ -104,8 +104,7 @@ Good luck.
 ## Live endpoints
 
 Endpoint: `http://134.209.221.94:8080/`  
-Stats: `http://134.209.221.94:8000/stats`
-
+Stats: `http://134.209.221.94:8080/dashboard.html`
 ---
 
 Explore the rest of the repository for the full architecture and additional demos.
