@@ -1,102 +1,53 @@
-import requests
-import threading
-import time
-import random
-import string
-import json
 import base64
 import hashlib
-import hmac
-from collections import deque
+import json
+import random
+import string
+import threading
+import time
 
-NUVL = "http://127.0.0.1:8080/nuvl"
-TIMEOUT = 3
-token_pool = deque(maxlen=1000)
-stats = {"sent": 0, "errors": 0, "pool": 0}
+import requests
+
+NUVL = "https://challenge.xer0trust.com/nuvl"
+TIMEOUT = 5
+
+stats = {
+    "sent": 0,
+    "errors": 0,
+}
+
 lock = threading.Lock()
 
-def rand_str(n=16):
-    return ''.join(random.choices(string.ascii_letters + string.digits, k=n))
+
+def rand_str(n=12):
+    return "".join(random.choices(string.ascii_lowercase + string.digits, k=n))
+
 
 def rand_hex(n=64):
-    return ''.join(random.choices('0123456789abcdef', k=n))
+    return "".join(random.choices("0123456789abcdef", k=n))
 
-def rand_b64():
-    return base64.urlsafe_b64encode(bytes(random.getrandbits(8) for _ in range(48))).decode().rstrip('=')
 
 def rand_ctx():
     pool = [
-        "CTX_ALPHA","CTX_BETA","CTX_GAMMA","CTX_PROD","CTX_DEV",
-        "CTX_ADMIN","CTX_USER","CTX_1","CTX_0","CTX_A","CTX_B",
-        "ALPHA","BETA","DEFAULT","ADMIN","ROOT","PROD","DEV","TEST",
-        "ctx_alpha","ctx_beta","auth","verify","provider","user",
-        rand_str(6), rand_str(10), rand_str(4),
+        "ctx_demo",
+        "ctx_alpha",
+        "ctx_beta",
+        "ctx_gamma",
+        "ctx_prod",
+        "ctx_dev",
+        "ctx_user",
+        "ctx_api",
+        "ctx_edge",
+        "ctx_" + rand_str(6),
     ]
     return random.choice(pool)
 
-def rand_nonce():
-    return random.randint(100000, 999999999)
 
 def now():
     return int(time.time())
 
-def rand_expiry(expired=False):
-    return now() - random.randint(60, 7200) if expired else now() + random.randint(60, 7200)
 
-def guess_sig(r, c, n, e):
-    # smart attacker tries plausible signing approaches
-    attempts = [
-        lambda: hashlib.sha256(f"{r}|{c}|{n}|{e}".encode()).hexdigest(),
-        lambda: hashlib.sha256(f"{c}|{r}|{n}|{e}".encode()).hexdigest(),
-        lambda: hashlib.sha256(f"{r}{c}{n}{e}".encode()).hexdigest(),
-        lambda: hashlib.md5(f"{r}|{c}|{n}|{e}".encode()).hexdigest(),
-        lambda: hmac.new(c.encode(), f"{r}|{n}|{e}".encode(), hashlib.sha256).hexdigest(),
-        lambda: hmac.new(b"secret", f"{r}|{c}|{n}|{e}".encode(), hashlib.sha256).hexdigest(),
-        lambda: hmac.new(b"provider", f"{r}|{c}|{n}|{e}".encode(), hashlib.sha256).hexdigest(),
-        lambda: hmac.new(b"nuvl", f"{r}|{c}|{n}|{e}".encode(), hashlib.sha256).hexdigest(),
-        lambda: hmac.new(b"NUVL_BIND_V1", f"{r}|{c}|{n}|{e}".encode(), hashlib.sha256).hexdigest(),
-        lambda: hmac.new(r.encode()[:32], f"{c}|{n}|{e}".encode(), hashlib.sha256).hexdigest(),
-        lambda: rand_hex(64),
-    ]
-    return random.choice(attempts)()
-
-def make_token(ctx, expired=False, missing=None, wrong_types=False, bad_r=False):
-    r = rand_hex(64) if not bad_r else rand_str(64)
-    c = ctx
-    n = rand_nonce()
-    e = rand_expiry(expired=expired)
-    s = guess_sig(r, c, n, e)
-    payload = {"r": r, "c": c, "n": n, "e": e, "s": s}
-    if wrong_types:
-        field = random.choice(["r", "c", "n", "e", "s"])
-        payload[field] = random.choice([None, 0, [], {}, True, "", -1, 3.14])
-    if missing:
-        for f in missing:
-            payload.pop(f, None)
-    raw = json.dumps(payload).encode()
-    return base64.urlsafe_b64encode(raw).decode()
-
-def store(ctx, token):
-    with lock:
-        token_pool.append((ctx, token))
-        stats["pool"] = len(token_pool)
-
-def send(ctx, token, body):
-    headers = {
-        "Content-Type": "application/octet-stream",
-        "X-Verification-Context": ctx,
-        "X-Provider-Token": token,
-    }
-    try:
-        requests.post(NUVL, data=body, headers=headers, timeout=TIMEOUT)
-        with lock:
-            stats["sent"] += 1
-        store(ctx, token)
-    except Exception:
-        with lock:
-            stats["errors"] += 1
-
-def std_body():
+def body_bytes():
     templates = [
         {"op": "transfer", "amount": random.randint(1, 9999), "to": "acct_" + rand_str(8)},
         {"op": "auth", "user": rand_str(8), "pass": rand_str(12)},
@@ -104,153 +55,171 @@ def std_body():
         {"action": "initiate", "token": rand_str(32)},
         {"cmd": "run", "args": [rand_str(4), rand_str(4)]},
     ]
-    return json.dumps(random.choice(templates)).encode()
+    return json.dumps(random.choice(templates), separators=(",", ":")).encode("utf-8")
 
-def attack_valid_shape():
+
+def sha256_hex(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def wrong_sig():
+    attempts = [
+        rand_hex(64),
+        hashlib.sha256(rand_str(32).encode()).hexdigest(),
+        hashlib.md5(rand_str(32).encode()).hexdigest(),
+        "0" * 64,
+        "f" * 64,
+    ]
+    return random.choice(attempts)
+
+
+def token_b64(obj) -> str:
+    raw = json.dumps(obj, separators=(",", ":")).encode("utf-8")
+    return base64.urlsafe_b64encode(raw).decode("utf-8")
+
+
+def send(headers, body):
+    try:
+        requests.post(NUVL, data=body, headers=headers, timeout=TIMEOUT)
+        with lock:
+            stats["sent"] += 1
+    except Exception:
+        with lock:
+            stats["errors"] += 1
+
+
+def send_with_token(ctx, token, body, include_ctx=True, include_token=True):
+    headers = {
+        "Content-Type": "application/json",
+    }
+    if include_ctx:
+        headers["X-Verification-Context"] = ctx
+    if include_token:
+        headers["X-Provider-Token"] = token
+    send(headers, body)
+
+
+def attack_bad_signature():
     while True:
+        body = body_bytes()
         ctx = rand_ctx()
-        token = make_token(ctx)
-        send(ctx, token, std_body())
-        time.sleep(random.uniform(0.005, 0.02))
+        r = sha256_hex(body)
+        n = rand_str(16)
+        e = str(now() + random.randint(60, 600))
+
+        token = token_b64({
+            "r": r,
+            "c": ctx,
+            "n": n,
+            "e": e,
+            "s": wrong_sig(),
+        })
+
+        send_with_token(ctx, token, body)
+        time.sleep(random.uniform(0.01, 0.03))
+
 
 def attack_expired():
     while True:
+        body = body_bytes()
         ctx = rand_ctx()
-        token = make_token(ctx, expired=True)
-        send(ctx, token, std_body())
-        time.sleep(random.uniform(0.05, 0.15))
+        r = sha256_hex(body)
+        n = rand_str(16)
+        e = str(now() - random.randint(60, 7200))
+
+        token = token_b64({
+            "r": r,
+            "c": ctx,
+            "n": n,
+            "e": e,
+            "s": wrong_sig(),
+        })
+
+        send_with_token(ctx, token, body)
+        time.sleep(random.uniform(0.04, 0.12))
+
+
+def attack_bad_expiry():
+    while True:
+        body = body_bytes()
+        ctx = rand_ctx()
+        r = sha256_hex(body)
+        n = rand_str(16)
+        e = random.choice(["soon", "never", "3.14", "NaN", "abc123"])
+
+        token = token_b64({
+            "r": r,
+            "c": ctx,
+            "n": n,
+            "e": e,
+            "s": wrong_sig(),
+        })
+
+        send_with_token(ctx, token, body)
+        time.sleep(random.uniform(0.04, 0.12))
+
+
+def attack_mismatch():
+    while True:
+        body = body_bytes()
+        ctx = rand_ctx()
+
+        bad_r = rand_hex(64)
+        while bad_r == sha256_hex(body):
+            bad_r = rand_hex(64)
+
+        n = rand_str(16)
+        e = str(now() + random.randint(60, 600))
+
+        token = token_b64({
+            "r": bad_r,
+            "c": ctx,
+            "n": n,
+            "e": e,
+            "s": wrong_sig(),
+        })
+
+        send_with_token(ctx, token, body)
+        time.sleep(random.uniform(0.04, 0.12))
+
 
 def attack_missing_fields():
-    combos = [
-        ["s"], ["r"], ["c"], ["n"], ["e"],
-        ["r", "s"], ["c", "s"], ["n", "e"],
-        ["r", "c", "n"], ["e", "s"], ["s", "n", "e"],
-    ]
     while True:
+        body = body_bytes()
         ctx = rand_ctx()
-        token = make_token(ctx, missing=random.choice(combos))
-        send(ctx, token, std_body())
+
+        mode = random.choice(["missing_ctx", "missing_token", "both"])
+        if mode == "missing_ctx":
+            send_with_token(ctx, "x", body, include_ctx=False, include_token=True)
+        elif mode == "missing_token":
+            send_with_token(ctx, "x", body, include_ctx=True, include_token=False)
+        else:
+            send_with_token(ctx, "x", body, include_ctx=False, include_token=False)
+
         time.sleep(random.uniform(0.05, 0.15))
 
-def attack_wrong_types():
-    while True:
-        ctx = rand_ctx()
-        token = make_token(ctx, wrong_types=True)
-        send(ctx, token, std_body())
-        time.sleep(random.uniform(0.05, 0.15))
 
-def attack_ctx_swap():
-    while True:
-        if token_pool:
-            orig_ctx, token = random.choice(list(token_pool))
-            new_ctx = rand_ctx()
-            send(new_ctx, token, std_body())
-        time.sleep(random.uniform(0.02, 0.08))
-
-def attack_replay():
-    while True:
-        if token_pool:
-            ctx, token = random.choice(list(token_pool))
-            send(ctx, token, std_body())
-        time.sleep(random.uniform(0.01, 0.05))
-
-def attack_body_mutation():
-    mutations = [
-        b'{"op":"transfer","amount":}',
-        b'{"op":null}',
-        b'{}{}',
-        b'null',
-        b'[]',
-        b'',
-        b'\x00' * 64,
-        b'{"op":"transfer","amount":100,"to":"acct_123"}' + b'\x00' * 10,
-        b'true',
-        b'<xml><op>transfer</op></xml>',
-        b'op=transfer&amount=100&to=acct_123',
-    ]
-    while True:
-        if token_pool:
-            ctx, token = random.choice(list(token_pool))
-            send(ctx, token, random.choice(mutations))
-        time.sleep(random.uniform(0.02, 0.08))
-
-def attack_malformed_base64():
-    bad = [
+def attack_malformed():
+    bad_tokens = [
         "!!!notbase64!!!",
-        "eyJ==",
+        "eyJ9",
         "not.valid.base64",
-        base64.urlsafe_b64encode(b"not json").decode(),
-        base64.urlsafe_b64encode(b"{}").decode(),
-        base64.urlsafe_b64encode(b"[]").decode(),
-        base64.urlsafe_b64encode(b"null").decode(),
+        base64.urlsafe_b64encode(b"{}").decode("utf-8"),
+        base64.urlsafe_b64encode(b"[]").decode("utf-8"),
+        base64.urlsafe_b64encode(b"null").decode("utf-8"),
         rand_hex(32),
         rand_str(48),
         "",
-        "Bearer " + rand_str(32),
         "." * 30,
-        rand_b64(),
-        base64.urlsafe_b64encode(json.dumps({"x": rand_str()}).encode()).decode(),
     ]
+
     while True:
+        body = body_bytes()
         ctx = rand_ctx()
-        token = random.choice(bad)
-        send(ctx, token, std_body())
+        token = random.choice(bad_tokens)
+        send_with_token(ctx, token, body)
         time.sleep(random.uniform(0.05, 0.15))
 
-def attack_oversized():
-    while True:
-        ctx = rand_ctx()
-        token = make_token(ctx)
-        size = random.choice([65537, 131072, 262144, 512000])
-        body = ('X' * size).encode()
-        send(ctx, token, body)
-        time.sleep(random.uniform(1.0, 4.0))
-
-def attack_burst():
-    while True:
-        ctx = rand_ctx()
-        token = make_token(ctx)
-        body = std_body()
-        threads = []
-        count = random.randint(15, 40)
-        for _ in range(count):
-            t = threading.Thread(target=send, args=(ctx, token, body), daemon=True)
-            threads.append(t)
-        for t in threads:
-            t.start()
-        for t in threads:
-            t.join()
-        time.sleep(random.uniform(3.0, 8.0))
-
-def attack_sig_guessing():
-    # dedicated thread trying every known signing pattern systematically
-    patterns = [
-        lambda r,c,n,e: hashlib.sha256(f"{r}|{c}|{n}|{e}".encode()).hexdigest(),
-        lambda r,c,n,e: hashlib.sha256(f"{c}|{r}|{n}|{e}".encode()).hexdigest(),
-        lambda r,c,n,e: hashlib.sha256(f"{r}|{c}|{e}|{n}".encode()).hexdigest(),
-        lambda r,c,n,e: hashlib.sha256(f"{n}|{r}|{c}|{e}".encode()).hexdigest(),
-        lambda r,c,n,e: hmac.new(b"secret", f"{r}|{c}|{n}|{e}".encode(), hashlib.sha256).hexdigest(),
-        lambda r,c,n,e: hmac.new(b"provider", f"{r}|{c}|{n}|{e}".encode(), hashlib.sha256).hexdigest(),
-        lambda r,c,n,e: hmac.new(b"nuvl", f"{r}|{c}|{n}|{e}".encode(), hashlib.sha256).hexdigest(),
-        lambda r,c,n,e: hmac.new(b"NUVL_BIND_V1", f"{r}|{c}|{n}|{e}".encode(), hashlib.sha256).hexdigest(),
-        lambda r,c,n,e: hmac.new(b"PROVIDER_ONLY_KEY_CHANGE_ME", f"{r}|{c}|{n}|{e}".encode(), hashlib.sha256).hexdigest(),
-        lambda r,c,n,e: hmac.new(b"CHANGE_ME", f"{r}|{c}|{n}|{e}".encode(), hashlib.sha256).hexdigest(),
-        lambda r,c,n,e: hmac.new(c.encode(), f"{r}|{n}|{e}".encode(), hashlib.sha256).hexdigest(),
-        lambda r,c,n,e: hmac.new(r.encode()[:32], f"{c}|{n}|{e}".encode(), hashlib.sha256).hexdigest(),
-        lambda r,c,n,e: hashlib.sha256((r+c+str(n)+str(e)).encode()).hexdigest(),
-        lambda r,c,n,e: hashlib.sha256(json.dumps({"r":r,"c":c,"n":n,"e":e}).encode()).hexdigest(),
-    ]
-    while True:
-        ctx = rand_ctx()
-        r = rand_hex(64)
-        n = rand_nonce()
-        e = rand_expiry()
-        for fn in patterns:
-            s = fn(r, ctx, n, e)
-            payload = {"r": r, "c": ctx, "n": n, "e": e, "s": s}
-            token = base64.urlsafe_b64encode(json.dumps(payload).encode()).decode()
-            send(ctx, token, std_body())
-            time.sleep(random.uniform(0.01, 0.03))
 
 def status_printer():
     while True:
@@ -258,25 +227,20 @@ def status_printer():
         with lock:
             s = stats["sent"]
             e = stats["errors"]
-            p = stats["pool"]
-        print(f"[{time.strftime('%H:%M:%S')}] sent={s} errors={e} pool={p}")
+        print(f"[{time.strftime('%H:%M:%S')}] sent={s} errors={e}")
+
 
 if __name__ == "__main__":
     print(f"[{time.strftime('%H:%M:%S')}] attacker started — target {NUVL}")
     print("Ctrl+C to stop\n")
 
     workers = [
-        threading.Thread(target=attack_valid_shape, daemon=True),
+        threading.Thread(target=attack_bad_signature, daemon=True),
         threading.Thread(target=attack_expired, daemon=True),
+        threading.Thread(target=attack_bad_expiry, daemon=True),
+        threading.Thread(target=attack_mismatch, daemon=True),
         threading.Thread(target=attack_missing_fields, daemon=True),
-        threading.Thread(target=attack_wrong_types, daemon=True),
-        threading.Thread(target=attack_ctx_swap, daemon=True),
-        threading.Thread(target=attack_replay, daemon=True),
-        threading.Thread(target=attack_body_mutation, daemon=True),
-        threading.Thread(target=attack_malformed_base64, daemon=True),
-        threading.Thread(target=attack_oversized, daemon=True),
-        threading.Thread(target=attack_burst, daemon=True),
-        threading.Thread(target=attack_sig_guessing, daemon=True),
+        threading.Thread(target=attack_malformed, daemon=True),
         threading.Thread(target=status_printer, daemon=True),
     ]
 
