@@ -1,6 +1,6 @@
 # NUVL Challenge
 
-This is a live demonstration of a provider-isolated verification boundary.
+This is a live demonstration of a provider-isolated verification boundary. $100 bounty.
 
 ## What you're looking at
 
@@ -101,10 +101,8 @@ Good luck.
 
 ---
 
-## Live endpoints
+## Live endpoint
 
-Endpoint: `http://134.209.221.94:8080/`  
-Stats: `http://134.209.221.94:8080/dashboard.html`
----
+Endpoint: `https://challenge.xer0trust.com
 
 Explore the rest of the repository for the full architecture and additional demos.
