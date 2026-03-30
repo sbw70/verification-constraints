@@ -103,6 +103,6 @@ Good luck.
 
 ## Live endpoint
 
-Endpoint: `https://challenge.xer0trust.com
+Endpoint: https://challenge.xer0trust.com
 
 Explore the rest of the repository for the full architecture and additional demos.
