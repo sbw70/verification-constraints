@@ -19,11 +19,11 @@ is a stateless intermediary that is structurally incapable of authorization.
 It holds no signing material, evaluates no policy, and cannot relay provider
 decisions. Compromise of the intermediary does not confer authorization
 capability.
-
+k
 Eight constraint modules address distinct authority-migration vectors across
 distributed, hardware-constrained, ledger-connected, and air-gapped
 environments. All modules are implementation-agnostic and designed for
-independent citation and application.
+independent application.
 
 ## Overview
 
