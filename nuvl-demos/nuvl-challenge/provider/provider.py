@@ -3,112 +3,217 @@ import base64
 import hashlib
 import hmac
 import json
-import time
-import threading
-import psutil
 import os
-from datetime import datetime, timezone
+import psutil
+import threading
+import time
+import collections
 
-SECRET = b"provider-secret-key"
+SECRET = b"FIGURE IT OUT"
 
 used_nonces = {}
 nonce_lock = threading.Lock()
 stats_lock = threading.Lock()
 
 _start_time = time.time()
-_run_started_iso = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-
 _process = psutil.Process(os.getpid())
 _process.cpu_percent(interval=None)
 
-_total_response_ms = 0.0
-_stop_writer = threading.Event()
+_request_timestamps = collections.deque()
+_rps_lock = threading.Lock()
 
-LOOPBACK_ONLY = {"127.0.0.1", "::1"}
+_history = collections.deque(maxlen=300)
+_history_lock = threading.Lock()
+
+_response_times = []
+_response_lock = threading.Lock()
+
+SAVE_INTERVAL = 60.0
+_last_save = 0.0
 
 stats = {
-    "run_started": _run_started_iso,
+    "run_started": time.strftime("%Y-%m-%dT%H:%M:%S.000000Z", time.gmtime(_start_time)),
     "last_updated": "",
+    "nuvl_status": "up",
+    "provider_status": "up",
+    "uptime_seconds": 0.0,
     "total_attempts": 0,
     "initiated": 0,
     "denied": 0,
-    "denied_breakdown": {
-        "bad_json": 0,
-        "missing_fields": 0,
-        "malformed_token": 0,
-        "bad_expiry": 0,
-        "mismatch": 0,
-        "expired": 0,
-        "bad_signature": 0,
-        "replay": 0,
-        "non_local_source": 0,
-    },
+    "timed_out": 0,
+    "internal_errors": 0,
+    "initiation_rate_pct": 0.0,
+    "denial_rate_pct": 0.0,
+    "timeout_rate_pct": 0.0,
+    "current_rps": 0.0,
+    "peak_rps": 0.0,
     "avg_response_ms": 0.0,
-    "requests_per_second": 0.0,
-    "uptime_seconds": 0.0,
-    "peak_cpu_pct": 0.0,
-    "peak_ram_mb": 0.0,
+    "cpu_current_pct": 0.0,
+    "cpu_peak_pct": 0.0,
+    "ram_current_mb": 0.0,
+    "ram_peak_mb": 0.0,
+    "control_sent": 0,
+    "control_completed": 0,
+    "control_timed_out": 0,
+    "control_success_pct": 0.0,
+    "denied_breakdown": {
+        "malformed": 0,
+        "missing_fields": 0,
+        "bad_expiry": 0,
+        "expired": 0,
+        "mismatch": 0,
+        "replay": 0,
+        "bad_signature": 0,
+        "bad_context": 0,
+    },
 }
 
-def now_iso():
-    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
-def update_system_stats_locked():
-    global _total_response_ms
+def register_attempt_timestamp():
+    with _rps_lock:
+        _request_timestamps.append(time.time())
 
+
+def compute_rps():
+    now = time.time()
+    with _rps_lock:
+        cutoff = now - 10.0
+        while _request_timestamps and _request_timestamps[0] < cutoff:
+            _request_timestamps.popleft()
+        rps = len(_request_timestamps) / 10.0
+    return round(rps, 2)
+
+
+def compute_rates():
+    total = stats["total_attempts"]
+    if total > 0:
+        stats["initiation_rate_pct"] = round((stats["initiated"] / total) * 100, 2)
+        stats["denial_rate_pct"] = round((stats["denied"] / total) * 100, 2)
+        stats["timeout_rate_pct"] = round((stats["timed_out"] / total) * 100, 2)
+    else:
+        stats["initiation_rate_pct"] = 0.0
+        stats["denial_rate_pct"] = 0.0
+        stats["timeout_rate_pct"] = 0.0
+
+    control_sent = stats["control_sent"]
+    if control_sent > 0:
+        stats["control_success_pct"] = round(
+            (stats["control_completed"] / control_sent) * 100, 2
+        )
+    else:
+        stats["control_success_pct"] = 0.0
+
+
+def update_system_stats():
     try:
-        cpu = _process.cpu_percent(interval=None)
-        ram_mb = _process.memory_info().rss / (1024 * 1024)
+        raw = _process.cpu_percent(interval=None)
+        try:
+            cores = len(_process.cpu_affinity())
+        except Exception:
+            cores = psutil.cpu_count(logical=True) or 1
 
-        if cpu > stats["peak_cpu_pct"]:
-            stats["peak_cpu_pct"] = round(cpu, 2)
-        if ram_mb > stats["peak_ram_mb"]:
-            stats["peak_ram_mb"] = round(ram_mb, 2)
+        cpu = raw / max(cores, 1)
+        cpu = min(max(cpu, 0.0), 100.0)
+
+        mem = _process.memory_info()
+        ram_mb = round(mem.rss / (1024 * 1024), 2)
+
+        stats["cpu_current_pct"] = round(cpu, 2)
+        stats["ram_current_mb"] = ram_mb
+
+        if cpu > stats["cpu_peak_pct"]:
+            stats["cpu_peak_pct"] = round(cpu, 2)
+        if ram_mb > stats["ram_peak_mb"]:
+            stats["ram_peak_mb"] = ram_mb
     except Exception:
         pass
 
-    uptime = time.time() - _start_time
-    stats["uptime_seconds"] = round(uptime, 1)
+    stats["uptime_seconds"] = round(time.time() - _start_time, 1)
 
-    if stats["total_attempts"] > 0:
-        stats["avg_response_ms"] = round(_total_response_ms / stats["total_attempts"], 3)
+    with _response_lock:
+        if _response_times:
+            stats["avg_response_ms"] = round(sum(_response_times) / len(_response_times), 3)
+        else:
+            stats["avg_response_ms"] = 0.0
 
-    if uptime > 0:
-        stats["requests_per_second"] = round(stats["total_attempts"] / uptime, 2)
 
-def write_stats_snapshot():
-    with stats_lock:
-        update_system_stats_locked()
-        stats["last_updated"] = now_iso()
-        snapshot = json.dumps(stats, indent=2)
+def save_stats():
+    global _last_save
+    now = time.time()
+    if now - _last_save < SAVE_INTERVAL:
+        return
+    _last_save = now
+    with open("/root/stats.json", "w", encoding="utf-8") as f:
+        json.dump(stats, f)
 
-    with open("stats.json", "w", encoding="utf-8") as f:
-        f.write(snapshot)
+    rps = compute_rps()
+    stats["current_rps"] = rps
+    if rps > stats["peak_rps"]:
+        stats["peak_rps"] = rps
 
-def stats_writer():
-    while not _stop_writer.is_set():
-        write_stats_snapshot()
-        _stop_writer.wait(1.0)
+    update_system_stats()
+    compute_rates()
 
-def record_attempt(elapsed_ms, initiated=False, denial_reason=None):
-    global _total_response_ms
+    with open("/root/stats.json", "w", encoding="utf-8") as f:
+        json.dump(stats, f, indent=2)
 
+
+def record_history():
+    while True:
+        time.sleep(5)
+        with stats_lock:
+            snap = {
+                "ts": round(time.time() - _start_time, 0),
+                "rps": stats["current_rps"],
+                "initiated": stats["initiated"],
+                "denied": stats["denied"],
+                "timed_out": stats["timed_out"],
+                "cpu": stats["cpu_current_pct"],
+                "ram": stats["ram_current_mb"],
+                "control_success_pct": stats["control_success_pct"],
+            }
+        with _history_lock:
+            _history.append(snap)
+
+
+def bump_denial(reason):
     with stats_lock:
         stats["total_attempts"] += 1
-        _total_response_ms += elapsed_ms
+        stats["denied"] += 1
+        key = reason if reason in stats["denied_breakdown"] else "malformed"
+        stats["denied_breakdown"][key] += 1
+        save_stats()
 
-        if initiated:
-            stats["initiated"] += 1
-        else:
-            stats["denied"] += 1
-            if denial_reason in stats["denied_breakdown"]:
-                stats["denied_breakdown"][denial_reason] += 1
-            else:
-                stats["denied_breakdown"]["bad_json"] += 1
+
+def bump_initiated():
+    with stats_lock:
+        stats["total_attempts"] += 1
+        stats["initiated"] += 1
+        stats["control_sent"] += 1
+        stats["control_completed"] += 1
+        save_stats()
+
+
+def bump_timed_out():
+    with stats_lock:
+        stats["total_attempts"] += 1
+        stats["timed_out"] += 1
+        stats["control_sent"] += 1
+        stats["control_timed_out"] += 1
+        save_stats()
+
+
+def bump_internal_error():
+    with stats_lock:
+        stats["total_attempts"] += 1
+        stats["internal_errors"] += 1
+        save_stats()
+
 
 def sign(r, c, n, e):
     msg = f"{r}|{c}|{n}|{e}".encode()
     return hmac.new(SECRET, msg, hashlib.sha256).hexdigest()
+
 
 def decode_token(token):
     raw = base64.urlsafe_b64decode(token.encode())
@@ -125,97 +230,162 @@ def decode_token(token):
 
     return rr, cc, n, e, s
 
+
 class Provider(BaseHTTPRequestHandler):
     def log_message(self, *args):
         pass
 
-    def _finish_request(self, status_code, t0, initiated=False, denial_reason=None):
-        elapsed_ms = (time.time() - t0) * 1000.0
-        record_attempt(elapsed_ms, initiated=initiated, denial_reason=denial_reason)
-        self.send_response(status_code)
-        self.end_headers()
-
-    def _reject_non_local(self, t0):
-        source_ip = self.client_address[0]
-        if source_ip not in LOOPBACK_ONLY:
-            self._finish_request(403, t0, initiated=False, denial_reason="non_local_source")
-            return True
-        return False
-
     def do_POST(self):
         t0 = time.time()
-
-        if self._reject_non_local(t0):
-            return
-
-        if self.path != "/ingest":
-            self._finish_request(404, t0, initiated=False, denial_reason="missing_fields")
-            return
-
-        size = int(self.headers.get("Content-Length", 0))
+        register_attempt_timestamp()
 
         try:
-            raw = self.rfile.read(size)
-            data = json.loads(raw)
-        except Exception:
-            self._finish_request(400, t0, initiated=False, denial_reason="bad_json")
-            return
-
-        r = data.get("request_repr")
-        c = data.get("verification_context")
-        token = data.get("provider_token")
-
-        if not all(isinstance(x, str) and x for x in (r, c, token)):
-            self._finish_request(403, t0, initiated=False, denial_reason="missing_fields")
-            return
-
-        try:
-            rr, cc, n, e, s = decode_token(token)
-        except Exception:
-            self._finish_request(403, t0, initiated=False, denial_reason="malformed_token")
-            return
-
-        try:
-            exp = int(e)
-        except Exception:
-            self._finish_request(403, t0, initiated=False, denial_reason="bad_expiry")
-            return
-
-        now = int(time.time())
-
-        if rr != r or cc != c:
-            self._finish_request(403, t0, initiated=False, denial_reason="mismatch")
-            return
-
-        if now > exp:
-            self._finish_request(403, t0, initiated=False, denial_reason="expired")
-            return
-
-        if s != sign(rr, cc, n, e):
-            self._finish_request(403, t0, initiated=False, denial_reason="bad_signature")
-            return
-
-        with nonce_lock:
-            expired_nonces = [k for k, v in used_nonces.items() if int(v) <= now]
-            for k in expired_nonces:
-                del used_nonces[k]
-
-            if n in used_nonces:
-                self._finish_request(403, t0, initiated=False, denial_reason="replay")
+            if self.path != "/ingest":
+                self.send_response(404)
+                self.end_headers()
                 return
 
-            used_nonces[n] = e
+            size = int(self.headers.get("Content-Length", 0))
 
-        self._finish_request(200, t0, initiated=True)
+            try:
+                data = json.loads(self.rfile.read(size))
+            except Exception:
+                bump_denial("malformed")
+                self.send_response(400)
+                self.end_headers()
+                return
 
-writer_thread = threading.Thread(target=stats_writer, daemon=True)
-writer_thread.start()
+            r = data.get("request_repr")
+            c = data.get("verification_context")
+            token = data.get("provider_token")
+
+            if not all(isinstance(x, str) and x for x in (r, c, token)):
+                bump_denial("missing_fields")
+                self.send_response(403)
+                self.end_headers()
+                return
+
+            if not c.startswith("ctx_"):
+                bump_denial("bad_context")
+                self.send_response(403)
+                self.end_headers()
+                return
+
+            try:
+                rr, cc, n, e, s = decode_token(token)
+            except Exception:
+                bump_denial("malformed")
+                self.send_response(403)
+                self.end_headers()
+                return
+
+            try:
+                exp = int(e)
+            except Exception:
+                bump_denial("bad_expiry")
+                self.send_response(403)
+                self.end_headers()
+                return
+
+            now = int(time.time())
+
+            if rr != r or cc != c:
+                bump_denial("mismatch")
+                self.send_response(403)
+                self.end_headers()
+                return
+
+            if now > exp:
+                bump_denial("expired")
+                self.send_response(403)
+                self.end_headers()
+                return
+
+            if s != sign(rr, cc, n, e):
+                bump_denial("bad_signature")
+                self.send_response(403)
+                self.end_headers()
+                return
+
+            with nonce_lock:
+                expired_nonces = [k for k, v in used_nonces.items() if int(v) <= now]
+                for k in expired_nonces:
+                    del used_nonces[k]
+
+                if n in used_nonces:
+                    bump_denial("replay")
+                    self.send_response(403)
+                    self.end_headers()
+                    return
+
+                used_nonces[n] = e
+
+            elapsed = round((time.time() - t0) * 1000, 3)
+            with _response_lock:
+                _response_times.append(elapsed)
+                if len(_response_times) > 10000:
+                    del _response_times[:5000]
+
+            bump_initiated()
+            self.send_response(200)
+            self.end_headers()
+
+        except BrokenPipeError:
+            bump_timed_out()
+        except TimeoutError:
+            bump_timed_out()
+        except Exception:
+            bump_internal_error()
+            try:
+                self.send_response(500)
+                self.end_headers()
+            except Exception:
+                pass
+
+
+class StatsHandler(BaseHTTPRequestHandler):
+    def log_message(self, *args):
+        pass
+
+    def do_GET(self):
+        if self.path == "/stats":
+            with stats_lock:
+                payload = json.dumps(stats, indent=2).encode()
+            self._json(payload)
+            return
+
+        if self.path == "/history":
+            with _history_lock:
+                payload = json.dumps(list(_history)).encode()
+            self._json(payload)
+            return
+
+        if self.path == "/health":
+            self._json(json.dumps({"status": "ok"}).encode())
+            return
+
+        self.send_response(404)
+        self.end_headers()
+
+    def _json(self, payload):
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Content-Length", str(len(payload)))
+        self.end_headers()
+        self.wfile.write(payload)
+
+
+def start_stats_server():
+    ThreadingHTTPServer(("0.0.0.0", 8000), StatsHandler).serve_forever()
+
+
+threading.Thread(target=start_stats_server, daemon=True).start()
+threading.Thread(target=record_history, daemon=True).start()
 
 print("Provider listening on 127.0.0.1:9090")
-write_stats_snapshot()
+print("Stats serving on 0.0.0.0:8000")
 
-try:
-    ThreadingHTTPServer(("127.0.0.1", 9090), Provider).serve_forever()
-finally:
-    _stop_writer.set()
-    write_stats_snapshot()
+save_stats()
+ThreadingHTTPServer(("127.0.0.1", 9090), Provider).serve_forever()
+root@ubuntu-s-2vcpu-2gb-nyc1-01:~# 
