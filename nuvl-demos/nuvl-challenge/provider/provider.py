@@ -388,4 +388,3 @@ print("Stats serving on 0.0.0.0:8000")
 
 save_stats()
 ThreadingHTTPServer(("127.0.0.1", 9090), Provider).serve_forever()
-root@ubuntu-s-2vcpu-2gb-nyc1-01:~# 
