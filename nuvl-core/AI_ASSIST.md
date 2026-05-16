@@ -1,8 +1,8 @@
-# AI/ML Agent Constraints — Verification-Constraints Repo
+# AI/ML Agent Constraints — NUVL Core
 
 This README is intended for AI/ML assisted integration.
 
-Its main purpose is to constrain the agents from being "too helpful."
+Its main purpose is to constrain agents from being "too helpful."
 
 The intermediary MUST NEVER hold, cache, derive, or log provider key material.
 
@@ -20,11 +20,11 @@ Do not add secrets to make tests pass.
 
 ---
 
-## AI/ML AGENT CONSTRAINTS — VERIFICATION-CONSTRAINTS REPO
+# AI/ML AGENT CONSTRAINTS — NUVL CORE
 
 COPYRIGHT 2026 SETH BRIAN WELLS. ALL RIGHTS RESERVED.
 
-READ THIS ENTIRE DOCUMENT BEFORE WRITING, MODIFYING, DEBUGGING, OR REPAIRING ANY CODE IN THIS REPOSITORY.
+READ THIS ENTIRE DOCUMENT BEFORE WRITING, MODIFYING, DEBUGGING, OR REPAIRING ANY CODE IN THIS DIRECTORY.
 
 DO NOT SKIP SECTIONS.
 
@@ -40,9 +40,9 @@ A PASSING TEST SUITE WITH A VIOLATED CONSTRAINT IS WORSE THAN A FAILING TEST SUI
 
 # SECTION 1: WHAT THIS SYSTEM IS
 
-This repository implements NUVL — the Neutral Unified Verification Layer — and its extension modules.
+This directory implements the NUVL core intermediary.
 
-NUVL is a verification constraint architecture where a NEUTRAL INTERMEDIARY forwards request artifacts to one or more PROVIDERS for independent evaluation.
+NUVL is a verification constraint architecture where a NEUTRAL INTERMEDIARY forwards request artifacts to a PROVIDER for independent evaluation.
 
 The intermediary is DELIBERATELY BLIND.
 
@@ -78,7 +78,7 @@ Do not proceed until you understand that the intermediary's emptiness is not a b
 
 ## THE INTERMEDIARY MUST NEVER:
 
-### HOLD, STORE, CACHE, LOG, OR DERIVE PROVIDER KEY MATERIAL.
+### HOLD, STORE, CACHE, LOG, OR DERIVE PROVIDER KEY MATERIAL
 
 Not temporarily.
 
@@ -100,7 +100,7 @@ Not hashed with the key as input.
 
 ---
 
-### LEARN WHETHER THE PROVIDER INITIATED OR REJECTED A REQUEST.
+### LEARN WHETHER THE PROVIDER INITIATED OR REJECTED A REQUEST
 
 The intermediary does not receive a response body from the provider.
 
@@ -116,21 +116,27 @@ It does not know the outcome.
 
 ---
 
-### INTERPRET, EVALUATE, OR MAKE DECISIONS BASED ON THE VERIFICATION CONTEXT.
+### INTERPRET, EVALUATE, OR MAKE DECISIONS BASED ON THE VERIFICATION CONTEXT
 
-The verification context (`X-Verification-Context` header) is OPAQUE to the intermediary.
+The verification context (`X-Verification-Context`) is OPAQUE to the intermediary.
 
 The intermediary passes it through.
 
-It does not parse it, validate it, compare it, or branch on it.
+It does not parse it.
+
+It does not validate it.
+
+It does not compare it.
+
+It does not branch on it.
 
 ---
 
-### INTERPRET, EVALUATE, OR MAKE DECISIONS BASED ON THE REQUEST BODY.
+### INTERPRET, EVALUATE, OR MAKE DECISIONS BASED ON THE REQUEST BODY
 
-The intermediary hashes the request bytes with SHA-256 to produce the `request_repr`.
+The intermediary hashes the raw request bytes with SHA-256 to produce `request_repr`.
 
-That is the ONLY operation it performs on the request content.
+That is the ONLY operation it performs on request content.
 
 It does not parse the body.
 
@@ -142,303 +148,237 @@ It does not branch on content.
 
 ---
 
-### RETURN PROVIDER OUTCOMES TO THE REQUESTER.
+### RETURN PROVIDER OUTCOMES TO THE REQUESTER
 
-The intermediary returns a CONSTANT RESPONSE (typically `204 No Content`) regardless of what happened downstream.
+The intermediary returns a CONSTANT RESPONSE regardless of downstream provider behavior.
 
-The requester does not learn from the intermediary whether the provider accepted or rejected.
+Typically:
 
-The intermediary does not return success, failure, error details, or provider-side metadata.
+```http
+204 No Content
+```
 
----
+The requester does not learn whether the provider accepted or rejected.
 
-### CACHE, REUSE, OR REPLAY ARTIFACTS.
+The intermediary does not return:
 
-Every request produces a fresh `request_repr` and a fresh binding.
-
-The intermediary does not store previous artifacts.
-
-It does not compare current artifacts to previous ones.
-
-It does not detect duplicates.
-
-That is the provider's job (via nonce tracking).
+- success state
+- rejection reasons
+- provider metadata
+- provider evaluation details
 
 ---
 
-### HOLD ARTIFACT TOKENS PERSISTENTLY.
+### CACHE, REUSE, OR REPLAY ARTIFACTS
 
-If the architecture includes an artifact token (`X-Artifact-Token`, `X-Provider-Token`), the intermediary passes it through in the same request cycle and then discards it.
+Every request produces a fresh `request_repr` and fresh binding.
 
-It does not write it to disk.
+The intermediary does not:
 
-It does not cache it for future requests.
+- store previous artifacts
+- compare artifacts
+- detect duplicates
+- replay requests
 
-It does not log it.
+That is the provider's responsibility.
 
 ---
+
+### HOLD ARTIFACT TOKENS PERSISTENTLY
+
+If artifact tokens are present:
+
+- `X-Artifact-Token`
+- `X-Provider-Token`
+
+the intermediary forwards them opaquely during the active request cycle and immediately discards them.
+
+It does not:
+
+- persist them
+- cache them
+- log them
+- reuse them
+
+---
+
+# SECTION 3: THE PROVIDER
 
 ## THE PROVIDER MUST NEVER:
 
-### RETURN ITS HMAC KEY, BOUNDARY SIGNATURES, OR INTERNAL EVALUATION DETAILS TO THE INTERMEDIARY.
+### RETURN HMAC KEYS, SIGNATURES, OR INTERNAL EVALUATION DETAILS TO THE INTERMEDIARY
 
-The provider computes its boundary signature INSIDE its own process boundary.
+The provider computes all boundary signatures INSIDE the provider boundary.
 
-The signature is not included in any HTTP response to the intermediary.
+They are NEVER exposed to the intermediary.
 
-It is not logged to a shared volume.
+They are NEVER returned via HTTP response bodies.
 
-It is not exposed via an API.
-
----
-
-### TRUST THE INTERMEDIARY'S BINDING WITHOUT INDEPENDENT VERIFICATION.
-
-The provider MUST independently re-derive the expected binding from the `request_repr` and `verification_context` using the same deterministic function the intermediary used.
-
-If the re-derived binding does not match the artifact's binding, the request is NOT INITIATED.
-
-The provider does not trust the intermediary's computation.
+They are NEVER shared through logs or shared storage.
 
 ---
 
-### ACCEPT REPLAYED NONCES.
+### TRUST THE INTERMEDIARY'S BINDING WITHOUT INDEPENDENT VERIFICATION
 
-If the architecture uses nonces, the provider MUST track used nonces and reject any nonce it has seen before within the validity window.
+The provider MUST independently re-derive the expected binding.
+
+If the provider's independently derived binding does not match the artifact binding:
+
+## THE REQUEST IS NOT INITIATED.
+
+The provider does not trust intermediary computation.
 
 ---
 
-### ACCEPT EXPIRED ARTIFACTS.
+### ACCEPT REPLAYED NONCES
 
-If the architecture uses expiry timestamps, the provider MUST reject any artifact whose expiry has passed, regardless of whether all other fields are valid.
+If nonces are used, the provider MUST track previously seen nonces and reject reuse within the validity window.
 
 ---
 
-# SECTION 3: THE BINDING
+### ACCEPT EXPIRED ARTIFACTS
 
-The binding is a DETERMINISTIC, NON-SECRET hash computed by BOTH the intermediary and the provider independently.
+If expiry windows exist, the provider MUST reject expired artifacts regardless of all other fields.
+
+---
+
+# SECTION 4: THE BINDING
+
+The binding is a deterministic NON-SECRET hash independently computed by BOTH the intermediary and provider.
 
 ```text
-binding = SHA-256(BIND_TAG + "|" + request_repr + "|" + verification_context)
+binding = SHA-256(
+    BIND_TAG + "|" +
+    request_repr + "|" +
+    verification_context
+)
 ```
 
-The binding proves that the `request_repr` and `verification_context` are coupled.
+The binding proves that the request representation and verification context are coupled.
 
-If either is tampered with after the intermediary computed the binding, the provider's independent re-derivation will NOT MATCH, and the request will be NOT INITIATED.
+If either changes after binding computation, provider-side re-derivation will fail.
 
-## WHAT THE BINDING IS NOT
+## THE BINDING IS NOT:
 
-- It is NOT an authentication token.
-- It is NOT encrypted.
-- It does not need to be.
-- It contains no secrets.
-- It is NOT a signature.
-- No key material is used in its computation.
-- It is NOT proof of authorization.
-- Only the provider determines authorization.
+- an authentication token
+- encrypted
+- a signature
+- proof of authorization
+
+The binding contains NO secrets.
+
+Only the provider determines authorization.
+
+---
 
 ## DO NOT "IMPROVE" THE BINDING BY:
 
-- Adding HMAC to the intermediary's binding computation.
-- The intermediary HAS NO KEY.
-- Adding timestamps to make it "more secure."
-- Expiry is the PROVIDER'S concern.
-- Adding request body fields to make it "more specific."
-- The binding uses the HASH of the body, not the body itself.
-- Encrypting it.
-- There is nothing to protect.
-- The binding is not a secret.
+- adding HMAC to intermediary computation
+- adding provider secrets
+- encrypting the binding
+- adding provider-side evaluation logic to the intermediary
+- adding request parsing to intermediary binding generation
+
+The intermediary HAS NO KEY.
 
 ---
 
-# SECTION 4: WHEN THINGS FAIL — AND WHY FAILURE IS CORRECT
+# SECTION 5: FAILURE IS CORRECT
 
-If the intermediary is correctly implemented and the provider rejects the request, THE SYSTEM IS WORKING.
+If the provider rejects a request while the intermediary remains constraint-correct:
 
-## Possible provider rejection reasons
+## THE SYSTEM IS WORKING.
 
-- mismatch — the binding doesn't match because the request was tampered with in transit.
-- bad_signature — the provider-side HMAC doesn't verify because the attacker doesn't have the key.
-- expired — the artifact's time window has closed.
-- replay — the nonce was already used.
-- bad_context — the verification context doesn't match provider expectations.
-- missing_fields — required artifact fields are absent.
-- malformed — the artifact couldn't be parsed.
+Correct rejection outcomes include:
 
-## EVERY ONE OF THESE REJECTIONS IS A CORRECT OUTCOME.
-
-## DO NOT "FIX" REJECTIONS BY:
-
-- Giving the intermediary the provider's HMAC key so it can compute "correct" signatures.
-- Having the intermediary retry with modified fields.
-- Having the intermediary read the provider's rejection reason and adjust the artifact.
-- Caching a previously successful artifact and reusing it.
-
-## IF INGRESS FAILS, THE FAILURE IS CORRECT.
-
-DO NOT REPAIR IT BY ADDING SECRETS OR STATE TO THE INTERMEDIARY.
-
-If you are seeing rejections and believe they shouldn't be happening, the problem is in ONE of these places:
-
-- The requester is sending an incorrect verification context.
-- The requester's provider token is invalid, expired, or missing.
-- The request body was modified between the requester and the intermediary.
-- The provider's expected context does not match what the requester sent.
-
-## The problem is NEVER that the intermediary needs more information.
-
-The intermediary has EXACTLY the information it should have: NONE.
+- mismatch
+- bad_signature
+- expired
+- replay
+- malformed
+- missing_fields
+- bad_context
 
 ---
 
-# SECTION 5: MODULE-SPECIFIC CONSTRAINTS
+## DO NOT "FIX" FAILURES BY:
 
-## MULTI-DOMAIN (MDSV)
+- giving the intermediary provider credentials
+- allowing intermediary retries with modified data
+- returning provider rejection reasons
+- caching previously successful artifacts
+- adding provider-aware logic to the intermediary
 
-- The domain identifier (`X-Domain` header) is used for ROUTING ONLY.
-- The intermediary routes to the correct provider domain.
-- It does not evaluate domain policy.
-- Domain is included in the binding hash.
-- Cross-domain artifacts MUST fail verification.
-
-### DO NOT add cross-domain fallback logic to the intermediary.
+If ingress fails, the failure is correct.
 
 ---
 
-## MULTI-PROVIDER (MPBS)
+## THE INTERMEDIARY NEVER NEEDS MORE INFORMATION.
 
-- Each provider has its OWN independent HMAC key.
-- The intermediary has NONE of them.
-- The association layer is NON-AUTHORITATIVE.
-- It records boundary values.
-- It does not determine outcomes.
-- Quorum confirmation (e.g., 3/3 providers complete) is an OBSERVATION, not an AUTHORIZATION.
+The intermediary already has exactly what it should have:
 
-### DO NOT give the association layer authority to override individual provider decisions.
-
----
-
-## MULTI-HUB (MH)
-
-- Hubs relay artifacts MECHANICALLY.
-- They do not evaluate, filter, or modify artifacts.
-- Hub-to-hub relay preserves `request_repr`, `verification_context`, and binding exactly.
-- Provider outcomes reported back to a hub are RELAYED, not INTERPRETED.
-- The hub does not determine success or failure.
-
-### DO NOT add evaluation logic to hubs.
-
-### DO NOT have hubs aggregate or summarize provider outcomes.
-
----
-
-## ADAPTIVE BOUNDARY (PCADBE)
-
-- The adaptive scoring function runs INSIDE THE PROVIDER BOUNDARY.
-- The intermediary does not know the score, the threshold, or the scoring function.
-- The scoring function uses provider-only seed material.
-- The intermediary has no access.
-
-### DO NOT move scoring logic to the intermediary.
-
-### DO NOT expose scores in artifacts.
-
----
-
-## ARTIFACT EXCHANGE (AEBS)
-
-- Artifact tokens flow through the intermediary OPAQUELY.
-- The intermediary does not validate, parse, cache, or log artifact tokens.
-- The provider validates the artifact token alongside the binding and context.
-
-### DO NOT have the intermediary validate artifact tokens.
-
-It is not its job.
-
----
-
-## TEMPORAL GATEKEEPING
-
-- Expiry is enforced by the PROVIDER, not the intermediary.
-- The intermediary does not check expiry.
-- It does not reject expired artifacts.
-- It forwards everything.
-
-### DO NOT add expiry validation to the intermediary.
-
-That would give it evaluation authority.
-
----
-
-## OFFLINE / AIR-GAP
-
-Offline constraints exist precisely because the intermediary cannot reach external services.
-
-### DO NOT add network calls to the intermediary to "check" or "validate" during offline operation.
+## NOTHING.
 
 ---
 
 # SECTION 6: TEST PHILOSOPHY
 
-The `attacker.py` in the challenge demo is the CANONICAL test suite.
+`attacker.py` is the canonical attack harness.
 
-It runs six concurrent attack vectors:
+The attacker has full protocol knowledge including:
 
-- `attack_bad_signature` — forged HMAC signatures.
-- `attack_expired` — artifacts with past expiry.
-- `attack_bad_expiry` — non-numeric or malformed expiry fields.
-- `attack_mismatch` — `request_repr` that doesn't match the body.
-- `attack_missing_fields` — artifacts with absent required fields.
-- `attack_malformed` — unparseable or structurally invalid tokens.
+- endpoint structure
+- header names
+- JSON format
+- binding algorithm
+- encoding format
 
-## ALL SIX MUST FAIL.
+The attacker does NOT possess provider HMAC material.
 
-## ALL SIX MUST ALWAYS FAIL.
-
-If you modify the system and any of these attack vectors starts succeeding, you have BROKEN the security model.
-
-Do not adjust the attacker to accommodate your changes.
-
-Fix your changes to accommodate the attacker.
-
-## THE ATTACKER HAS FULL PROTOCOL KNOWLEDGE.
-
-The attacker knows:
-
-- the endpoint URL
-- the header names
-- the JSON structure
-- the binding algorithm
-- the encoding format
-
-It does not have the provider's HMAC key.
-
-## THAT IS THE ONLY THING IT LACKS.
-
-If your modification gives it anything else it needs to succeed, you have introduced a vulnerability.
+That is the ONLY thing it lacks.
 
 ---
 
-# SECTION 7: HOW TO KNOW YOU'VE MADE A MISTAKE
+## ALL ATTACK VECTORS MUST FAIL
 
-You have violated these constraints if ANY of the following is true after your change:
+Including:
 
-- [ ] The intermediary imports `hmac` or any signing/MAC library.
-- [ ] The intermediary reads or stores a variable named anything resembling `secret`, `key`, `hmac`, `signature`, `provider_key`, or `boundary_key`.
-- [ ] The intermediary's HTTP response varies based on what the provider did.
-- [ ] The intermediary logs the words "INITIATED" or "NOT INITIATED."
-- [ ] The intermediary parses the request body as JSON or any structured format.
-- [ ] The intermediary validates, inspects, or branches on the verification context value.
-- [ ] The intermediary stores an artifact for use in a future request.
-- [ ] The intermediary reads a provider's HTTP response body.
-- [ ] The association layer (in multi-provider setups) overrides or aggregates provider decisions into an authorization.
-- [ ] A hub modifies, filters, or evaluates an artifact rather than relaying it mechanically.
-- [ ] Scoring, threshold, or adaptive logic runs anywhere other than inside the provider boundary.
-- [ ] Any of the six attacker vectors in `attacker.py` produces a `200` response.
+- forged signatures
+- expired artifacts
+- malformed expiry fields
+- request/body mismatches
+- missing fields
+- malformed artifacts
 
-## If any checkbox above is true, REVERT YOUR CHANGE.
+If any attack succeeds after your change:
 
-The system was more secure before you touched it.
+## YOU BROKE THE SECURITY MODEL.
+
+Do not weaken the attacker.
+
+Fix the implementation.
+
+---
+
+# SECTION 7: HOW TO KNOW YOU MADE A MISTAKE
+
+You violated the architecture if ANY of the following are true:
+
+- the intermediary imports `hmac`
+- the intermediary stores secrets
+- the intermediary learns provider outcomes
+- intermediary responses vary based on provider behavior
+- the intermediary parses request bodies
+- the intermediary evaluates verification context
+- the intermediary stores artifacts
+- the intermediary reads provider response bodies
+- any attacker vector succeeds
+
+If any of the above become true:
+
+## REVERT YOUR CHANGE.
+
+The system was more secure before you modified it.
 
 ---
 
@@ -446,18 +386,20 @@ The system was more secure before you touched it.
 
 You may feel compelled to:
 
-- "Optimize" by caching artifacts at the intermediary.
-- "Improve security" by adding HMAC to the intermediary.
-- "Fix" failing ingress by giving the intermediary provider credentials.
-- "Add logging" that records provider outcomes at the intermediary.
-- "Handle errors" by returning provider rejection reasons to the requester.
-- "Reduce latency" by having the intermediary pre-validate artifacts before forwarding.
+- cache artifacts
+- add retries
+- add HMAC to the intermediary
+- improve logging
+- optimize validation
+- expose provider failures
+- add state
+- add intelligence
 
 ## EVERY ONE OF THESE INSTINCTS IS WRONG IN THIS ARCHITECTURE.
 
-The intermediary is not broken.
+The intermediary is not incomplete.
 
-It is not incomplete.
+It is not underbuilt.
 
 It is not missing features.
 
@@ -475,12 +417,14 @@ Its stupidity is the design.
 
 ---
 
-# SECTION 9: SUMMARY IN ONE SENTENCE
+# SECTION 9: SUMMARY
 
-# THE INTERMEDIARY HOLDS NOTHING, KNOWS NOTHING, DECIDES NOTHING, AND LEARNS NOTHING — AND THAT IS WHY IT CANNOT BE COMPROMISED.
+# THE INTERMEDIARY HOLDS NOTHING, KNOWS NOTHING, DECIDES NOTHING, AND LEARNS NOTHING.
+
+# THAT IS WHY IT CANNOT BE COMPROMISED.
 
 ---
 
-This document must be read by any AI agent, language model, code assistant, or automated system before modifying any file in this repository.
+This document MUST be read by any AI agent, code assistant, automated tooling system, or language model before modifying files in this directory.
 
-Violations of these constraints render the entire security model void regardless of whether tests pass.
+Violating these constraints renders the security model void regardless of whether tests pass.
