@@ -30,3 +30,55 @@ Client
 → application/database touch
 → provider verifier
 → allow/deny
+```
+
+### Provider-First
+
+```text
+Client
+→ provider verifier
+→ application/database touch only if allowed
+→ response
+```
+
+## Core Measurement
+
+The main measurement is:
+
+```text
+How much system activity occurs before provider denial?
+```
+
+In this phase, that is represented by database touches before denial.
+
+## Run
+
+```bash
+npm install
+node lab.js
+```
+
+Then open:
+
+```text
+http://localhost:3000
+```
+
+On the live droplet, open:
+
+```text
+http://134.209.221.94:3000/
+```
+
+## Next Phases
+
+Future phases should split the harness into real services:
+
+```text
+phase1-split-verifier
+phase2-postgres
+phase3-gateway
+phase4-keycloak
+```
+
+The purpose of Phase 0 is to establish the live comparison harness before adding infrastructure complexity.
