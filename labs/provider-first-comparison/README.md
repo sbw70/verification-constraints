@@ -1,32 +1,20 @@
-# Phase 0 Live Harness
+# Provider-First vs Conventional Request Ordering
 
-This is a single-process live benchmark harness for comparing provider-first request ordering against conventional request ordering.
+This lab family compares conventional enterprise request ordering against provider-first / NUVL-style request ordering.
 
-It runs as one Node.js process and provides:
-- live dashboard
-- built-in background traffic
-- conventional path simulation
-- provider-first path simulation
-- latency metrics
-- provider timing metrics
-- denial behavior metrics
-- pre-denial database touch metrics
-- basic host/process resource metrics
+The core question is:
 
-## Important Scope
+> How much infrastructure activates before the provider can say no?
 
-This is Phase 0.
+These labs are intended to measure operational behavior, including:
+- provider visibility timing
+- rejection timing
+- pre-denial activation
+- pre-denial data exposure
+- latency
+- throughput
+- resource behavior under load
 
-It is not a full distributed enterprise stack.
+This is not a governance dissertation or a mathematical proof of authority drift.
 
-The verifier, database, API, and dashboard currently run inside one process. This makes the harness useful for validating measurement logic and dashboard behavior before splitting components into separate services.
-
-## Paths Compared
-
-### Conventional
-
-```text
-Client
-→ application/database touch
-→ provider verifier
-→ allow/deny
+It is a repeatable systems comparison focused on whether request ordering changes observable behavior.
