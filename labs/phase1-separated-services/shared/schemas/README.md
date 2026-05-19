@@ -1,88 +1,24 @@
-# Event Schema
+# Schemas
 
-This schema defines the benchmark event format used by both request paths.
+This directory contains the shared schema definitions used throughout the benchmark environment.
 
-Every service should emit events in the same structure so conventional and provider-first behavior can be compared directly.
+Schemas exist to normalize communication, telemetry, workload structure, and event generation across both request paths.
 
-## Event Shape
+The purpose of the schema layer is to ensure:
+- both paths receive equivalent request intent
+- services emit comparable telemetry
+- benchmark events remain structurally consistent
+- measurements can be aggregated reliably
+- execution behavior can be analyzed uniformly
 
-```json
-{
-  "trace_id": "trace_123",
-  "path": "conventional",
-  "service": "gateway",
-  "event": "request_received",
-  "timestamp_ms": 1710000000000,
-  "elapsed_ms": 0,
-  "outcome": "initiated",
-  "request_id": "req_123",
-  "token_type": "valid_user",
-  "action": "transaction:create",
-  "resource": "acct_123",
-  "provider_decision_seen": false,
-  "db_touched": false,
-  "notes": ""
-}
-```
+Schema definitions may include:
+- request schemas
+- response schemas
+- event schemas
+- metric schemas
+- workload schemas
+- trace schemas
 
-## Required Fields
+The benchmark compares execution ordering and infrastructure behavior.
 
-| Field | Purpose |
-|---|---|
-| `trace_id` | Shared identifier for one request across all services |
-| `path` | `conventional` or `provider_first` |
-| `service` | Component emitting the event |
-| `event` | What happened at that service |
-| `timestamp_ms` | Wall-clock timestamp in milliseconds |
-| `elapsed_ms` | Time since request initiation |
-| `outcome` | Current request state |
-| `request_id` | Unique request identifier |
-| `token_type` | Type of test token used |
-| `action` | Requested action |
-| `resource` | Target resource |
-| `provider_decision_seen` | Whether provider/verifier has been reached |
-| `db_touched` | Whether data/state layer was touched |
-| `notes` | Optional diagnostic text |
-
-## Path Values
-
-```text
-conventional
-provider_first
-```
-
-## Standard Events
-
-```text
-request_initiated
-request_received
-identity_checked
-gateway_forwarded
-application_activated
-data_service_touched
-provider_adapter_called
-boundary_checked
-verifier_seen
-provider_allowed
-provider_denied
-response_returned
-request_timed_out
-request_errored
-```
-
-## Standard Outcomes
-
-```text
-initiated
-in_progress
-allowed
-denied
-timed_out
-errored
-```
-
-## Purpose
-
-This schema keeps both benchmark paths comparable.
-
-The internal ordering may differ, but both paths must emit events using the same vocabulary.
+Shared schemas help ensure the comparison is based on operational sequencing rather than inconsistent data structures or telemetry formats.
