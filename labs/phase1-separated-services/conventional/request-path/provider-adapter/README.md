@@ -1,6 +1,15 @@
 # Provider Adapter
 
-The provider adapter is the conventional path component responsible for forwarding late-stage authorization or admissibility requests to the provider/verifier layer.
+The provider adapter is responsible for translating internal application requests into provider-compatible verification requests.
+
+Responsibilities may include:
+- request translation
+- verification request construction
+- provider communication
+- response normalization
+- protocol adaptation
+- retry handling
+- timeout handling
 
 Position in request path:
 
@@ -13,15 +22,13 @@ Client
 → provider/verifier
 ```
 
-In this ordering, downstream systems may already:
-- allocate execution resources
-- activate application logic
-- establish sessions
-- interact with context/state
-- touch data services
+The provider adapter exists to represent the final intermediary-side execution layer before provider-controlled authorization occurs.
 
-before provider-controlled authorization occurs.
+In conventional enterprise architectures, this layer commonly performs additional processing before the provider decision is returned.
 
-The adapter itself does not hold provider authority.
-
-It acts as the conventional path interface to external provider-controlled verification systems.
+This component is important to the benchmark because it helps demonstrate:
+- execution occurring before admissibility
+- downstream activation depth
+- intermediary coordination behavior
+- latency accumulation before denial
+- authority drift through orchestration layers
