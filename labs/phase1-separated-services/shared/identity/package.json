@@ -1,1 +1,13 @@
-
+{
+  "name": "shared-identity",
+  "version": "0.1.0",
+  "description": "Shared identity and token validation service for the Phase 1 separated-services benchmark.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.3"
+  },
+  "license": "Apache-2.0"
+}
