@@ -1,17 +1,25 @@
 # Dashboard
 
-This directory contains the shared visualization and live monitoring components for the benchmark environment.
+This directory contains the shared visualization and monitoring infrastructure for the benchmark environment.
 
-The dashboard is responsible for presenting live execution behavior across both request paths.
+The dashboard layer exists to provide live operational visibility into both benchmark paths during execution.
 
-Responsibilities may include:
-- live metric display
-- latency visualization
-- denial timing visualization
-- infrastructure activation tracking
-- throughput monitoring
-- resource usage monitoring
-- execution path comparison
-- provider timing comparison
+Dashboard components are shared so conventional and provider-first architectures are measured and displayed using the same telemetry, visualization logic, and comparison model.
 
-The dashboard is shared so both architectures are measured and displayed using the same instrumentation and presentation logic.
+Displayed information may include:
+- live throughput
+- latency measurements
+- provider visibility timing
+- denial timing
+- infrastructure activation depth
+- request traces
+- timeout behavior
+- resource utilization
+- system health
+- side-by-side execution comparison
+
+The purpose of the dashboard layer is to make request-ordering behavior observable during benchmark operation.
+
+The dashboard is not intended to act as a policy engine or execution component.
+
+Its purpose is operational visibility and benchmark instrumentation.
