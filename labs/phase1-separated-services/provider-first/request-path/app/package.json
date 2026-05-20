@@ -1,1 +1,13 @@
-
+{
+  "name": "provider-first-app",
+  "version": "0.1.0",
+  "description": "Provider-first application execution service activated after verifier approval.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.3"
+  },
+  "license": "Apache-2.0"
+}
