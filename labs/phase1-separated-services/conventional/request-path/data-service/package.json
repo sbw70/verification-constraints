@@ -1,1 +1,13 @@
-
+{
+  "name": "conventional-data-service",
+  "version": "0.1.0",
+  "description": "Conventional downstream data service for the intermediary-first benchmark path.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.3"
+  },
+  "license": "Apache-2.0"
+}
