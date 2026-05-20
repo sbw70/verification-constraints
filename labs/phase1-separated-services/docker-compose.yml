@@ -1,1 +1,60 @@
+services:
+  shared-identity:
+    build: ./shared/identity
+    ports:
+      - "3001:3101"
 
+  conventional-gateway:
+    build: ./conventional/request-path/gateway
+    ports:
+      - "3101:3101"
+
+  conventional-app:
+    build: ./conventional/request-path/app
+    ports:
+      - "3102:3102"
+
+  conventional-data-service:
+    build: ./conventional/request-path/data-service
+    ports:
+      - "3103:3103"
+
+  conventional-provider-adapter:
+    build: ./conventional/request-path/provider-adapter
+    ports:
+      - "3104:3104"
+
+  provider-first-boundary:
+    build: ./provider-first/request-path/boundary
+    ports:
+      - "4101:4101"
+
+  provider-first-verifier:
+    build: ./provider-first/request-path/verifier
+    ports:
+      - "4102:4102"
+
+  provider-first-gateway:
+    build: ./provider-first/request-path/gateway
+    ports:
+      - "4103:4103"
+
+  provider-first-app:
+    build: ./provider-first/request-path/app
+    ports:
+      - "4104:4104"
+
+  provider-first-data-service:
+    build: ./provider-first/request-path/data-service
+    ports:
+      - "4105:4105"
+
+  shared-dashboard:
+    build: ./shared/dashboard
+    ports:
+      - "5101:5101"
+
+  shared-load-generator:
+    build: ./shared/load-generator
+    ports:
+      - "5201:5201"
