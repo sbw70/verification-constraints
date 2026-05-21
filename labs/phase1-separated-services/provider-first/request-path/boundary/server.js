@@ -1,3 +1,4 @@
+const express = require("express");
 const axios = require("axios");
 
 const SERVICE_NAME = "provider-first-boundary";
@@ -14,12 +15,7 @@ app.get("/health", (req, res) => {
 });
 
 app.post("/boundary-check", async (req, res) => {
-    trace_id,
-    request_id,
-    token,
-    action,
-    resource
-  } = req.body;
+  const { trace_id, request_id, token, action, resource } = req.body;
 
   const boundary_event = {
     service: SERVICE_NAME,
@@ -32,30 +28,20 @@ app.post("/boundary-check", async (req, res) => {
   };
 
   try {
+    const verifierResponse = await axios.post(
+      "http://provider-first-verifier:4102/verify",
+      {
+        trace_id,
+        request_id,
+        token_type: token === "admin-token" ? "valid_admin" : "valid_user",
+        action,
+        resource
+      }
+    );
 
-  const verifierResponse = await axios.post(
-    "http://provider-first-verifier:4102/verify",
-    {
-      trace_id,
-      request_id,
-      token_type: token === "admin-token"
-        ? "valid_admin"
-        : "valid_user",
-
-      action,
-      resource
-    }
-  );
-
-  res.json({
-    boundary_event,
-    verifier_response: verifierResponse.data
-  });
-
-} catch (err) {
-
-  res.status(500).json({
-    error: "verifier_forward_failed"
-  });
-
-  }
+    res.json({
+      boundary_event,
+      verifier_response: verifierResponse.data
+    });
+  } catch (err) {
+    res.status(500).json
