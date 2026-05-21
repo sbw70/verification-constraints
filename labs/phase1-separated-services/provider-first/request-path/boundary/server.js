@@ -13,8 +13,7 @@ app.get("/health", (req, res) => {
   });
 });
 
-app.post("/boundary-check", (req, res) => {
-  const {
+app.post("/boundary-check", async (req, res) => {
     trace_id,
     request_id,
     token,
