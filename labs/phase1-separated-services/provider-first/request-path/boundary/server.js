@@ -1,4 +1,4 @@
-const express = require("express");
+const axios = require("axios");
 
 const SERVICE_NAME = "provider-first-boundary";
 const PORT = process.env.PORT || 4101;
