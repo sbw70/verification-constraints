@@ -19,6 +19,8 @@ app.get("/health", (req, res) => {
 });
 
 app.post("/request", async (req, res) => {
+  const gateway_received_at_ms = Date.now();
+
   const {
     trace_id,
     request_id,
@@ -28,12 +30,16 @@ app.post("/request", async (req, res) => {
   } = req.body;
 
   try {
+    const gateway_forwarded_at_ms = Date.now();
+
     const appResponse = await axios.post(APP_URL, {
       trace_id,
       request_id,
       action,
       resource
     });
+
+    const gateway_responded_at_ms = Date.now();
 
     res.json({
       service: SERVICE_NAME,
@@ -43,6 +49,13 @@ app.post("/request", async (req, res) => {
       token_present: !!token,
       action,
       resource,
+
+      gateway_received_at_ms,
+      gateway_forwarded_at_ms,
+      gateway_responded_at_ms,
+      gateway_elapsed_ms:
+        gateway_responded_at_ms - gateway_received_at_ms,
+
       app_response: appResponse.data
     });
   } catch (err) {
