@@ -1,3 +1,4 @@
+cat > provider-first/request-path/gateway/server.js <<'EOF'
 const express = require("express");
 const axios = require("axios");
 
@@ -15,7 +16,6 @@ app.get("/health", (req, res) => {
 });
 
 app.post("/gateway", async (req, res) => {
-
   const received_at_ms = Date.now();
 
   const {
@@ -33,7 +33,6 @@ app.post("/gateway", async (req, res) => {
   ];
 
   try {
-
     const boundaryResponse = await axios.post(
       "http://provider-first-boundary:4101/boundary-check",
       {
@@ -50,39 +49,26 @@ app.post("/gateway", async (req, res) => {
 
     res.json({
       service: SERVICE_NAME,
-
       trace_id,
       request_id,
-
       forwarded_to_boundary: true,
-
-      gateway_received_at_ms:
-        received_at_ms,
-
-      gateway_responded_at_ms:
-        responded_at_ms,
-
-      gateway_elapsed_ms:
-        responded_at_ms - received_at_ms,
-
+      gateway_received_at_ms: received_at_ms,
+      gateway_responded_at_ms: responded_at_ms,
+      gateway_elapsed_ms: responded_at_ms - received_at_ms,
       trace: updated_trace,
-
-      boundary_response:
-        boundaryResponse.data
+      boundary_response: boundaryResponse.data
     });
 
   } catch (err) {
-
     res.status(500).json({
       service: SERVICE_NAME,
       error: "boundary_forward_failed",
       details: err.message
     });
-
   }
-
 });
 
 app.listen(PORT, () => {
   console.log(`${SERVICE_NAME} listening on ${PORT}`);
 });
+EOF
