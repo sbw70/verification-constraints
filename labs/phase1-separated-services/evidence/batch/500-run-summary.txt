@@ -1,0 +1,26 @@
+
+Running 500 comparative denied requests...
+
+
+=========================================
+ 500 RUN COMPARISON RESULTS
+=========================================
+
+Provider-First Average Gateway Time:
+3 ms
+
+Conventional Average Gateway Time:
+2 ms
+
+Conventional Average App Time:
+1 ms
+
+Conventional Average Data-Service Time:
+0 ms
+
+Architectural Observation:
+Provider-first denied prior to downstream execution.
+Conventional path activated downstream application and data services.
+
+Summary written to:
+evidence/batch/500-run-summary.txt
