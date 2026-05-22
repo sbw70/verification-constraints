@@ -1,12 +1,13 @@
 {
   "name": "conventional-app",
   "version": "0.1.0",
-  "description": "Conventional application execution service for the intermediary-first benchmark path.",
+  "description": "Conventional application service.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
+    "axios": "^1.6.8",
     "express": "^4.18.3"
   },
   "license": "Apache-2.0"
