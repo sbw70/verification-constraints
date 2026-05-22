@@ -43,14 +43,15 @@ app.post("/execute", async (req, res) => {
       trace_id,
       request_id,
       application_activated: true,
+      downstream_execution: true,
+      denied_before_app: false,
+      provider_decision_seen: false,
       action,
       resource,
-
       app_received_at_ms,
       app_responded_at_ms,
       app_elapsed_ms:
         app_responded_at_ms - app_received_at_ms,
-
       data_response: dataResponse.data
     });
   } catch (err) {
