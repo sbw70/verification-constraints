@@ -1,4 +1,5 @@
 const express = require("express");
+const axios = require("axios");
 
 const SERVICE_NAME = "provider-first-gateway";
 const PORT = process.env.PORT || 4103;
@@ -13,33 +14,73 @@ app.get("/health", (req, res) => {
   });
 });
 
-app.post("/request", (req, res) => {
+app.post("/gateway", async (req, res) => {
+
+  const received_at_ms = Date.now();
+
   const {
     trace_id,
     request_id,
-    allowed,
+    token,
     action,
-    resource
+    resource,
+    trace = []
   } = req.body;
 
-  if (!allowed) {
-    return res.status(403).json({
+  const updated_trace = [
+    ...trace,
+    SERVICE_NAME
+  ];
+
+  try {
+
+    const boundaryResponse = await axios.post(
+      "http://provider-first-boundary:4101/boundary-check",
+      {
+        trace_id,
+        request_id,
+        token,
+        action,
+        resource,
+        trace: updated_trace
+      }
+    );
+
+    const responded_at_ms = Date.now();
+
+    res.json({
       service: SERVICE_NAME,
+
       trace_id,
       request_id,
-      denied: true,
-      reason: "provider-first verifier denied request"
+
+      forwarded_to_boundary: true,
+
+      gateway_received_at_ms:
+        received_at_ms,
+
+      gateway_responded_at_ms:
+        responded_at_ms,
+
+      gateway_elapsed_ms:
+        responded_at_ms - received_at_ms,
+
+      trace: updated_trace,
+
+      boundary_response:
+        boundaryResponse.data
     });
+
+  } catch (err) {
+
+    res.status(500).json({
+      service: SERVICE_NAME,
+      error: "boundary_forward_failed",
+      details: err.message
+    });
+
   }
 
-  res.json({
-    service: SERVICE_NAME,
-    trace_id,
-    request_id,
-    gateway_forwarded: true,
-    action,
-    resource
-  });
 });
 
 app.listen(PORT, () => {
