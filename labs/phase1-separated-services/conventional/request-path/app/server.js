@@ -1,6 +1,8 @@
 const express = require("express");
 const axios = require("axios");
 
+let requestCounter = 0;
+
 const SERVICE_NAME = "conventional-app";
 const PORT = process.env.PORT || 3102;
 
@@ -14,11 +16,15 @@ app.use(express.json());
 app.get("/health", (req, res) => {
   res.json({
     service: SERVICE_NAME,
-    status: "ok"
+    status: "ok",
+    requests_seen: requestCounter
   });
 });
 
 app.post("/execute", async (req, res) => {
+
+  requestCounter++;
+
   const app_received_at_ms = Date.now();
 
   const {
@@ -46,6 +52,7 @@ app.post("/execute", async (req, res) => {
       downstream_execution: true,
       denied_before_app: false,
       provider_decision_seen: false,
+      total_requests_seen: requestCounter,
       action,
       resource,
       app_received_at_ms,
@@ -58,7 +65,8 @@ app.post("/execute", async (req, res) => {
     res.status(500).json({
       service: SERVICE_NAME,
       error: "app failed to reach data service",
-      details: err.message
+      details: err.message,
+      total_requests_seen: requestCounter
     });
   }
 });

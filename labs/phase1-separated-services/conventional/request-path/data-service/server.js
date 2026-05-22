@@ -1,5 +1,7 @@
 const express = require("express");
 
+let requestCounter = 0;
+
 const SERVICE_NAME = "conventional-data-service";
 const PORT = process.env.PORT || 3103;
 
@@ -9,11 +11,15 @@ app.use(express.json());
 app.get("/health", (req, res) => {
   res.json({
     service: SERVICE_NAME,
-    status: "ok"
+    status: "ok",
+    requests_seen: requestCounter
   });
 });
 
 app.post("/data-access", (req, res) => {
+
+  requestCounter++;
+
   const data_received_at_ms = Date.now();
 
   const {
@@ -31,15 +37,18 @@ app.post("/data-access", (req, res) => {
     request_id,
     data_service_touched: true,
     downstream_execution: true,
+    total_requests_seen: requestCounter,
     action,
     resource,
     mock_data_access: "complete",
 
     data_received_at_ms,
     data_responded_at_ms,
+
     data_elapsed_ms:
       data_responded_at_ms - data_received_at_ms
   });
+
 });
 
 app.listen(PORT, () => {
