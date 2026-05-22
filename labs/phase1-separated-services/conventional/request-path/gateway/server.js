@@ -1,6 +1,8 @@
 const express = require("express");
 const axios = require("axios");
 
+let requestCounter = 0;
+
 const SERVICE_NAME = "conventional-gateway";
 const PORT = process.env.PORT || 3101;
 
@@ -14,12 +16,16 @@ app.use(express.json());
 app.get("/health", (req, res) => {
   res.json({
     service: SERVICE_NAME,
-    status: "ok"
+    status: "ok",
+    requests_seen: requestCounter
   });
 });
 
 app.post("/request", async (req, res) => {
-  const gateway_received_at_ms = Date.now();
+
+  requestCounter++;
+
+  const gatewayStarted = Date.now();
 
   const {
     trace_id,
@@ -30,7 +36,6 @@ app.post("/request", async (req, res) => {
   } = req.body;
 
   try {
-    const gateway_forwarded_at_ms = Date.now();
 
     const appResponse = await axios.post(APP_URL, {
       trace_id,
@@ -39,7 +44,7 @@ app.post("/request", async (req, res) => {
       resource
     });
 
-    const gateway_responded_at_ms = Date.now();
+    const gatewayFinished = Date.now();
 
     res.json({
       service: SERVICE_NAME,
@@ -50,21 +55,27 @@ app.post("/request", async (req, res) => {
       action,
       resource,
 
-      gateway_received_at_ms,
-      gateway_forwarded_at_ms,
-      gateway_responded_at_ms,
+      gateway_received_at_ms: gatewayStarted,
+      gateway_responded_at_ms: gatewayFinished,
       gateway_elapsed_ms:
-        gateway_responded_at_ms - gateway_received_at_ms,
+        gatewayFinished - gatewayStarted,
+
+      total_requests_seen: requestCounter,
 
       app_response: appResponse.data
     });
+
   } catch (err) {
+
     res.status(500).json({
       service: SERVICE_NAME,
       error: "gateway failed to reach app",
-      details: err.message
+      details: err.message,
+      total_requests_seen: requestCounter
     });
+
   }
+
 });
 
 app.listen(PORT, () => {
