@@ -1,0 +1,14 @@
+
+=========================================
+ CONCURRENT TEST COMPLETE
+=========================================
+
+Total concurrent request pairs:
+100
+
+Total elapsed wall-clock time:
+0 seconds
+
+Architectural Observation:
+Provider-first denied prior to downstream activation.
+Conventional path activated downstream services during concurrent denied traffic.
