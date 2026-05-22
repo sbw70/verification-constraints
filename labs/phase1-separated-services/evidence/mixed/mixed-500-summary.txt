@@ -1,0 +1,13 @@
+=========================================
+ MIXED 500 REQUEST SUMMARY
+=========================================
+
+Provider-first allowed: 125
+Provider-first denied:  375
+
+Conventional allowed/continued: 500
+Conventional denied:            0
+
+Observation:
+Provider-first distinguishes allowed/denied at the verifier boundary.
+Conventional path continues downstream activation for the benchmark request path.
