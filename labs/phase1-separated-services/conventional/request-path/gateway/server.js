@@ -38,45 +38,57 @@ app.post("/request", async (req, res) => {
     resource
   } = req.body;
 
-  const activated_components = [SERVICE_NAME];
-
   try {
-    const identity_started_at_ms = Date.now();
-
     const identityResponse = await axios.post(IDENTITY_URL, {
       token
     });
 
-    const identity_responded_at_ms = Date.now();
-
-    activated_components.push("shared-identity");
+    const identity = identityResponse.data;
 
     const appResponse = await axios.post(APP_URL, {
       trace_id,
       request_id,
       token,
-      token_type: identityResponse.data.token_type,
+      token_type: identity.token_type,
+      token_valid: identity.valid,
+      subject: identity.subject,
+      role: identity.role,
       action,
       resource,
-      trace: activated_components
+      trace: [
+        SERVICE_NAME,
+        "shared-identity"
+      ]
     });
 
     const gateway_responded_at_ms = Date.now();
 
-    const allowed = !!appResponse.data?.provider_response?.allowed;
+    const providerDecision =
+      appResponse.data.provider_decision || {};
+
+    const allowed = providerDecision.allowed === true;
+    const denied = !allowed;
 
     res.status(allowed ? 200 : 403).json({
       service: SERVICE_NAME,
       trace_id,
       request_id,
 
-      path: "conventional",
-      allowed,
-      denied: !allowed,
-
       gateway_forwarded: true,
       token_present: !!token,
-      token_type: identityResponse.data.token_type,
+
+      identity_seen: true,
+      identity_valid: identity.valid,
+      token_type: identity.token_type,
+      subject: identity.subject,
+      role: identity.role,
+
+      denied_before_app: false,
+      provider_decision_seen: providerDecision.provider_decision_seen === true,
+
+      allowed,
+      denied,
+      reason: providerDecision.reason || "provider denied after downstream execution",
 
       action,
       resource,
@@ -86,27 +98,31 @@ app.post("/request", async (req, res) => {
       gateway_elapsed_ms:
         gateway_responded_at_ms - gateway_received_at_ms,
 
-      identity_elapsed_ms:
-        identity_responded_at_ms - identity_started_at_ms,
-
       total_requests_seen: requestCounter,
 
-      activated_components:
-        appResponse.data.activated_components || activated_components,
+      activated_components: [
+        SERVICE_NAME,
+        "shared-identity",
+        "conventional-app",
+        "conventional-data-service",
+        "conventional-provider-adapter"
+      ],
 
-      downstream_execution: true,
-      denied_before_app: false,
-      provider_decision_seen: true,
-
-      identity_response: identityResponse.data,
       app_response: appResponse.data
     });
   } catch (err) {
+    const gateway_responded_at_ms = Date.now();
+
     res.status(500).json({
       service: SERVICE_NAME,
-      path: "conventional",
-      error: "gateway failed",
+      trace_id,
+      request_id,
+      error: "conventional gateway failed",
       details: err.message,
+      gateway_received_at_ms,
+      gateway_responded_at_ms,
+      gateway_elapsed_ms:
+        gateway_responded_at_ms - gateway_received_at_ms,
       total_requests_seen: requestCounter
     });
   }
