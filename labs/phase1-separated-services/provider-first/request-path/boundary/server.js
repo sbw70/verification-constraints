@@ -22,7 +22,6 @@ app.get("/health", (req, res) => {
 });
 
 app.post("/boundary-check", async (req, res) => {
-
   requestCounter++;
 
   const started_at_ms = Date.now();
@@ -32,60 +31,61 @@ app.post("/boundary-check", async (req, res) => {
     request_id,
     token,
     action,
-    resource
+    resource,
+    trace = []
   } = req.body;
 
-  const trace = [
+  const activated_components = [
+    ...trace,
     SERVICE_NAME
   ];
 
-  const boundary_event = {
-    service: SERVICE_NAME,
-    trace_id,
-    request_id,
-    boundary_checked: true,
-    token_present: !!token,
-    action,
-    resource,
-    total_requests_seen: requestCounter
-  };
-
   try {
-
     const verifierResponse = await axios.post(VERIFIER_URL, {
       trace_id,
       request_id,
       token,
       action,
-      resource
+      resource,
+      trace: activated_components
     });
 
     const verifier_returned_at_ms = Date.now();
 
     res.json({
-      boundary_event,
-      verifier_response: verifierResponse.data,
-      trace: [
-        ...trace,
-        "provider-first-verifier"
-      ],
+      service: SERVICE_NAME,
+      path: "provider-first",
+
+      trace_id,
+      request_id,
+
+      boundary_checked: true,
+      token_present: !!token,
+
+      action,
+      resource,
+
       started_at_ms,
       verifier_returned_at_ms,
       total_elapsed_ms:
-        verifier_returned_at_ms - started_at_ms
+        verifier_returned_at_ms - started_at_ms,
+
+      total_requests_seen: requestCounter,
+
+      activated_components:
+        verifierResponse.data.activated_components,
+
+      verifier_response: verifierResponse.data
     });
-
   } catch (err) {
-
     res.status(500).json({
       service: SERVICE_NAME,
+      path: "provider-first",
       error: "boundary failed to reach verifier",
       details: err.message,
       total_requests_seen: requestCounter
     });
-
   }
-
 });
 
 app.listen(PORT, () => {
