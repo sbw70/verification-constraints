@@ -33,35 +33,37 @@ app.post("/execute", async (req, res) => {
   const {
     trace_id,
     request_id,
-    token,
     token_type,
+    token_valid,
+    subject,
+    role,
     action,
     resource,
     trace = []
   } = req.body;
-
-  const activated_components = [
-    ...trace,
-    SERVICE_NAME
-  ];
 
   try {
     const dataResponse = await axios.post(DATA_SERVICE_URL, {
       trace_id,
       request_id,
       action,
-      resource,
-      trace: activated_components
+      resource
     });
 
     const providerResponse = await axios.post(PROVIDER_ADAPTER_URL, {
       trace_id,
       request_id,
-      token,
       token_type,
+      token_valid,
+      subject,
+      role,
       action,
       resource,
-      trace: dataResponse.data.activated_components
+      trace: [
+        ...trace,
+        SERVICE_NAME,
+        "conventional-data-service"
+      ]
     });
 
     const app_responded_at_ms = Date.now();
@@ -71,8 +73,6 @@ app.post("/execute", async (req, res) => {
       trace_id,
       request_id,
 
-      path: "conventional",
-
       application_activated: true,
       downstream_execution: true,
       denied_before_app: false,
@@ -81,6 +81,9 @@ app.post("/execute", async (req, res) => {
       total_requests_seen: requestCounter,
 
       token_type,
+      token_valid,
+      subject,
+      role,
       action,
       resource,
 
@@ -89,18 +92,29 @@ app.post("/execute", async (req, res) => {
       app_elapsed_ms:
         app_responded_at_ms - app_received_at_ms,
 
-      activated_components:
-        providerResponse.data.activated_components,
+      trace: [
+        ...trace,
+        SERVICE_NAME,
+        "conventional-data-service",
+        "conventional-provider-adapter"
+      ],
 
       data_response: dataResponse.data,
-      provider_response: providerResponse.data
+      provider_decision: providerResponse.data
     });
   } catch (err) {
+    const app_responded_at_ms = Date.now();
+
     res.status(500).json({
       service: SERVICE_NAME,
-      path: "conventional",
-      error: "app failed",
+      trace_id,
+      request_id,
+      error: "app failed during downstream execution",
       details: err.message,
+      app_received_at_ms,
+      app_responded_at_ms,
+      app_elapsed_ms:
+        app_responded_at_ms - app_received_at_ms,
       total_requests_seen: requestCounter
     });
   }
