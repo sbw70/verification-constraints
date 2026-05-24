@@ -7,11 +7,12 @@ module.exports = {
       interpreter: "bash",
       autorestart: true,
       watch: false,
-      max_restarts: 10,
+      max_restarts: 20,
       restart_delay: 5000,
       env: {
         NODE_ENV: "production",
-        SLEEP_SECONDS: "2"
+        SLEEP_SECONDS: "2",
+        SERVICE_WAIT_SECONDS: "5"
       }
     }
   ]
