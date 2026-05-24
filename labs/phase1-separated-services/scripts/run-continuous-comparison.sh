@@ -8,10 +8,14 @@ RPS="${RPS:-20}"
 BURST_RPS="${BURST_RPS:-80}"
 BURST_SECONDS="${BURST_SECONDS:-5}"
 BURST_EVERY_SECONDS="${BURST_EVERY_SECONDS:-60}"
-VALID_RATIO="${VALID_RATIO:-30}"
 
-VALID_TOKEN="${VALID_TOKEN:-admin-token}"
-INVALID_TOKEN="${INVALID_TOKEN:-user-token}"
+ALLOW_RATIO="${ALLOW_RATIO:-30}"
+
+ALLOW_TOKEN="${ALLOW_TOKEN:-admin-token}"
+DENY_TOKEN="${DENY_TOKEN:-user-token}"
+
+ACTION="${ACTION:-admin:access}"
+RESOURCE="${RESOURCE:-acct_001}"
 
 request_count=0
 
@@ -20,21 +24,24 @@ echo "Conventional:       $CONVENTIONAL_URL"
 echo "Provider-first:     $PROVIDER_FIRST_URL"
 echo "Steady RPS pairs:   $RPS"
 echo "Burst RPS pairs:    $BURST_RPS for ${BURST_SECONDS}s every ${BURST_EVERY_SECONDS}s"
-echo "Valid ratio:        ${VALID_RATIO}%"
+echo "Allow ratio:        ${ALLOW_RATIO}%"
+echo "Action:             $ACTION"
+echo "Resource:           $RESOURCE"
 echo
 
 make_payload() {
   local token="$1"
-  local action="$2"
-  local n="$3"
+  local n="$2"
+  local expected="$3"
 
   cat <<JSON
 {
   "trace_id": "continuous_trace_${n}",
   "request_id": "continuous_req_${n}",
   "token": "${token}",
-  "action": "${action}",
-  "resource": "acct_001"
+  "expected_result": "${expected}",
+  "action": "${ACTION}",
+  "resource": "${RESOURCE}"
 }
 JSON
 }
@@ -42,30 +49,30 @@ JSON
 send_pair() {
   local r
   local token
-  local action
+  local expected
   local payload
 
   request_count=$((request_count + 1))
   r=$((RANDOM % 100))
 
-  if [ "$r" -lt "$VALID_RATIO" ]; then
-    token="$VALID_TOKEN"
-    action="admin:access"
+  if [ "$r" -lt "$ALLOW_RATIO" ]; then
+    token="$ALLOW_TOKEN"
+    expected="allowed"
   else
-    token="$INVALID_TOKEN"
-    action="admin:access"
+    token="$DENY_TOKEN"
+    expected="denied"
   fi
 
-  payload="$(make_payload "$token" "$action" "$request_count")"
+  payload="$(make_payload "$token" "$request_count" "$expected")"
 
   curl -sS -o /dev/null \
-    -w "conventional,%{http_code},%{time_total}\n" \
+    -w "conventional,%{http_code},%{time_total},${expected}\n" \
     -H "Content-Type: application/json" \
     -d "$payload" \
     "$CONVENTIONAL_URL" &
 
   curl -sS -o /dev/null \
-    -w "provider-first,%{http_code},%{time_total}\n" \
+    -w "provider-first,%{http_code},%{time_total},${expected}\n" \
     -H "Content-Type: application/json" \
     -d "$payload" \
     "$PROVIDER_FIRST_URL" &
@@ -91,7 +98,9 @@ run_load() {
 while true; do
   steady_for=$((BURST_EVERY_SECONDS - BURST_SECONDS))
 
-  run_load "$RPS" "$steady_for"
+  if [ "$steady_for" -gt 0 ]; then
+    run_load "$RPS" "$steady_for"
+  fi
 
   echo "$(date -Is) burst start"
   run_load "$BURST_RPS" "$BURST_SECONDS"
