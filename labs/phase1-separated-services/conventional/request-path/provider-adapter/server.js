@@ -25,6 +25,9 @@ app.post("/provider-check", (req, res) => {
     trace_id,
     request_id,
     token_type,
+    token_valid,
+    subject,
+    role,
     action,
     resource,
     trace = []
@@ -52,25 +55,29 @@ app.post("/provider-check", (req, res) => {
 
     provider_decision_seen: true,
 
+    token_type,
+    token_valid,
+    subject,
+    role,
+
     allowed,
     denied: !allowed,
     reason,
 
-    token_type,
     action,
     resource,
+
+    trace: [
+      ...trace,
+      SERVICE_NAME
+    ],
 
     received_at_ms,
     responded_at_ms,
     elapsed_ms:
       responded_at_ms - received_at_ms,
 
-    total_requests_seen: requestCounter,
-
-    activated_components: [
-      ...trace,
-      SERVICE_NAME
-    ]
+    total_requests_seen: requestCounter
   });
 });
 
