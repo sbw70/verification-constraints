@@ -1,39 +1,56 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -u
 
-echo "[+] Starting phase1 separated services harness"
+BASE_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$BASE_DIR"
 
-cd "$(dirname "$0")/.."
+echo "[droplet] Rebuilding Phase‑1 separated-services lab..."
 
-echo "[+] Stopping old containers"
-sudo docker compose down --remove-orphans || true
+# Stop old containers (ignore errors)
+docker compose down || true
 
-echo "[+] Building containers"
-sudo docker compose build
+# Rebuild everything cleanly
+docker compose build
 
-echo "[+] Starting containers"
-sudo docker compose up -d
+# Start services in detached mode
+docker compose up -d
 
-echo "[+] Container status"
-sudo docker compose ps
+echo "[droplet] Waiting for required services to become healthy..."
 
-echo "[+] Health checks"
-sleep 3
+# Dashboard (passive telemetry receiver)
+until curl -s http://localhost:3000/health >/dev/null; do
+  echo "  dashboard not ready..."
+  sleep 1
+done
 
-echo "[conventional gateway]"
-curl -s localhost:4000/health || true
-echo
+# Shared identity (internal service)
+until curl -s http://localhost:3101/health >/dev/null; do
+  echo "  shared-identity not ready..."
+  sleep 1
+done
 
-echo "[provider-first gateway]"
-curl -s localhost:4100/health || true
-echo
+# Conventional gateway (public entrypoint)
+until curl -s http://localhost:3201/health >/dev/null; do
+  echo "  conventional-gateway not ready..."
+  sleep 1
+done
 
-echo "[provider-first boundary]"
-curl -s localhost:4101/health || true
-echo
+# Provider-first verifier (internal)
+until curl -s http://localhost:4102/health >/dev/null; do
+  echo "  provider-first-verifier not ready..."
+  sleep 1
+done
 
-echo "[provider-first verifier]"
-curl -s localhost:4102/health || true
-echo
+# Provider-first gateway (public entrypoint)
+until curl -s http://localhost:4103/health >/dev/null; do
+  echo "  provider-first-gateway not ready..."
+  sleep 1
+done
 
-echo "[+] Done"
+echo "[droplet] All services healthy."
+echo "[droplet] Starting live comparison harness..."
+
+# IMPORTANT:
+# Droplet harness does NOT own a loop.
+# It delegates to start-live-comparison.sh, which delegates to run-continuous-comparison.sh.
+exec "$BASE_DIR/scripts/start-live-comparison.sh"
