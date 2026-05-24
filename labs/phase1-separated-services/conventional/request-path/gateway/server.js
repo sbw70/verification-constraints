@@ -14,10 +14,6 @@ const APP_URL =
   process.env.APP_URL ||
   "http://conventional-app:3102/execute";
 
-const PROVIDER_ADAPTER_URL =
-  process.env.PROVIDER_ADAPTER_URL ||
-  "http://conventional-provider-adapter:3104/provider-check";
-
 const app = express();
 app.use(express.json());
 
@@ -45,100 +41,91 @@ app.post("/request", async (req, res) => {
   const activated_components = [SERVICE_NAME];
 
   try {
-    const identity_started_at_ms = Date.now();
-
     const identityResponse = await axios.post(IDENTITY_URL, {
       token
     });
 
-    const identity_responded_at_ms = Date.now();
-
     activated_components.push("shared-identity");
 
-    const token_type = identityResponse.data.token_type;
-
-    const app_started_at_ms = Date.now();
-
-    const appResponse = await axios.post(APP_URL, {
-      trace_id,
-      request_id,
+    const {
+      valid,
       token_type,
-      action,
-      resource
-    });
+      subject,
+      role,
+      reason: identity_reason
+    } = identityResponse.data;
 
-    const app_responded_at_ms = Date.now();
-
-    activated_components.push("conventional-app");
-
-    if (appResponse.data?.data_response?.service) {
-      activated_components.push(appResponse.data.data_response.service);
-    }
-
-    const provider_started_at_ms = Date.now();
-
-    const providerResponse = await axios.post(PROVIDER_ADAPTER_URL, {
-      trace_id,
-      request_id,
-      token_type,
-      action,
-      resource
-    });
-
-    const provider_responded_at_ms = Date.now();
-
-    activated_components.push("conventional-provider-adapter");
+    const appResponse = await axios.post(
+      APP_URL,
+      {
+        trace_id,
+        request_id,
+        token,
+        token_valid: valid,
+        token_type,
+        subject,
+        role,
+        identity_reason,
+        action,
+        resource,
+        activated_components
+      },
+      {
+        validateStatus: () => true
+      }
+    );
 
     const gateway_responded_at_ms = Date.now();
 
-    res.json({
+    const providerAllowed =
+      appResponse.data?.provider_response?.allowed === true;
+
+    res.status(providerAllowed ? 200 : 403).json({
       service: SERVICE_NAME,
       trace_id,
       request_id,
 
-      path: "conventional",
-
       gateway_forwarded: true,
       token_present: !!token,
+      token_valid: valid,
       token_type,
+      subject,
+      role,
+      identity_reason,
 
       action,
       resource,
-
-      activated_components,
-      activation_count: activated_components.length,
-
-      provider_decision_seen: true,
-      denied_before_app: false,
-      downstream_execution: true,
 
       gateway_received_at_ms,
       gateway_responded_at_ms,
       gateway_elapsed_ms:
         gateway_responded_at_ms - gateway_received_at_ms,
 
-      identity_elapsed_ms:
-        identity_responded_at_ms - identity_started_at_ms,
-
-      app_elapsed_ms:
-        app_responded_at_ms - app_started_at_ms,
-
-      provider_adapter_elapsed_ms:
-        provider_responded_at_ms - provider_started_at_ms,
-
       total_requests_seen: requestCounter,
 
-      identity_response: identityResponse.data,
-      app_response: appResponse.data,
-      provider_response: providerResponse.data
+      activated_components:
+        appResponse.data?.activated_components ||
+        activated_components,
+
+      app_response: appResponse.data
     });
   } catch (err) {
+    const gateway_responded_at_ms = Date.now();
+
     res.status(500).json({
       service: SERVICE_NAME,
-      path: "conventional",
-      error: "conventional gateway failed",
+      trace_id,
+      request_id,
+      error: "gateway failed",
       details: err.message,
-      total_requests_seen: requestCounter
+
+      gateway_received_at_ms,
+      gateway_responded_at_ms,
+      gateway_elapsed_ms:
+        gateway_responded_at_ms - gateway_received_at_ms,
+
+      total_requests_seen: requestCounter,
+      activated_components
     });
   }
 });
