@@ -17,7 +17,6 @@ app.get("/health", (req, res) => {
 });
 
 app.post("/data-access", (req, res) => {
-
   requestCounter++;
 
   const data_received_at_ms = Date.now();
@@ -26,7 +25,8 @@ app.post("/data-access", (req, res) => {
     trace_id,
     request_id,
     action,
-    resource
+    resource,
+    trace = []
   } = req.body;
 
   const data_responded_at_ms = Date.now();
@@ -35,20 +35,26 @@ app.post("/data-access", (req, res) => {
     service: SERVICE_NAME,
     trace_id,
     request_id,
+
     data_service_touched: true,
     downstream_execution: true,
+
     total_requests_seen: requestCounter,
+
     action,
     resource,
     mock_data_access: "complete",
 
     data_received_at_ms,
     data_responded_at_ms,
-
     data_elapsed_ms:
-      data_responded_at_ms - data_received_at_ms
-  });
+      data_responded_at_ms - data_received_at_ms,
 
+    activated_components: [
+      ...trace,
+      SERVICE_NAME
+    ]
+  });
 });
 
 app.listen(PORT, () => {
