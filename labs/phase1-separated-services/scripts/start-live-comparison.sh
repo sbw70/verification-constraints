@@ -16,10 +16,10 @@ else
 fi
 
 echo "Waiting for services..."
-sleep 5
+sleep "${SERVICE_WAIT_SECONDS:-5}"
 
 echo "Docker containers:"
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
-echo "Starting continuous comparison loop"
+echo "Starting live evidence loop"
 exec ./scripts/live-comparison-loop.sh
