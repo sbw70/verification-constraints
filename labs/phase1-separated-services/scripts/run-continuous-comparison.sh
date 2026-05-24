@@ -10,8 +10,8 @@ BURST_SECONDS="${BURST_SECONDS:-5}"
 BURST_EVERY_SECONDS="${BURST_EVERY_SECONDS:-60}"
 VALID_RATIO="${VALID_RATIO:-30}"
 
-VALID_TOKEN="${VALID_TOKEN:-admin-token}"
-INVALID_TOKEN="${INVALID_TOKEN:-user-token}"
+ALLOW_TOKEN="${ALLOW_TOKEN:-admin-token}"
+DENY_TOKEN="${DENY_TOKEN:-user-token}"
 
 request_count=0
 
@@ -20,7 +20,7 @@ echo "Conventional:     $CONVENTIONAL_URL"
 echo "Provider-first:   $PROVIDER_FIRST_URL"
 echo "RPS pairs:        $RPS"
 echo "Burst RPS pairs:  $BURST_RPS for ${BURST_SECONDS}s every ${BURST_EVERY_SECONDS}s"
-echo "Valid ratio:      ${VALID_RATIO}%"
+echo "Allowed ratio:    ${VALID_RATIO}%"
 echo
 
 make_payload() {
@@ -47,9 +47,9 @@ send_pair() {
   r=$((RANDOM % 100))
 
   if [ "$r" -lt "$VALID_RATIO" ]; then
-    token="$VALID_TOKEN"
+    token="$ALLOW_TOKEN"
   else
-    token="$INVALID_TOKEN"
+    token="$DENY_TOKEN"
   fi
 
   payload="$(make_payload "$token" "$request_count")"
