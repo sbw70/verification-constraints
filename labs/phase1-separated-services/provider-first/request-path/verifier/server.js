@@ -1,19 +1,17 @@
 const express = require("express");
+const axios = require("axios");
 
 let requestCounter = 0;
 
 const SERVICE_NAME = "provider-first-verifier";
 const PORT = process.env.PORT || 4102;
 
+const IDENTITY_URL =
+  process.env.IDENTITY_URL ||
+  "http://shared-identity:3101/validate-token";
+
 const app = express();
 app.use(express.json());
-
-function classifyToken(token) {
-  if (token === "admin-token") return "valid_admin";
-  if (token === "user-token") return "valid_user";
-  if (token === "expired-token") return "expired_token";
-  return "invalid_token";
-}
 
 app.get("/health", (req, res) => {
   res.json({
@@ -23,7 +21,7 @@ app.get("/health", (req, res) => {
   });
 });
 
-app.post("/verify", (req, res) => {
+app.post("/verify", async (req, res) => {
   requestCounter++;
 
   const received_at_ms = Date.now();
@@ -37,58 +35,89 @@ app.post("/verify", (req, res) => {
     trace = []
   } = req.body;
 
-  const token_type = classifyToken(token);
+  const updated_trace = [
+    ...trace,
+    SERVICE_NAME
+  ];
 
-  let allowed = false;
-  let reason = "not allowed";
+  try {
+    const identityResponse = await axios.post(IDENTITY_URL, {
+      token
+    });
 
-  if (token_type === "valid_user" && action === "profile:read") {
-    allowed = true;
-    reason = "user profile read allowed";
+    const identity = identityResponse.data;
+
+    let allowed = false;
+    let denied = true;
+    let reason = "not allowed";
+
+    if (!identity.valid) {
+      reason = identity.reason || "identity rejected token";
+    }
+
+    if (
+      identity.token_type === "valid_user" &&
+      action === "profile:read"
+    ) {
+      allowed = true;
+      denied = false;
+      reason = "user profile read allowed";
+    }
+
+    if (
+      identity.token_type === "valid_admin" &&
+      action === "admin:access"
+    ) {
+      allowed = true;
+      denied = false;
+      reason = "admin access allowed";
+    }
+
+    const responded_at_ms = Date.now();
+
+    res.json({
+      service: SERVICE_NAME,
+      trace_id,
+      request_id,
+
+      provider_decision_seen: true,
+      identity_checked: true,
+
+      token_valid: identity.valid,
+      token_type: identity.token_type,
+      subject: identity.subject,
+      role: identity.role,
+
+      allowed,
+      denied,
+      reason,
+
+      action,
+      resource,
+
+      trace: updated_trace,
+
+      received_at_ms,
+      responded_at_ms,
+      elapsed_ms: responded_at_ms - received_at_ms,
+
+      total_requests_seen: requestCounter
+    });
+  } catch (err) {
+    const responded_at_ms = Date.now();
+
+    res.status(500).json({
+      service: SERVICE_NAME,
+      trace_id,
+      request_id,
+      error: "verifier failed to reach identity service",
+      details: err.message,
+      received_at_ms,
+      responded_at_ms,
+      elapsed_ms: responded_at_ms - received_at_ms,
+      total_requests_seen: requestCounter
+    });
   }
-
-  if (token_type === "valid_admin" && action === "admin:access") {
-    allowed = true;
-    reason = "admin access allowed";
-  }
-
-  if (token_type === "expired_token") {
-    reason = "token expired";
-  }
-
-  if (token_type === "invalid_token") {
-    reason = "invalid token";
-  }
-
-  const responded_at_ms = Date.now();
-
-  res.json({
-    service: SERVICE_NAME,
-    trace_id,
-    request_id,
-
-    provider_decision_seen: true,
-
-    allowed,
-    denied: !allowed,
-    reason,
-
-    token_type,
-    action,
-    resource,
-
-    received_at_ms,
-    responded_at_ms,
-    elapsed_ms:
-      responded_at_ms - received_at_ms,
-
-    total_requests_seen: requestCounter,
-
-    activated_components: [
-      ...trace,
-      SERVICE_NAME
-    ]
-  });
 });
 
 app.listen(PORT, () => {
