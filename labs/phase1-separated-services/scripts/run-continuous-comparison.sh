@@ -10,29 +10,30 @@ BURST_SECONDS="${BURST_SECONDS:-5}"
 BURST_EVERY_SECONDS="${BURST_EVERY_SECONDS:-60}"
 VALID_RATIO="${VALID_RATIO:-30}"
 
-ALLOW_TOKEN="${ALLOW_TOKEN:-admin-token}"
-DENY_TOKEN="${DENY_TOKEN:-user-token}"
+VALID_TOKEN="${VALID_TOKEN:-admin-token}"
+INVALID_TOKEN="${INVALID_TOKEN:-user-token}"
 
 request_count=0
 
 echo "Continuous comparison load started"
-echo "Conventional:     $CONVENTIONAL_URL"
-echo "Provider-first:   $PROVIDER_FIRST_URL"
-echo "RPS pairs:        $RPS"
-echo "Burst RPS pairs:  $BURST_RPS for ${BURST_SECONDS}s every ${BURST_EVERY_SECONDS}s"
-echo "Allowed ratio:    ${VALID_RATIO}%"
+echo "Conventional:       $CONVENTIONAL_URL"
+echo "Provider-first:     $PROVIDER_FIRST_URL"
+echo "Steady RPS pairs:   $RPS"
+echo "Burst RPS pairs:    $BURST_RPS for ${BURST_SECONDS}s every ${BURST_EVERY_SECONDS}s"
+echo "Valid ratio:        ${VALID_RATIO}%"
 echo
 
 make_payload() {
   local token="$1"
-  local n="$2"
+  local action="$2"
+  local n="$3"
 
   cat <<JSON
 {
   "trace_id": "continuous_trace_${n}",
   "request_id": "continuous_req_${n}",
   "token": "${token}",
-  "action": "admin:access",
+  "action": "${action}",
   "resource": "acct_001"
 }
 JSON
@@ -41,18 +42,21 @@ JSON
 send_pair() {
   local r
   local token
+  local action
   local payload
 
   request_count=$((request_count + 1))
   r=$((RANDOM % 100))
 
   if [ "$r" -lt "$VALID_RATIO" ]; then
-    token="$ALLOW_TOKEN"
+    token="$VALID_TOKEN"
+    action="admin:access"
   else
-    token="$DENY_TOKEN"
+    token="$INVALID_TOKEN"
+    action="admin:access"
   fi
 
-  payload="$(make_payload "$token" "$request_count")"
+  payload="$(make_payload "$token" "$action" "$request_count")"
 
   curl -sS -o /dev/null \
     -w "conventional,%{http_code},%{time_total}\n" \
