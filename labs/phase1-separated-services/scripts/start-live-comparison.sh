@@ -1,25 +1,45 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -u
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "$ROOT_DIR"
+BASE_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$BASE_DIR"
 
-echo "Starting phase1 separated-services live comparison"
+echo "[start] Bringing up Phase‑1 separated-services lab..."
+docker compose up -d --build
 
-if [ -f docker-compose.yml ]; then
-  docker compose up -d --build
-elif [ -f compose.yml ]; then
-  docker compose -f compose.yml up -d --build
-else
-  echo "No docker-compose.yml or compose.yml found"
-  exit 1
-fi
+echo "[start] Waiting for required services to become healthy..."
 
-echo "Waiting for services..."
-sleep "${SERVICE_WAIT_SECONDS:-5}"
+# Dashboard (passive telemetry receiver)
+until curl -s http://localhost:3000/health >/dev/null; do
+  echo "  dashboard not ready..."
+  sleep 1
+done
 
-echo "Docker containers:"
-docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+# Shared identity (internal service, not a request entrypoint)
+until curl -s http://localhost:3101/health >/dev/null; do
+  echo "  shared-identity not ready..."
+  sleep 1
+done
 
-echo "Starting live evidence loop"
-exec ./scripts/live-comparison-loop.sh
+# Conventional gateway (public entrypoint)
+until curl -s http://localhost:3201/health >/dev/null; do
+  echo "  conventional-gateway not ready..."
+  sleep 1
+done
+
+# Provider-first verifier (internal)
+until curl -s http://localhost:4102/health >/dev/null; do
+  echo "  provider-first-verifier not ready..."
+  sleep 1
+done
+
+# Provider-first gateway (public entrypoint)
+until curl -s http://localhost:4103/health >/dev/null; do
+  echo "  provider-first-gateway not ready..."
+  sleep 1
+done
+
+echo "[start] All services healthy."
+echo "[start] Launching continuous comparison loop..."
+
+exec "$BASE_DIR/scripts/run-continuous-comparison.sh"
