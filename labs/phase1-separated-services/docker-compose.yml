@@ -1,9 +1,7 @@
 version: "3.9"
 
 services:
-  # ---------------------------------------------------------
-  # Dashboard / Control Plane (passive telemetry receiver)
-  # ---------------------------------------------------------
+  # Dashboard / Control Plane (public)
   dashboard:
     build: ./dashboard
     container_name: dashboard
@@ -13,21 +11,17 @@ services:
       - PORT=3000
     restart: unless-stopped
 
-  # ---------------------------------------------------------
   # Shared Identity Service (internal only)
-  # ---------------------------------------------------------
   shared-identity:
     build: ./shared-identity
     container_name: shared-identity
-    ports:
-      - "3101:3101"        # internal validation endpoint
+    expose:
+      - "3101"             # internal-only
     environment:
       - PORT=3101
     restart: unless-stopped
 
-  # ---------------------------------------------------------
-  # Conventional Path
-  # ---------------------------------------------------------
+  # Conventional Path -------------------------------------------------
 
   # Public entrypoint for conventional path
   conventional-gateway:
@@ -48,8 +42,8 @@ services:
   conventional-app:
     build: ./conventional/app
     container_name: conventional-app
-    ports:
-      - "3202:3202"        # internal only
+    expose:
+      - "3202"             # internal-only
     environment:
       - PORT=3202
       - DATA_URL=http://conventional-data-service:3203/query
@@ -61,15 +55,13 @@ services:
   conventional-data-service:
     build: ./conventional/data-service
     container_name: conventional-data-service
-    ports:
-      - "3203:3203"        # internal only
+    expose:
+      - "3203"             # internal-only
     environment:
       - PORT=3203
     restart: unless-stopped
 
-  # ---------------------------------------------------------
-  # Provider-First Path
-  # ---------------------------------------------------------
+  # Provider-First Path -----------------------------------------------
 
   # Public entrypoint for provider-first path
   provider-first-gateway:
@@ -90,8 +82,8 @@ services:
   provider-first-boundary:
     build: ./provider-first/boundary
     container_name: provider-first-boundary
-    ports:
-      - "4101:4101"        # internal only
+    expose:
+      - "4101"             # internal-only
     environment:
       - PORT=4101
       - VERIFIER_URL=http://provider-first-verifier:4102/verify
@@ -103,8 +95,8 @@ services:
   provider-first-verifier:
     build: ./provider-first/verifier
     container_name: provider-first-verifier
-    ports:
-      - "4102:4102"        # internal only
+    expose:
+      - "4102"             # internal-only
     environment:
       - PORT=4102
       - IDENTITY_URL=http://shared-identity:3101/validate-token
@@ -116,8 +108,8 @@ services:
   provider-first-app:
     build: ./provider-first/app
     container_name: provider-first-app
-    ports:
-      - "4104:4104"        # internal only
+    expose:
+      - "4104"             # internal-only
     environment:
       - PORT=4104
     restart: unless-stopped
