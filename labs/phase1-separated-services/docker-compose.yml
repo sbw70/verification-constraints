@@ -1,60 +1,123 @@
+version: "3.9"
+
 services:
+  # ---------------------------------------------------------
+  # Dashboard / Control Plane (passive telemetry receiver)
+  # ---------------------------------------------------------
+  dashboard:
+    build: ./dashboard
+    container_name: dashboard
+    ports:
+      - "3000:3000"        # public dashboard + telemetry ingest
+    environment:
+      - PORT=3000
+    restart: unless-stopped
+
+  # ---------------------------------------------------------
+  # Shared Identity Service (internal only)
+  # ---------------------------------------------------------
   shared-identity:
-    build: ./shared/identity
+    build: ./shared-identity
+    container_name: shared-identity
     ports:
-      - "3001:3101"
+      - "3101:3101"        # internal validation endpoint
+    environment:
+      - PORT=3101
+    restart: unless-stopped
 
+  # ---------------------------------------------------------
+  # Conventional Path
+  # ---------------------------------------------------------
+
+  # Public entrypoint for conventional path
   conventional-gateway:
-    build: ./conventional/request-path/gateway
+    build: ./conventional/gateway
+    container_name: conventional-gateway
     ports:
-      - "3101:3101"
+      - "3201:3201"        # PUBLIC conventional request entrypoint
+    environment:
+      - PORT=3201
+      - IDENTITY_URL=http://shared-identity:3101/validate-token
+      - APP_URL=http://conventional-app:3202/execute
+    depends_on:
+      - shared-identity
+      - conventional-app
+    restart: unless-stopped
 
+  # Internal app service
   conventional-app:
-    build: ./conventional/request-path/app
+    build: ./conventional/app
+    container_name: conventional-app
     ports:
-      - "3102:3102"
+      - "3202:3202"        # internal only
+    environment:
+      - PORT=3202
+      - DATA_URL=http://conventional-data-service:3203/query
+    depends_on:
+      - conventional-data-service
+    restart: unless-stopped
 
+  # Internal data service
   conventional-data-service:
-    build: ./conventional/request-path/data-service
+    build: ./conventional/data-service
+    container_name: conventional-data-service
     ports:
-      - "3103:3103"
+      - "3203:3203"        # internal only
+    environment:
+      - PORT=3203
+    restart: unless-stopped
 
-  conventional-provider-adapter:
-    build: ./conventional/request-path/provider-adapter
-    ports:
-      - "3104:3104"
+  # ---------------------------------------------------------
+  # Provider-First Path
+  # ---------------------------------------------------------
 
-  provider-first-boundary:
-    build: ./provider-first/request-path/boundary
-    ports:
-      - "4101:4101"
-
-  provider-first-verifier:
-    build: ./provider-first/request-path/verifier
-    ports:
-      - "4102:4102"
-
+  # Public entrypoint for provider-first path
   provider-first-gateway:
-    build: ./provider-first/request-path/gateway
+    build: ./provider-first/gateway
+    container_name: provider-first-gateway
     ports:
-      - "4103:4103"
+      - "4103:4103"        # PUBLIC provider-first entrypoint
+    environment:
+      - PORT=4103
+      - BOUNDARY_URL=http://provider-first-boundary:4101/boundary-check
+      - APP_URL=http://provider-first-app:4104/execute
+    depends_on:
+      - provider-first-boundary
+      - provider-first-app
+    restart: unless-stopped
 
+  # Internal boundary/verifier aggregator
+  provider-first-boundary:
+    build: ./provider-first/boundary
+    container_name: provider-first-boundary
+    ports:
+      - "4101:4101"        # internal only
+    environment:
+      - PORT=4101
+      - VERIFIER_URL=http://provider-first-verifier:4102/verify
+    depends_on:
+      - provider-first-verifier
+    restart: unless-stopped
+
+  # Internal verifier
+  provider-first-verifier:
+    build: ./provider-first/verifier
+    container_name: provider-first-verifier
+    ports:
+      - "4102:4102"        # internal only
+    environment:
+      - PORT=4102
+      - IDENTITY_URL=http://shared-identity:3101/validate-token
+    depends_on:
+      - shared-identity
+    restart: unless-stopped
+
+  # Internal provider-first app
   provider-first-app:
-    build: ./provider-first/request-path/app
+    build: ./provider-first/app
+    container_name: provider-first-app
     ports:
-      - "4104:4104"
-
-  provider-first-data-service:
-    build: ./provider-first/request-path/data-service
-    ports:
-      - "4105:4105"
-
-  shared-dashboard:
-    build: ./shared/dashboard
-    ports:
-      - "5101:5101"
-
-  shared-load-generator:
-    build: ./shared/load-generator
-    ports:
-      - "5201:5201"
+      - "4104:4104"        # internal only
+    environment:
+      - PORT=4104
+    restart: unless-stopped
