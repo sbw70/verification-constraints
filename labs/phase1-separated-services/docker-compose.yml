@@ -1,115 +1,45 @@
-version: "3.9"
-
-services:
-  # Dashboard / Control Plane (public)
-  dashboard:
-    build: ./dashboard
-    container_name: dashboard
-    ports:
-      - "3000:3000"        # public dashboard + telemetry ingest
-    environment:
-      - PORT=3000
-    restart: unless-stopped
-
-  # Shared Identity Service (internal only)
-  shared-identity:
-    build: ./shared-identity
-    container_name: shared-identity
-    expose:
-      - "3101"             # internal-only
-    environment:
-      - PORT=3101
-    restart: unless-stopped
-
-  # Conventional Path -------------------------------------------------
-
-  # Public entrypoint for conventional path
-  conventional-gateway:
-    build: ./conventional/gateway
+conventional-gateway:
+    build: ./conventional/request-path/gateway
     container_name: conventional-gateway
     ports:
-      - "3201:3201"        # PUBLIC conventional request entrypoint
+      - "3201:3201"
     environment:
-      - PORT=3201
-      - IDENTITY_URL=http://shared-identity:3101/validate-token
-      - APP_URL=http://conventional-app:3202/execute
+      PORT: "3201"
+      IDENTITY_URL: http://shared-identity:3101/validate-token
+      APP_URL: http://conventional-app:3202/execute
     depends_on:
       - shared-identity
       - conventional-app
     restart: unless-stopped
 
-  # Internal app service
   conventional-app:
-    build: ./conventional/app
+    build: ./conventional/request-path/app
     container_name: conventional-app
     expose:
-      - "3202"             # internal-only
+      - "3202"
     environment:
-      - PORT=3202
-      - DATA_URL=http://conventional-data-service:3203/query
+      PORT: "3202"
+      DATA_SERVICE_URL: http://conventional-data-service:3203/data-access
+      PROVIDER_ADAPTER_URL: http://conventional-provider-adapter:3204/provider-check
     depends_on:
       - conventional-data-service
+      - conventional-provider-adapter
     restart: unless-stopped
 
-  # Internal data service
   conventional-data-service:
-    build: ./conventional/data-service
+    build: ./conventional/request-path/data-service
     container_name: conventional-data-service
     expose:
-      - "3203"             # internal-only
+      - "3203"
     environment:
-      - PORT=3203
+      PORT: "3203"
     restart: unless-stopped
 
-  # Provider-First Path -----------------------------------------------
-
-  # Public entrypoint for provider-first path
-  provider-first-gateway:
-    build: ./provider-first/gateway
-    container_name: provider-first-gateway
-    ports:
-      - "4103:4103"        # PUBLIC provider-first entrypoint
-    environment:
-      - PORT=4103
-      - BOUNDARY_URL=http://provider-first-boundary:4101/boundary-check
-      - APP_URL=http://provider-first-app:4104/execute
-    depends_on:
-      - provider-first-boundary
-      - provider-first-app
-    restart: unless-stopped
-
-  # Internal boundary/verifier aggregator
-  provider-first-boundary:
-    build: ./provider-first/boundary
-    container_name: provider-first-boundary
+  conventional-provider-adapter:
+    build: ./conventional/request-path/provider-adapter
+    container_name: conventional-provider-adapter
     expose:
-      - "4101"             # internal-only
+      - "3204"
     environment:
-      - PORT=4101
-      - VERIFIER_URL=http://provider-first-verifier:4102/verify
-    depends_on:
-      - provider-first-verifier
-    restart: unless-stopped
-
-  # Internal verifier
-  provider-first-verifier:
-    build: ./provider-first/verifier
-    container_name: provider-first-verifier
-    expose:
-      - "4102"             # internal-only
-    environment:
-      - PORT=4102
-      - IDENTITY_URL=http://shared-identity:3101/validate-token
-    depends_on:
-      - shared-identity
-    restart: unless-stopped
-
-  # Internal provider-first app
-  provider-first-app:
-    build: ./provider-first/app
-    container_name: provider-first-app
-    expose:
-      - "4104"             # internal-only
-    environment:
-      - PORT=4104
+      PORT: "3204"
     restart: unless-stopped
