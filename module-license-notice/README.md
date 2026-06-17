@@ -41,7 +41,10 @@ No rights are granted by default.
 
 License scope is determined exclusively by the presence of an explicit license header within an individual file.
 
-If a file contains an Apache License, Version 2.0 header, it is licensed under Apache 2.0.  
-If it does not, it is not.
+A file is licensed under Apache 2.0 only if it carries a full, unqualified Apache 2.0 grant — for example, an `SPDX-License-Identifier: Apache-2.0` line, or the complete Apache 2.0 header with no added restrictions.
+
+A file carrying a mixed or qualified notice — for example, one stating that certain components are Apache-licensed while the remaining logic is proprietary — is governed by the specific terms written in that file, not by Apache 2.0 as a whole.
+
+A file with no license header grants no license.
 
 For commercial licensing inquiries or evaluation requests, contact the repository owner.
