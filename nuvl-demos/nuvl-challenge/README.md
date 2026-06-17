@@ -4,7 +4,7 @@ This is a live demonstration of a provider-isolated verification boundary. $100 
 
 ## What you're looking at
 
-- `nuvl_core.py`  
+- `nuvl.py`  
   Stateless verification boundary. Does not authorize. Does not hold keys.
 
 - `provider.py`  
