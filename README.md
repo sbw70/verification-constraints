@@ -67,28 +67,37 @@ They define what components must not assume.
 
 ## Constraint Modules
 
-### 1. Adaptive Execution Boundary Determination  
+### 1. Multi-Provider Boundary Constraints  
+Constrains execution across multiple providers such that each provider independently retains authority over its own verification, authorization, execution, and boundary signaling decisions.
+
+### 2. Multi-Domain Stateless Verification Constraints  
+Constrains verification across heterogeneous domains, networks, environments, or operational contexts without allowing domain translation, relay behavior, or cross-domain movement to create shared authorization authority.
+
+### 3. Request-Bound Artifact Exchange Constraints  
+Defines exchange of request-bound artifacts between intermediaries, providers, and downstream systems while preventing artifacts from becoming identity tokens, bearer credentials, policy decisions, or independent authorization instruments.
+
+### 4. Adaptive Execution Boundary Determination  
 Constrains model-driven or adaptive evaluation mechanisms such that decision authority remains provider-scoped.
 
-### 2. Stateless Intermediation (Multi-Hub Architecture)  
+### 5. Stateless Intermediation (Multi-Hub Architecture)  
 Defines routing and coordination hubs that forward requests without acquiring execution authority.
 
-### 3. Hardware-Constrained Endpoint Architecture  
+### 6. Hardware-Constrained Endpoint Architecture  
 Restricts hardware-limited or embedded devices from assuming verification or authorization roles.
 
-### 4. Disclosure-Constrained Verification Artifacts  
+### 7. Disclosure-Constrained Verification Artifacts  
 Limits inferable information in verification artifacts without relocating interpretive authority.
 
-### 5. Offline and Air-Gapped Execution Constraints  
+### 8. Offline and Air-Gapped Execution Constraints  
 Preserves execution semantics under deferred transmission or physical isolation.
 
-### 6. Temporal Gatekeeping Framework  
+### 9. Temporal Gatekeeping Framework  
 Constrains timing, ordering, replay, and freshness properties from acquiring authorization meaning.
 
-### 7. Measurement-Sensitive / Quantum-Influenced Execution Constraints  
+### 10. Measurement-Sensitive / Quantum-Influenced Execution Constraints  
 Prevents replay, sampling, probabilistic modeling, or observation from amplifying or redefining execution authority.
 
-### 8. Ledger State Reliance Constraints (Blockchain / Supply Chain)  
+### 11. Ledger State Reliance Constraints (Blockchain / Supply Chain)  
 Prohibits ledger state, consensus outcomes, settlement finality, or smart-contract evaluation from substituting for provider-controlled verification or execution authority.
 
 ---
