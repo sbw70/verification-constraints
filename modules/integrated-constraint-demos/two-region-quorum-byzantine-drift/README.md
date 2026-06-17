@@ -129,7 +129,7 @@ Failover is client-side selection of region entrypoint; downstream topology rema
 
 Run:
 
-    python3 two-region-quorum-byzantize-drift.py
+    python3 two-region-quorum-byzantine-drift.py
 
 Key tunables (environment variables):
 
