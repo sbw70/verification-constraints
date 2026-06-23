@@ -159,6 +159,7 @@ The modules are designed to be:
 
 - Standalone
 - Composable
+- Zero dependencies
 - Language agnostic
 - Implementation-agnostic
 
