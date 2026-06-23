@@ -159,8 +159,9 @@ The modules are designed to be:
 
 - Standalone
 - Composable
+- Language agnostic
 - Implementation-agnostic
-- Citation-ready
+
 
 They collectively define a constraint-oriented verification architecture for distributed systems.
 
