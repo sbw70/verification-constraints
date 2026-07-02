@@ -168,6 +168,14 @@ They collectively define a constraint-oriented verification architecture for dis
 
 ---
 
+## Live Deployments
+
+- [Project site](https://nuvltech.com)
+- [Live challenge dashboard](https://challenge.xer0trust.com) — running under continuous adversarial traffic since March 31, 2026
+- [Live lab](https://lab.xer0trust.com)
+
+---
+
 ## Licensing
 
 The neutral core implementation (`nuvl-core/`) and explicitly designated files are released under the Apache License 2.0.
@@ -178,4 +186,4 @@ Commercial licensing inquiries may be directed to the repository owner.
 
 Non-commercial research licensing may be available upon request.
 
-xer0trust.com 
+
