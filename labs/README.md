@@ -42,3 +42,10 @@ Exact values belong in dated reports, screenshots, dashboards, or specific lab n
 Labs are research and development environments.
 
 They are not production deployment instructions, formal benchmarks, certifications, or claims that every implementation will produce the same measurements.
+
+## Link
+
+[Live Lab](lab.xer0trust.com)
+
+
+
