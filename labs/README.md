@@ -4,18 +4,22 @@ Experimental testbeds, comparison harnesses, and validation environments for pro
 
 This directory is separate from the core NUVL reference implementation.
 
-The labs are used to evaluate where denial occurs, what activates before denial, and whether provider-controlled authority remains inside the provider boundary.
+The labs are used to test how the constraint model behaves under different request paths, load profiles, deployment shapes, and operating conditions.
 
 ## Lab Types
 
 Labs may include:
 
-- comparison harnesses
-- simulated enterprise request paths
-- provider-first benchmark environments
+- provider-first comparison environments
+- simulated request paths
+- benchmark and load-mix harnesses
 - measurement dashboards
-- repeatable test scenarios
-- control-plane validation environments
+- repeatable validation scenarios
+- live control-plane tests
+- hardware or endpoint trials
+- deferred, delayed, or disconnected-client tests
+- local-network experiments
+- future research and development testbeds
 
 ## Provider-First Comparison
 
@@ -35,6 +39,6 @@ Exact values belong in dated reports, screenshots, dashboards, or specific lab n
 
 ## Scope
 
-Labs are experimental validation environments.
+Labs are research and development environments.
 
-They are not production deployment instructions, formal benchmarks, or claims that every implementation will produce the same measurements.
+They are not production deployment instructions, formal benchmarks, certifications, or claims that every implementation will produce the same measurements.
