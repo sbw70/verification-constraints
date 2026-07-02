@@ -159,7 +159,7 @@ The modules are designed to be:
 
 - Standalone
 - Composable
-- Zero dependencies
+- No added trust dependency
 - Language agnostic
 - Implementation-agnostic
 
