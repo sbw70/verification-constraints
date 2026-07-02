@@ -179,6 +179,6 @@ NUVL can carry the request, but it cannot authorize execution.
 
 ## Live Endpoint
 
-Endpoint: https://challenge.xer0trust.com
+[Live Dashboard](https://challenge.xer0trust.com)
 
 Explore the rest of the repository for the full architecture and additional demos.
