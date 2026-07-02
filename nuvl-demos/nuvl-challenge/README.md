@@ -24,6 +24,14 @@ Reference implementation of a valid request path.
 
 Use this to understand what an admissible request is supposed to look like.
 
+### `mint_token.py`
+
+Local provider-side token minting helper.
+
+Use this to generate a valid local test artifact before changing one field at a time with the attack harness.
+
+This does not change the boundary model. Token issuance remains provider-side. The helper exists only so the local test loop can start from a valid artifact.
+
 ### `attacker.py`
 
 Attack harness and boundary-check tool.
@@ -52,7 +60,7 @@ If this occurs, the provider has accepted the request as admissible inside its o
 
 ## Constraints
 
-You do not have the provider signing key.
+You do not have the live provider signing key.
 
 There is no identity system to exploit.
 
@@ -65,6 +73,30 @@ NUVL does not hold provider signing material.
 All execution authority exists behind the provider boundary.
 
 Replay attempts are detected and rejected.
+
+## Local Token Minting
+
+For local testing, use `mint_token.py` to generate a valid provider-side test payload.
+
+Example:
+
+`python3 mint_token.py --pretty`
+
+The output contains:
+
+- `request_repr`
+- `verification_context`
+- `provider_token`
+
+The token mirrors the local provider format:
+
+- `r` — request representation
+- `c` — verification context
+- `n` — nonce
+- `e` — expiry
+- `s` — HMAC signature over `r|c|n|e`
+
+Use this valid artifact as the starting point for local boundary testing.
 
 ## Attack Harness: Check the Boundary
 
