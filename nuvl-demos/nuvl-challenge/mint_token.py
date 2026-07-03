@@ -12,8 +12,8 @@ This script mirrors the provider token format used by provider.py:
         "s": hmac_sha256(secret, f"{r}|{c}|{n}|{e}")
     }))
 
-It is for local validation and check-your-work testing. It does not change the
-NUVL boundary model: token issuance remains provider-side.
+This is provider-side issuance logic for local validation and check-your-work
+testing. The client does not mint, sign, hash, or create nonce material.
 """
 
 import argparse
@@ -29,6 +29,9 @@ from pathlib import Path
 
 DEFAULT_SECRET = "FIGURE IT OUT"
 DEFAULT_CONTEXT = "ctx_demo"
+
+# Must match the BODY used by client.py so the flag-free path works.
+DEFAULT_BODY = b'{"op":"initiate","target":"gate","mode":"standard"}'
 
 
 def sha256_hex(data: bytes) -> str:
@@ -53,9 +56,11 @@ def read_body(args: argparse.Namespace) -> bytes:
         return Path(args.body_file).read_bytes()
 
     if not sys.stdin.isatty():
-        return sys.stdin.buffer.read()
+        incoming = sys.stdin.buffer.read()
+        if incoming:
+            return incoming
 
-    return b"demo request body"
+    return DEFAULT_BODY
 
 
 def build_payload(args: argparse.Namespace) -> dict:
@@ -148,6 +153,12 @@ def main() -> int:
         help="pretty-print JSON output",
     )
 
+    parser.add_argument(
+        "--out",
+        default=None,
+        help="write token payload to this file instead of stdout",
+    )
+
     args = parser.parse_args()
 
     if not args.context.startswith("ctx_"):
@@ -165,9 +176,14 @@ def main() -> int:
     payload = build_payload(args)
 
     if args.pretty:
-        print(json.dumps(payload, indent=2))
+        output = json.dumps(payload, indent=2)
     else:
-        print(json.dumps(payload, separators=(",", ":")))
+        output = json.dumps(payload, separators=(",", ":"))
+
+    if args.out:
+        Path(args.out).write_text(output + "\n", encoding="utf-8")
+    else:
+        print(output)
 
     return 0
 
