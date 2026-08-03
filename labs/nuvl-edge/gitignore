@@ -1,0 +1,177 @@
+# ============================================================
+# Private cryptographic material
+# ============================================================
+
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+*_private.*
+*private_key*
+*secret_key*
+
+# ============================================================
+# Environment files and credentials
+# ============================================================
+
+.env
+.env.*
+!.env.example
+
+credentials*.json
+secrets*.json
+password*.txt
+wifi*.txt
+
+# ============================================================
+# Python-generated files
+# ============================================================
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# ============================================================
+# Virtual environments
+# ============================================================
+
+.venv/
+venv/
+env/
+ENV/
+
+# ============================================================
+# Generated authority artifacts and test fixtures
+# ============================================================
+
+*_artifact.json
+*_artifact_*.json
+artifact.json
+
+# Sanitized example fixtures may be committed intentionally.
+!*example_artifact.json
+!*artifact.example.json
+
+# ============================================================
+# Persistent replay and commit state
+# ============================================================
+
+*_spent_state*.json
+*_spent_state*.json.tmp
+*_spent_state*.tmp
+
+spent_state.json
+spent_state.json.tmp
+
+*_crash_stage.txt
+*_crash_marker*
+*_commit_stage*
+
+# ============================================================
+# Process and runtime output
+# ============================================================
+
+*.pid
+*.sock
+nohup.out
+
+# Temporary and backup files
+*.tmp
+*.temp
+*.bak
+*.old
+*.orig
+*.swp
+*.swo
+*~
+
+# ============================================================
+# Logs
+# ============================================================
+
+*.log
+
+# Curated evidence logs may be committed intentionally.
+!evidence/**/*.log
+
+# ============================================================
+# Packet captures and large diagnostic output
+# ============================================================
+
+*.pcap
+*.pcapng
+*.cap
+
+# Curated captures may be committed only after sanitization.
+!evidence/**/*.pcap
+!evidence/**/*.pcapng
+
+# ============================================================
+# Local manifests and generated hash reports
+# ============================================================
+
+*_local_manifest*.txt
+*_inventory.csv
+*_candidate_check.csv
+
+# Explicitly curated manifests may be committed under evidence.
+!evidence/**/*manifest*.txt
+!evidence/SHA256SUMS.txt
+!SHA256SUMS.txt
+
+# ============================================================
+# Operating-system files
+# ============================================================
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ============================================================
+# IDE and editor metadata
+# ============================================================
+
+.vscode/
+.idea/
+*.code-workspace
+
+# ============================================================
+# Build and packaging output
+# ============================================================
+
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# ============================================================
+# Local quarantine and staging material
+# ============================================================
+
+quarantine/
+_quarantine/
+local-only/
+private-evidence/
+raw-evidence/
+working/
+scratch/
+staging-temp/
+
+# ============================================================
+# Original working-directory exports
+# ============================================================
+
+espmain_tree.txt
+espmain_inventory.csv
+espmain_docs_inventory.csv
+nuvl_release_candidate_check.csv
