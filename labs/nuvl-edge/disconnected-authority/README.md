@@ -1,39 +1,81 @@
-# Disconnected Authority Tests
+# NUVL Edge — Disconnected Authority
 
 This directory contains the NUVL Edge Lab tests for provider-issued authority that remains bounded during temporary provider disconnection.
 
-The tests examine whether a constrained endpoint or local verification boundary can exercise a narrowly scoped provider-issued artifact without converting that artifact into reusable, expandable, or locally minted authority.
+The tests examine whether a constrained endpoint and local verification boundary can exercise a narrowly scoped, provider-issued artifact without converting it into reusable, expandable, or locally minted authority.
 
-The tested design separates:
-
-- Provider issuance
-- Local artifact verification
-- Single-use enforcement
-- Persistent replay state
-- Endpoint action
-- Recovery after restart, power loss, or injected crash
-
-The core rule is:
+The governing rule is:
 
 > Disconnection may change availability, but it must not enlarge authority.
 
-## What Is Being Tested
+## What These Tests Demonstrate
 
-The disconnected-authority sequence evaluates whether a provider-issued artifact remains constrained by its original bounds when the provider is unavailable.
+The disconnected-authority tests cover:
 
-Depending on the test, those bounds include:
+- Provider issuance of a signed, bounded artifact
+- Local verification using provider public verification material
+- Device, action, context, nonce, and validity constraints
+- Single-use enforcement
+- Replay denial
+- Persistent spent-state
+- Process-restart recovery
+- Abrupt power-loss recovery
+- Overlapping spend attempts
+- Crash after persistent commit but before response
+- Crash before atomic state replacement
 
-- Authorized device
-- Authorized action
-- Authorized context
-- Nonce
-- Validity period
-- Signature
-- Single-use state
-- Replay state
-- Persistent commit state
+Together, the tests examine whether bounded authority remains bounded when the provider is temporarily unavailable and when the local verification path is interrupted.
 
-The test set includes valid use and deliberate negative cases. A PASS requires both correct acceptance and correct rejection.
+## Architecture
+
+The general test path is:
+
+```text
+Provider
+   |
+   | issues signed, bounded artifact
+   v
+ESP32-S3 endpoint or test client
+   |
+   | presents artifact and bounded request
+   v
+Raspberry Pi verification boundary
+   |
+   | verifies provider signature
+   | verifies device, action, context, nonce, and validity
+   | checks single-use or spent-state
+   v
+Accepted once or denied
+```
+
+The provider retains the private signing key.
+
+The local verification boundary may hold:
+
+- Provider public verification material
+- The presented artifact
+- Persistent spent-state
+- Temporary state required by the tested commit procedure
+
+The endpoint does not receive the provider private key and does not independently mint provider authority.
+
+## Artifact Bounds
+
+The exact artifact structure varies between tests, but the validation set includes checks for:
+
+```text
+device
+action
+context
+nonce
+validity period
+signature
+single-use status
+```
+
+A valid signature alone is not enough for acceptance.
+
+The artifact must also match the expected device, action, context, nonce, validity period, and replay state.
 
 ## Directory Structure
 
@@ -57,74 +99,20 @@ disconnected-authority/
     └── README.md
 ```
 
-The earlier POC004 process-restart test is documented in the project history but is not included here as a complete reproduction package until the exact boundary version is tied conclusively to the recorded run.
+The earlier POC004 process-restart test remains part of the test history but is not currently presented as a complete public reproduction package because the exact boundary version associated with the recorded run has not been conclusively identified.
 
-## Test Sequence
-
-The tests build on one another.
+## Test Summary
 
 | Test | Result | Property exercised |
 |---|---|---|
 | POC003 | PASS | Provider-issued authority remains bounded and single-use during disconnection |
-| POC004 | PASS | Replay state survives process restart |
-| POC004B | PASS | Completed replay-state commit survives abrupt Raspberry Pi power loss |
+| POC004 | PASS | Replay state survives verification-boundary process restart |
+| POC004B | PASS | A completed spent-state commit survives abrupt Raspberry Pi power loss |
 | POC005 | PASS | Overlapping attempts produce exactly one acceptance |
-| POC006A | PASS | Crash after commit but before response does not permit reuse |
-| WP2-T1 | PASS | Crash before atomic replacement does not falsely consume the artifact |
+| POC006A | PASS | A crash after commit but before response does not permit reuse |
+| WP2-T1 | PASS | A crash before atomic replacement does not falsely consume the artifact |
 
-POC004 remains part of the evidence history but is not yet treated as a complete public reproduction package.
-
-## Common Architecture
-
-The general disconnected-authority path is:
-
-```text
-Provider
-   |
-   | issues signed, bounded artifact
-   v
-Raspberry Pi verification boundary
-   |
-   | verifies signature and explicit bounds
-   | checks persistent single-use state
-   v
-ESP32-S3 endpoint
-   |
-   | presents artifact or test request
-   v
-Accepted once or rejected
-```
-
-The provider retains the private signing key.
-
-The local verification boundary may hold:
-
-- Provider public verification material
-- Bounded artifact data
-- Persistent spent-state
-- Temporary commit state required by the tested persistence method
-
-The endpoint does not receive the provider private key and does not independently mint provider authority.
-
-## Common Artifact Properties
-
-The tested artifacts are intended to bind authority to explicit fields rather than functioning as general bearer credentials.
-
-The tested field set varies by file version, but the validation matrix includes:
-
-```text
-device
-action
-context
-nonce
-validity period
-signature
-single-use status
-```
-
-A valid signature alone is not sufficient for acceptance.
-
-The artifact must also satisfy the expected device, action, context, freshness, and replay conditions.
+The results apply to the tested paths and fault-injection points.
 
 ## POC003 — Bounded Disconnected Single Use
 
@@ -136,11 +124,11 @@ poc003-single-use/
 
 POC003 establishes the base disconnected-authority behavior.
 
-The provider issues a signed artifact before disconnection. The artifact is then exercised through the local boundary while the provider is unavailable.
+The provider issues a signed artifact before disconnection. The artifact is then presented to the local verification boundary while the provider is unavailable.
 
-The tested matrix includes:
+The test matrix includes:
 
-- Valid bounded offline use
+- Valid bounded use
 - Replay
 - Context mismatch
 - Action mismatch
@@ -166,39 +154,40 @@ expired artifact         -> denied
 missing artifact         -> denied
 ```
 
-Known client-side files include:
+The recorded behavior demonstrated that provider disconnection did not convert the artifact into general or reusable authority.
+
+TThe POC003 source set includes:
 
 ```text
+poc003_ed25519_provider_1h.py
+poc003_pi_boundary_housewifi.py
 poc003_esp32_prepare_housewifi.py
 poc003_esp32_spend_v2_housewifi.py
 ```
 
-Known boundary candidate:
+The provider issues an Ed25519-signed, single-use artifact before disconnection. The Raspberry Pi boundary verifies and enforces that artifact while the provider is unavailable.
+
+## POC004 — Replay State Across Process Restart
+
+POC004 tested whether spent-state enforcement survived restart of the Raspberry Pi verification-boundary process.
+
+The test sequence was:
 
 ```text
-poc003_pi_boundary_housewifi.py
+prepare single-use artifact
+perform initial valid spend
+confirm acceptance
+stop verification-boundary process
+restart verification-boundary process
+replay the same artifact
+confirm denial
 ```
 
-Two provider candidates exist in the original working set:
+Observed result:
 
-```text
-poc003_ed25519_provider.py
-poc003_ed25519_provider_1h.py
-```
+> Replay remained denied after verification-boundary process restart.
 
-Only the provider version tied to the recorded house-network test should be identified as the canonical reproduction file.
-
-Best last-known end-to-end client:
-
-```text
-poc003_esp32_spend_v2_housewifi.py
-```
-
-## POC004 — Replay State Across Restart
-
-POC004 demonstrated that spent-state enforcement survived boundary process restart.
-
-Known files from the original test history include:
+Files from the original test history include:
 
 ```text
 poc004_pi_boundary_persistent.py
@@ -207,11 +196,7 @@ poc004_esp32_spend_before_restart.py
 poc004_esp32_replay_after_restart.py
 ```
 
-The exact boundary version associated with the recorded run has not yet been mapped conclusively.
-
-For that reason, POC004 is documented as a demonstrated result but is not currently presented as a complete public reproduction folder.
-
-The test should not be reconstructed by mixing the original and Archer boundary variants without source-history or hash confirmation.
+The exact boundary variant used in the recorded run has not been conclusively mapped, so POC004 is documented as a demonstrated result but is not currently included as a complete standalone folder.
 
 ## POC004B — Replay State Across Power Loss
 
@@ -221,28 +206,28 @@ Folder:
 poc004b-power-loss/
 ```
 
-POC004B extends persistent replay enforcement from process restart to abrupt Raspberry Pi power loss.
+POC004B extends the persistent replay test from process restart to abrupt Raspberry Pi power loss.
 
-Test sequence:
+The test sequence was:
 
 ```text
 prepare artifact
-start persistent boundary
+start persistent verification boundary
 perform initial valid spend
 confirm acceptance
 remove Raspberry Pi power
 restore Raspberry Pi power
-restart boundary
+restart verification boundary
 replay the spent artifact
 confirm denial
 restore fleet services
 ```
 
-Observed property:
+Observed result:
 
 > A completed persistent-state commit remained effective after abrupt Raspberry Pi power loss.
 
-Known client-side files include:
+Client-side files include:
 
 ```text
 poc004b_prepare_powercycle_artifact_archer.py
@@ -250,15 +235,13 @@ poc004b_initial_spend_archer.py
 poc004b_replay_after_powerloss_archer.py
 ```
 
-The tested boundary implementation was:
+The recorded verification-boundary implementation was:
 
 ```text
 poc004b_pi_boundary_powercycle_archer.py
 ```
 
-Its public release is a separate publication decision.
-
-Curated evidence includes:
+Evidence includes:
 
 ```text
 poc004b_archer_evidence_20260730_225507.log
@@ -266,11 +249,24 @@ post_powercycle_fleet_restoration_20260730_231251.log
 poc004b_local_manifest_20260731_232149.txt
 ```
 
-The restoration sequence eventually returned the three-endpoint fleet to normal operation.
+### Recovery Result
 
-One endpoint required reset before timely participation resumed. That anomaly remains part of the test record.
+After power restoration:
 
-## POC005 — Concurrent Double-Spend
+- The verification boundary recovered
+- The fleet coordinator recovered
+- The three-endpoint fleet eventually returned to normal operation
+- One endpoint required reset before timely participation resumed
+
+The recovery result is recorded as:
+
+```text
+PASS with anomaly
+```
+
+The endpoint reset does not invalidate the persistent replay result. It remains a documented operational recovery limitation.
+
+## POC005 — Overlapping Double-Spend Attempts
 
 Folder:
 
@@ -278,22 +274,20 @@ Folder:
 poc005-double-spend/
 ```
 
-POC005 submits overlapping attempts against one single-use artifact.
+POC005 submits two overlapping attempts against one single-use artifact.
 
-Known client-side files include:
+Client-side files include:
 
 ```text
 poc005_prepare_race.py
 poc005_concurrent_double_spend.py
 ```
 
-The tested boundary implementation was:
+The recorded verification-boundary implementation was:
 
 ```text
 poc005_pi_boundary_persistent_archer.py
 ```
-
-Its public release is a separate publication decision.
 
 Expected outcome:
 
@@ -306,13 +300,17 @@ duplicate accept:  0
 
 PASS requires exactly one successful exercise.
 
-Zero accepts is not PASS.
+```text
+0 accepted -> FAIL
+1 accepted -> PASS
+2 accepted -> FAIL
+```
 
-More than one accept is not PASS.
+This test does not claim mathematically simultaneous execution.
 
-This test does not claim mathematically simultaneous execution. It demonstrates single-use enforcement under near-concurrent competing attempts.
+It demonstrates single-use enforcement under near-concurrent competing attempts in the tested path.
 
-## POC006A — Commit Before Accept
+## POC006A — Crash After Commit, Before Response
 
 Folder:
 
@@ -320,9 +318,9 @@ Folder:
 poc006a-commit-before-accept/
 ```
 
-POC006A tests the crash window after persistent state has been committed but before the successful response is returned.
+POC006A tests the crash window after persistent spent-state has been committed but before the successful response is returned to the client.
 
-Known client-side files include:
+Client-side files include:
 
 ```text
 poc006_prepare_crash_artifact_archer.py
@@ -330,31 +328,29 @@ poc006_crash_spend_archer.py
 poc006_replay_after_crash_archer.py
 ```
 
-The tested boundary implementation was:
+The recorded verification-boundary implementation was:
 
 ```text
 poc006_crash_window_boundary_archer.py
 ```
 
-Its public release is a separate publication decision.
-
-Test sequence:
+The test sequence was:
 
 ```text
 prepare artifact
 submit valid spend
 commit spent-state
 inject crash before response
-restart boundary
+restart verification boundary
 retry the same artifact
 confirm replay denial
 ```
 
-Observed property:
+Observed result:
 
 > A crash after persistent commit but before response did not permit the artifact to be accepted again.
 
-The absence of a successful response did not reverse the completed commit.
+The missing successful response did not reverse the completed commit.
 
 ## WP2-T1 — Crash Before Atomic Replacement
 
@@ -366,7 +362,7 @@ wp2-t1-pre-replace/
 
 WP2-T1 tests the opposite persistence window: a crash before atomic replacement of the committed state file.
 
-Known client-side files include:
+Client-side files include:
 
 ```text
 wp2_t1_prepare_temp_fsync_artifact_archer.py
@@ -375,7 +371,7 @@ wp2_t1_retry_commit_after_restart_archer.py
 wp2_t1_replay_check_archer.py
 ```
 
-The tested boundary was:
+The recorded verification boundary was:
 
 ```text
 wp2_t1_pre_replace_boundary_archer.py
@@ -387,176 +383,104 @@ Confirmed SHA-256:
 87351DBDF539E0E44480B28B205AE04FAD796D9C60DA9C4084FDEFDA49A9BFC8
 ```
 
-Do not substitute:
+Do not confuse it with:
 
 ```text
 wp2_t1_temp_fsync_boundary_archer.py
 ```
 
-That similarly named file has different contents and was not the tested boundary.
+That similarly named file has different contents and was not the verification boundary used in the recorded WP2-T1 test.
 
-Test sequence:
+The test sequence was:
 
 ```text
 prepare artifact
-begin persistent update
+begin persistent-state update
 write and fsync temporary state
 inject crash before atomic replacement
-restart boundary
+restart verification boundary
 retry the interrupted commit
 confirm successful completion
 attempt replay
 confirm replay denial
 ```
 
-Observed property:
+Observed result:
 
 > A crash before atomic replacement did not falsely consume the artifact. The interrupted commit could be retried after restart, after which replay remained denied.
 
-Curated final evidence:
+Final evidence:
 
 ```text
 wp2_t1_final_evidence_20260801_010225.log
 ```
 
-Known evidence details:
+Evidence details:
 
 ```text
-Size: 5,374 bytes
+Size:
+5,374 bytes
+
 SHA-256:
 5BB1053A0AF88831F59D8D346D524F10F1E432C5B6D7A3A2A2342312120BBF20
 ```
 
-The smaller phase logs should be added only after their exact filenames, sizes, and hashes are captured.
+## Public Test Packages
 
-## Intentionally Withheld Boundary Implementations
+Some test folders do not include the mechanism-level verification-boundary implementation.
 
-Some verification-boundary implementations used in these tests are intentionally not included in the current public release.
+Those folders provide the available material needed to understand and evaluate the recorded test, including:
 
-The public packages may instead include:
-
-- Available client sequence
+- Client sequence
 - Boundary interface
-- Expected request structure
-- Expected response structure
-- Failure-injection procedure
+- Request and response behavior
+- Failure-injection point
 - Expected result
 - Observed result
 - PASS criteria
 - Evidence
-- Source and evidence hashes
-- Limitations
+- Relevant hashes
+- Known limitations
 
-This is an intentional publication-boundary decision, not a missing-file error.
+Where a boundary source is not included, the test-folder README states that directly.
 
-See the [Publication Boundary](../README.md#publication-boundary) section in the main NUVL Edge Lab README.
+The omission is intentional and does not indicate that the file was accidentally lost from the repository.
 
-## Reproduction Expectations
+## Common Test Flow
 
-A test folder should not be considered independently reproducible merely because some files are present.
+The disconnected-authority tests follow the same general operating sequence:
 
-A complete reproduction package must identify:
+1. Start the provider when artifact issuance is required.
+2. Issue a bounded artifact.
+3. Transfer or prepare the artifact for the endpoint.
+4. Start the Raspberry Pi verification boundary.
+5. Confirm the provider public verification material is available locally.
+6. Perform the initial valid exercise.
+7. Apply the test-specific restart, outage, race, or crash condition.
+8. Retry or replay the artifact.
+9. Compare the result with the documented PASS criteria.
+10. Preserve the test output and recovery result.
 
-- Exact files used
-- Public or withheld boundary status
-- Provider version
-- Public-key deployment method
-- Artifact preparation procedure
-- Network topology
-- Service ports
-- Persistent-state location
-- State-reset procedure
-- Failure-injection step
-- Expected outcome
-- PASS criteria
-- Evidence files
-- SHA-256 values
-- Known anomalies
-
-A similarly named file must not be substituted for a tested file without hash or source-history confirmation.
-
-## Source Classes
-
-Published files are classified as one of the following:
-
-### Original tested source
-
-The exact file used in the recorded test.
-
-### Sanitized public derivative
-
-A copy modified to remove credentials, private values, or environment-specific configuration.
-
-### Rerun-confirmed public source
-
-A sanitized or reorganized public copy that was executed again and confirmed against the documented PASS criteria.
-
-Do not attach an original tested hash to a modified public copy.
-
-Each sanitized derivative must receive its own SHA-256 in:
-
-```text
-../evidence/SHA256SUMS.txt
-```
-
-The hash entry should identify the file as a sanitized derivative.
-
-## Generated State
-
-The following are generated runtime state and should not be treated as normal source files:
-
-```text
-*_artifact.json
-*_spent_state*.json
-*_spent_state*.json.tmp
-*_crash_stage.txt
-*.pid
-nohup.out
-```
-
-Provider-signed artifacts are not private keys, but they contain test-specific bindings and signatures.
-
-They should remain in the private evidence bundle unless a sanitized fixture is deliberately selected for public release.
-
-## Private Material
-
-Do not publish:
-
-```text
-*.pem
-*.key
-*_private.*
-credentials*.json
-secrets*.json
-.env
-.env.*
-```
-
-The provider private signing key must remain outside the public repository.
-
-Public verification material may be included only when it is clearly identified as test material and does not expose private signing material.
+Each test-folder README provides its exact command sequence and prerequisites.
 
 ## Evidence
 
-Curated evidence belongs under:
+Evidence for these tests is stored under:
 
 ```text
 ../evidence/
 ```
 
-Each test-folder README should identify:
+The current public evidence set includes:
 
-- Evidence filename
-- Test identifier
-- Date
-- File size
-- SHA-256
-- Relevant source version
-- Expected result
-- Observed result
-- Any anomaly or setup incident
+```text
+poc004b_archer_evidence_20260730_225507.log
+post_powercycle_fleet_restoration_20260730_231251.log
+poc004b_local_manifest_20260731_232149.txt
+wp2_t1_final_evidence_20260801_010225.log
+```
 
-See [`../evidence/README.md`](../evidence/README.md) for the evidence index and verification procedure.
+See [`../evidence/README.md`](../evidence/README.md) for descriptions and verification commands.
 
 ## Limitations and Open Work
 
@@ -582,12 +506,12 @@ They should not be generalized beyond those conditions without additional eviden
 
 Run the tests in this order:
 
-1. Original fleet baseline
-2. POC003 valid bounded single use
-3. POC003 negative-path matrix
-4. POC004B power-loss persistence
-5. POC005 overlapping double-spend
-6. POC006A crash after commit
-7. WP2-T1 crash before atomic replacement
+1. Reproduce the original fleet baseline.
+2. Run POC003 valid bounded single use.
+3. Run the POC003 negative-path matrix.
+4. Run POC004B power-loss persistence.
+5. Run POC005 overlapping double-spend.
+6. Run POC006A crash after commit.
+7. Run WP2-T1 crash before atomic replacement.
 
-A reproducer should establish normal fleet and boundary operation before attempting power-loss or crash-injection tests.
+Normal provider, endpoint, coordinator, and verification-boundary operation should be confirmed before attempting power-loss or crash-injection tests.
