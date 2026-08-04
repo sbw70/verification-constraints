@@ -1,85 +1,33 @@
-# NUVL Edge Laboratory
+# NUVL Edge Lab
 
-This directory contains the physical edge-validation work for NUVL and related provider-controlled bounded-authority mechanisms.
+NUVL Edge Lab is a physical test environment for evaluating provider-controlled validation and bounded authority on low-resource endpoints.
 
-The laboratory uses ESP32-S3 endpoints, a Raspberry Pi verification boundary, local wireless networks, and a Windows control host to test:
+The laboratory uses three ESP32-S3 devices, a Raspberry Pi verification boundary, local wireless infrastructure, and a Windows control host. The tests examine whether constrained endpoints can request and display provider decisions without independently acquiring reusable authorization authority.
 
-- Provider-bound request validation
-- Three-endpoint fleet coordination
-- Per-device identity and result binding
-- Mixed accept and deny outcomes
-- Fail-closed behavior during boundary unavailability
-- Bounded disconnected authority
-- Replay rejection across restart and power loss
-- Concurrent double-spend resistance
-- Commit-before-accept crash behavior
-- Recovery from interrupted persistent-state replacement
+The repository contains curated source, test procedures, and evidence from the tested paths. It is not a dump of the original development directory.
 
-This is a curated reproduction package. It is not a dump of the original `esp32-main` working directory.
+## What This Lab Demonstrates
 
-Only identified test source, required endpoint configuration, selected evidence, and documentation belong here.
+The current test set covers:
 
-## Scope
+- Three physical endpoints using one shared verification boundary
+- Per-device identity, decision, and reason binding
+- Mixed accepted and denied outcomes in the same fleet run
+- Fail-closed behavior when a verification path is unavailable
+- Recovery after endpoint-specific and shared-boundary faults
+- Provider-issued authority bounded for disconnected use
+- Replay rejection across process restart and power loss
+- Exactly one successful exercise under overlapping attempts
+- Commit-before-accept behavior during an injected crash
+- Recovery when a crash occurs before atomic state replacement
 
-This laboratory is intended to show:
+The central architectural distinction is:
 
-1. What was built
-2. Which files were used
-3. How each test was executed
-4. What result constituted PASS
-5. What was actually observed
-6. Which limitations, anomalies, and failed approaches remain relevant
+> The endpoint may request, observe, display, or act on a bounded result, but it does not independently create, enlarge, or reuse provider authority.
 
-It is not:
+## Laboratory Architecture
 
-- A production deployment guide
-- A certification
-- A claim that every network or hardware combination will produce identical timing
-- A publication of every development file
-- A publication of private key material or generated runtime state
-- A representation that every embodiment described in related whitepapers or patent filings is implemented here
-
-## Publication Boundary
-
-The public repository should contain only material needed to reproduce or evaluate a documented result.
-
-Suitable public material includes:
-
-- Endpoint firmware
-- Fleet coordinators and launchers
-- Test clients
-- Sanitized configuration examples
-- Boundary interface descriptions
-- Test procedures
-- PASS criteria
-- Curated logs and hashes
-- Limitations, anomalies, and failed-test records
-
-Some verification-boundary implementations may expose persistence ordering, crash-window handling, atomic-state replacement, or other mechanism-level details relevant to pending or future intellectual-property claims.
-
-Those files should remain withheld until their release is an explicit publication and intellectual-property decision.
-
-Withholding a verification-boundary implementation does not prevent publication of:
-
-- The client sequence
-- The boundary interface
-- Expected requests and responses
-- Failure-injection procedures
-- PASS criteria
-- Observed results
-- Evidence files
-- File hashes
-- Known limitations
-
-Where a boundary implementation is intentionally withheld, the corresponding test-folder README must state that directly and link back to this section.
-
-The omission of a withheld boundary is intentional and should not be treated as a missing-file error.
-
-A missing source file must not be replaced by a similarly named file without hash or source-history confirmation.
-
-## Laboratory Topology
-
-The primary fleet path is:
+The original fleet path is:
 
 ```text
 Three ESP32-S3 endpoints
@@ -88,7 +36,7 @@ Three ESP32-S3 endpoints
         v
 Raspberry Pi fleet coordinator
         |
-        | assigned mode and relative wait_ms
+        | mode assignment and relative wait_ms
         v
 ESP32-S3 request generation
         |
@@ -96,30 +44,25 @@ ESP32-S3 request generation
         v
 Raspberry Pi verification boundary
         |
-        | provider-bound decision
+        | decision and reason
         v
 ESP32-S3 result report
         |
         v
-Fleet launcher validates identity, IP, decision, reason, and timing
+Fleet launcher validates:
+identity + IP + decision + reason + timing
 ```
 
-Primary ports:
+Primary services:
 
-```text
-8089  NUVL verification boundary
-19052 Fleet coordinator
-```
+| Port | Service |
+|---:|---|
+| `8089` | NUVL verification boundary |
+| `19052` | Fleet coordinator |
 
-The original Raspberry Pi boundary uses Python `HTTPServer` and is single-threaded.
+The original Raspberry Pi boundary uses Python `HTTPServer` and is single-threaded. The fleet tests demonstrate coordinated fan-in through a shared boundary. They do not claim parallel execution inside that boundary.
 
-The fleet demonstrations establish coordinated fan-in through one shared boundary. They do not claim parallel execution inside that boundary.
-
-## Repository Layout
-
-Create only the folders being populated.
-
-Empty placeholder directories are not required.
+## Repository Structure
 
 ```text
 labs/nuvl-edge/
@@ -128,17 +71,8 @@ labs/nuvl-edge/
 │
 ├── fleet/
 │   ├── README.md
-│   │
 │   ├── baseline/
-│   │   ├── README.md
-│   │   ├── boundary/
-│   │   ├── coordinator/
-│   │   ├── firmware/
-│   │   ├── launchers/
-│   │   └── endpoint-config/
-│   │
 │   └── archer-validation/
-│       └── README.md
 │
 ├── disconnected-authority/
 │   ├── README.md
@@ -153,29 +87,27 @@ labs/nuvl-edge/
     └── SHA256SUMS.txt
 ```
 
-The original POC004 process-restart test may be added later after the exact boundary version is tied to the recorded run.
+### [`fleet/`](fleet/)
 
-## Release Status
+Contains the three-endpoint fleet implementation and later fault-isolation variants.
 
-| Test | Repository folder | Result | Public-release status | Main property |
-|---|---|---|---|---|
-| Fleet three-endpoint baseline | `fleet/baseline/` | PASS | Release candidate | Correct endpoint identity and result binding |
-| Fleet mixed outcomes | `fleet/baseline/` | PASS | Release candidate | Different outcomes remained bound to the correct devices |
-| Single-endpoint diagnostic | `fleet/baseline/` | PASS | Release candidate after configuration cleanup | Individual board, Wi-Fi, and boundary-path reachability |
-| Single-endpoint isolation | `fleet/archer-validation/` | PASS | Hold for later release | One unavailable endpoint did not corrupt the other results |
-| Single-endpoint restoration | `fleet/archer-validation/` | PASS | Hold for later release | The isolated endpoint resumed participation |
-| Shared-boundary outage | `fleet/archer-validation/` | PASS | Hold for later release | All endpoints failed unavailable with zero accepted action |
-| Shared-boundary recovery | `fleet/archer-validation/` | PASS with anomaly | Hold for later release | Services recovered; one endpoint required reset for timely participation |
-| POC003 | `disconnected-authority/poc003-single-use/` | PASS | Release after provider-version check | Bounded disconnected single use |
-| POC004 | Not yet assigned | PASS | Hold pending exact-version confirmation | Replay state survived process restart |
-| POC004B | `disconnected-authority/poc004b-power-loss/` | PASS | Clients and evidence releasable; boundary pending publication decision | Completed commit survived abrupt Raspberry Pi power loss |
-| POC005 | `disconnected-authority/poc005-double-spend/` | PASS | Clients and evidence releasable; boundary pending publication decision | Competing attempts produced exactly one acceptance |
-| POC006A | `disconnected-authority/poc006a-commit-before-accept/` | PASS | Clients and evidence releasable; boundary pending publication decision | Crash after commit and before response remained replay-denied |
-| WP2-T1 | `disconnected-authority/wp2-t1-pre-replace/` | PASS | Clients and evidence releasable; boundary pending publication decision | Crash before atomic replacement did not falsely consume the artifact |
+Start with [`fleet/baseline/`](fleet/baseline/) for the original supported fleet path.
 
-## Original Fleet Baseline
+### [`disconnected-authority/`](disconnected-authority/)
 
-The original pre-latency-investigation fleet implementation consists of:
+Contains the client sequences, procedures, and evidence for bounded disconnected use, replay prevention, power-loss persistence, overlapping attempts, and crash-window testing.
+
+Some verification-boundary implementations are intentionally withheld from the current public release. Each affected test folder identifies what is included, what is withheld, and what interface behavior is required.
+
+### [`evidence/`](evidence/)
+
+Contains selected logs, manifests, and hashes supporting specific test claims.
+
+Raw development output, generated state, credentials, private keys, and unrelated terminal captures are not part of the public evidence set.
+
+## Start Here: Original Fleet Baseline
+
+The original pre-latency-investigation fleet implementation uses:
 
 ```text
 nuvl_local_hardened.py
@@ -186,16 +118,16 @@ run_three_esp32_poll.py
 run_three_esp32_mixed.py
 ```
 
-Each physical ESP32 contains:
+Each ESP32 contains:
 
 ```text
 main.py
 device_id.txt
 ```
 
-`main.py` is the deployed copy of the applicable ESP32 firmware.
+`main.py` is the deployed ESP32 firmware.
 
-Confirmed endpoint identities:
+The confirmed endpoint identities are:
 
 ```text
 esp32-field-01
@@ -203,46 +135,73 @@ esp32-s3-02
 esp32-s3-03
 ```
 
-Store the public identity examples as:
+Public examples are stored separately so the three files do not overwrite one another:
 
 ```text
 fleet/baseline/endpoint-config/
-├── esp32-field-01/
-│   └── device_id.txt
-├── esp32-s3-02/
-│   └── device_id.txt
-└── esp32-s3-03/
-    └── device_id.txt
+├── esp32-field-01/device_id.txt
+├── esp32-s3-02/device_id.txt
+└── esp32-s3-03/device_id.txt
 ```
 
-Each `device_id.txt` file contains only its corresponding endpoint identity.
+COM port numbers are bench-specific and are not durable endpoint identities.
 
-COM port assignments are bench-specific and are not durable endpoint identities.
+## Baseline Reproduction Path
 
-### Baseline File Placement
+A reproducer should begin with the baseline before attempting outage, isolation, persistence, or crash-injection tests.
+
+### 1. Prepare the Raspberry Pi
+
+Run the verification boundary:
 
 ```text
-fleet/baseline/
-├── README.md
-├── boundary/
-│   └── nuvl_local_hardened.py
-├── coordinator/
-│   └── multi_endpoint_coordinator_v2.py
-├── firmware/
-│   ├── esp32_multi_poll_main_v2.py
-│   └── esp32_multi_once.py
-├── launchers/
-│   ├── run_three_esp32_poll.py
-│   └── run_three_esp32_mixed.py
-└── endpoint-config/
-    ├── esp32-field-01/device_id.txt
-    ├── esp32-s3-02/device_id.txt
-    └── esp32-s3-03/device_id.txt
+nuvl_local_hardened.py
 ```
 
-## Original Fleet Tests
+Run the fleet coordinator:
 
-### Three-Endpoint Accepted Baseline
+```text
+multi_endpoint_coordinator_v2.py
+```
+
+The coordinator uses relative `wait_ms` values. This replaced an earlier absolute-timestamp design that failed because Raspberry Pi Python and MicroPython represented epochs differently.
+
+### 2. Prepare Each ESP32-S3
+
+Copy the fleet firmware to each board as:
+
+```text
+main.py
+```
+
+Copy the board-specific identity as:
+
+```text
+device_id.txt
+```
+
+The firmware:
+
+- Reads the endpoint identity from `device_id.txt`
+- Polls the Raspberry Pi coordinator over outbound HTTP
+- Receives a test mode and relative release delay
+- Posts its request to `/nuvl`
+- Reports the result to the coordinator
+- Displays the outcome through the onboard RGB LED
+
+LED states:
+
+| LED | Meaning |
+|---|---|
+| Blue | Ready or idle |
+| Yellow | Request created |
+| Purple | Verification pending |
+| Green | Accepted |
+| Red | Denied |
+| Orange | Stale, replay, or malformed denial |
+| White | Network, provider, boundary, or execution unavailable |
+
+### 3. Run the Three-Accept Baseline
 
 Launcher:
 
@@ -250,7 +209,7 @@ Launcher:
 run_three_esp32_poll.py
 ```
 
-Expected result:
+Expected binding:
 
 ```text
 esp32-field-01 -> accepted / provider_admissible
@@ -269,16 +228,16 @@ elapsed=33–34 ms
 result=PASS
 ```
 
-This test verifies:
+PASS requires:
 
-- Three physical endpoint responses
-- Correct endpoint identity
-- Correct endpoint IP binding
+- Three expected endpoint responses
+- Correct endpoint identities
+- Correct endpoint IP bindings
 - Three accepted outcomes
-- No missing results
-- No cross-assigned results
+- No missing result
+- No cross-assigned result
 
-### Three-Endpoint Mixed Outcomes
+### 4. Run the Mixed-Outcome Test
 
 Launcher:
 
@@ -306,81 +265,32 @@ elapsed=29–38 ms
 result=PASS
 ```
 
-This is the stronger original fleet test because aggregate counts alone cannot earn PASS.
+This is the stronger fleet test because aggregate counts cannot earn PASS. Each decision and reason must remain bound to the correct physical endpoint.
 
-Each expected decision and reason must remain bound to the correct physical endpoint.
+## Test Catalog
 
-### Harness-Oracle Failure Preserved
+| Test | Location | Result | Property exercised |
+|---|---|---|---|
+| Three-endpoint baseline | [`fleet/baseline/`](fleet/baseline/) | PASS | Correct identity and result binding |
+| Mixed fleet outcomes | [`fleet/baseline/`](fleet/baseline/) | PASS | Different outcomes remain bound to the correct devices |
+| Single-endpoint diagnostic | [`fleet/baseline/`](fleet/baseline/) | PASS | Individual board, Wi-Fi, and boundary-path validation |
+| Single-endpoint isolation | [`fleet/archer-validation/`](fleet/archer-validation/) | PASS | One unavailable endpoint does not corrupt the other results |
+| Single-endpoint restoration | [`fleet/archer-validation/`](fleet/archer-validation/) | PASS | The isolated endpoint resumes participation |
+| Shared-boundary outage | [`fleet/archer-validation/`](fleet/archer-validation/) | PASS | All endpoints fail unavailable with zero accepted action |
+| Shared-boundary recovery | [`fleet/archer-validation/`](fleet/archer-validation/) | PASS with anomaly | Services recover; one endpoint required reset for timely participation |
+| POC003 | [`disconnected-authority/poc003-single-use/`](disconnected-authority/poc003-single-use/) | PASS | Bounded disconnected single use |
+| POC004B | [`disconnected-authority/poc004b-power-loss/`](disconnected-authority/poc004b-power-loss/) | PASS | Completed commit survives abrupt Raspberry Pi power loss |
+| POC005 | [`disconnected-authority/poc005-double-spend/`](disconnected-authority/poc005-double-spend/) | PASS | Competing attempts produce exactly one acceptance |
+| POC006A | [`disconnected-authority/poc006a-commit-before-accept/`](disconnected-authority/poc006a-commit-before-accept/) | PASS | Crash after commit and before response remains replay-denied |
+| WP2-T1 | [`disconnected-authority/wp2-t1-pre-replace/`](disconnected-authority/wp2-t1-pre-replace/) | PASS | Crash before atomic replacement does not falsely consume the artifact |
 
-An earlier mixed-outcome run produced the correct system outcomes but was marked FAIL by an all-accept launcher oracle:
+The earlier POC004 process-restart test remains documented but is not yet presented as a complete reproduction package because the exact boundary version has not been tied conclusively to the recorded run.
 
-```text
-run_id=18c5b0a38b1d51b0
-system outcomes=correct
-launcher result=FAIL
-cause=all-accept PASS oracle
-classification=harness/oracle failure
-```
+## Disconnected-Authority Test Sequence
 
-This record should be retained as evidence that the test harness itself was challenged and corrected.
+### POC003 — Bounded Single Use
 
-## Archer Validation
-
-The later Archer validation branch contains environment-specific stage-timing, isolation, outage, and recovery variants.
-
-Known files include:
-
-```text
-nuvl_local_hardened_latency.py
-esp32_multi_poll_main_v2_pm_none_stage_v2_archer.py
-esp32_multi_poll_main_v2_pm_none_stage_v2_archer_isolate_com9.py
-run_three_esp32_poll_archer.py
-run_three_esp32_mixed_archer.py
-run_three_esp32_poll_isolate_com9_archer.py
-run_three_esp32_poll_shared_boundary_outage_archer.py
-```
-
-These files are not the original fleet baseline.
-
-The `COM9` designation records the bench mapping used during the test. It is not a durable endpoint identity and should be explained before that package is released.
-
-### Archer-Era Results
-
-- Three-endpoint baseline: PASS
-- Mixed per-device outcomes: PASS
-- Single-endpoint isolation: PASS
-- Single-endpoint restoration: PASS
-- Shared-boundary outage: PASS
-- Shared-boundary recovery: PASS with anomaly
-
-The recovery anomaly was that one endpoint required reset before timely participation resumed.
-
-This should not be omitted from the public record.
-
-## POC003 — Bounded Disconnected Single Use
-
-Proposed folder:
-
-```text
-disconnected-authority/poc003-single-use/
-```
-
-Known files:
-
-```text
-poc003_pi_boundary_housewifi.py
-poc003_esp32_prepare_housewifi.py
-poc003_esp32_spend_v2_housewifi.py
-```
-
-Two provider candidates exist:
-
-```text
-poc003_ed25519_provider.py
-poc003_ed25519_provider_1h.py
-```
-
-Only the provider version tied to the recorded house-network test should be released as the canonical reproduction file.
+POC003 exercises provider-issued authority during provider disconnection.
 
 The tested matrix includes:
 
@@ -401,142 +311,49 @@ Best last-known end-to-end client:
 poc003_esp32_spend_v2_housewifi.py
 ```
 
-## POC004 — Persistent Replay Rejection
+Two provider variants exist in the original working set. The test-folder documentation identifies the version selected for public reproduction.
 
-Known files:
+### POC004B — Power-Loss Persistence
 
-```text
-poc004_pi_boundary_persistent.py
-poc004_pi_boundary_persistent_archer.py
-poc004_esp32_spend_before_restart.py
-poc004_esp32_replay_after_restart.py
-```
+POC004B tests whether completed spent-state remains effective after abrupt Raspberry Pi power loss.
 
-This test demonstrated that replay state survived process restart.
+Observed property:
 
-The original and Archer boundary variants must not be mixed without identifying which boundary belongs to the recorded run.
+> A completed persistent-state commit remained effective after power loss, and the spent artifact remained unavailable for reuse after restart.
 
-Until that version mapping is resolved, POC004 should remain documented but should not be presented as a complete public reproduction package.
+The restoration sequence eventually returned the three-endpoint fleet to normal operation. One endpoint required reset before timely participation resumed. That anomaly is retained in the evidence record.
 
-## POC004B — Abrupt Power-Loss Persistence
+### POC005 — Overlapping Attempts
 
-Proposed folder:
+POC005 submits overlapping attempts against one single-use artifact.
 
-```text
-disconnected-authority/poc004b-power-loss/
-```
+Observed property:
 
-Known files:
+> Exactly one attempt succeeded and no duplicate acceptance occurred.
 
-```text
-poc004b_pi_boundary_powercycle_archer.py
-poc004b_prepare_powercycle_artifact_archer.py
-poc004b_initial_spend_archer.py
-poc004b_replay_after_powerloss_archer.py
-```
+This test does not claim mathematically simultaneous execution. It demonstrates single-use enforcement under near-concurrent competing attempts.
 
-Main property:
+### POC006A — Crash After Commit
 
-> A completed persistent-state commit remained effective after abrupt Raspberry Pi power loss.
+POC006A injects a crash after persistent commit but before the response is returned.
 
-Curated evidence:
+Observed property:
 
-```text
-poc004b_archer_evidence_20260730_225507.log
-post_powercycle_fleet_restoration_20260730_231251.log
-poc004b_local_manifest_20260731_232149.txt
-```
+> The missing response did not permit the committed artifact to be accepted again.
 
-Known evidence hashes:
+### WP2-T1 — Crash Before Replacement
 
-```text
-poc004b_archer_evidence_20260730_225507.log
-9E60FF57BA28E53E081E768C04B298053B5653A505DF76F78D3F9D20837F73F1
+WP2-T1 injects a crash before atomic replacement of persistent state.
 
-post_powercycle_fleet_restoration_20260730_231251.log
-0087276A01D749938D92A3FF8EB059EA28F0017A4EEB8586C7BD95564F6A91A8
+Observed property:
 
-poc004b_local_manifest_20260731_232149.txt
-14D17FA75B08240BFCF38EC2430EDFDEEA8AD3E4CB941926661C2595116EC8C1
-```
+> The interrupted replacement did not falsely consume the artifact. The commit could be retried after restart, after which replay remained denied.
 
-The restoration sequence eventually returned the three-endpoint fleet to normal operation.
-
-One endpoint required reset before timely participation resumed.
-
-The public-release decision for `poc004b_pi_boundary_powercycle_archer.py` should be made separately from the client and evidence release.
-
-## POC005 — Concurrent Double-Spend
-
-Proposed folder:
-
-```text
-disconnected-authority/poc005-double-spend/
-```
-
-Known files:
-
-```text
-poc005_pi_boundary_persistent_archer.py
-poc005_prepare_race.py
-poc005_concurrent_double_spend.py
-```
-
-Main property:
-
-> Overlapping attempts produced exactly one successful exercise and no duplicate acceptance.
-
-This test does not claim mathematically simultaneous execution.
-
-It demonstrates single-use enforcement under near-concurrent competing attempts.
-
-The public-release decision for `poc005_pi_boundary_persistent_archer.py` should be made separately from the preparation client, race client, and evidence.
-
-## POC006A — Commit Before Accept
-
-Proposed folder:
-
-```text
-disconnected-authority/poc006a-commit-before-accept/
-```
-
-Known files:
-
-```text
-poc006_crash_window_boundary_archer.py
-poc006_prepare_crash_artifact_archer.py
-poc006_crash_spend_archer.py
-poc006_replay_after_crash_archer.py
-```
-
-Main property:
-
-> A crash after persistent commit but before response did not permit the artifact to be accepted again.
-
-The public-release decision for `poc006_crash_window_boundary_archer.py` should be made separately from the preparation, crash-spend, replay clients, and evidence.
-
-## WP2-T1 — Crash Before Atomic Replacement
-
-Proposed folder:
-
-```text
-disconnected-authority/wp2-t1-pre-replace/
-```
-
-Known files:
+The tested boundary was identified by:
 
 ```text
 wp2_t1_pre_replace_boundary_archer.py
-wp2_t1_prepare_temp_fsync_artifact_archer.py
-wp2_t1_crash_spend_archer.py
-wp2_t1_retry_commit_after_restart_archer.py
-wp2_t1_replay_check_archer.py
-```
-
-The tested boundary was confirmed by SHA-256:
-
-```text
-wp2_t1_pre_replace_boundary_archer.py
+SHA-256:
 87351DBDF539E0E44480B28B205AE04FAD796D9C60DA9C4084FDEFDA49A9BFC8
 ```
 
@@ -548,86 +365,47 @@ wp2_t1_temp_fsync_boundary_archer.py
 
 That similarly named file has different contents and was not the tested boundary.
 
-Main property:
+## Publication Boundary
 
-> A crash before atomic replacement did not falsely consume the artifact. The interrupted commit could be retried after restart, after which replay remained denied.
+Some verification-boundary source files are intentionally withheld because they may expose mechanism-level implementation details involving persistence order, crash handling, or atomic replacement.
 
-Curated final evidence:
+A withheld boundary does not prevent evaluation of the documented test.
 
-```text
-wp2_t1_final_evidence_20260801_010225.log
-```
+The corresponding public test packages may include:
 
-Known final-evidence details:
+- Client sequence
+- Boundary interface
+- Request and response structure
+- Failure-injection procedure
+- Expected result
+- PASS criteria
+- Observed result
+- Evidence
+- Source and evidence hashes
+- Known limitations
 
-```text
-Size: 5,374 bytes
-SHA-256: 5BB1053A0AF88831F59D8D346D524F10F1E432C5B6D7A3A2A2342312120BBF20
-```
+Where a boundary is withheld, the test-folder README states that directly.
 
-The smaller phase logs should not be listed by placeholder name.
+This is an intentional publication decision, not a missing-file error.
 
-Add them only after their exact filenames, sizes, and hashes are captured.
+## Source and Evidence Integrity
 
-The public-release decision for `wp2_t1_pre_replace_boundary_archer.py` should be made separately from the preparation, crash-spend, retry, replay clients, and evidence.
+The repository distinguishes three source classes:
 
-## Intentionally Withheld Boundary Notice
+1. **Original tested source**  
+   The exact file used in the recorded test.
 
-The READMEs for the following folders must contain an explicit withheld-boundary notice:
+2. **Sanitized public derivative**  
+   A copy modified to remove credentials, private values, or environment-specific configuration.
 
-```text
-disconnected-authority/poc004b-power-loss/
-disconnected-authority/poc005-double-spend/
-disconnected-authority/poc006a-commit-before-accept/
-disconnected-authority/wp2-t1-pre-replace/
-```
+3. **Rerun-confirmed public source**  
+   A sanitized or reorganized public copy that was executed again and confirmed against its documented PASS criteria.
 
-Use this wording:
-
-> The verification-boundary implementation used for this test is intentionally not included in the current public release.
->
-> The public package includes the available client sequence, boundary interface, expected requests and responses, failure-injection procedure, PASS criteria, observed results, evidence, and hashes needed to evaluate the documented behavior.
->
-> This is an intentional publication-boundary decision, not a missing-file error.
->
-> See the Publication Boundary section in the NUVL Edge Laboratory README.
-
-## Network Configuration
-
-Published source copies should not contain an active credential.
-
-Replace bench-specific values with clear placeholders before release:
-
-```python
-SSID = "YOUR_WIFI_SSID"
-PASSWORD = "YOUR_WIFI_PASSWORD"
-PI_IP = "YOUR_PI_IP"
-```
-
-The original test environment used:
-
-```text
-SSID: GL-MT300N-V2-94f
-Pi address: 192.168.8.234
-```
-
-The password present in the original bench files was the Mango factory-default value used during testing.
-
-The test unit was later reconfigured.
-
-A sanitized public source file is not byte-identical to the original tested source.
-
-Documentation must distinguish:
-
-- Original tested source
-- Sanitized public derivative
-- Rerun-confirmed public source
+A sanitized derivative is not byte-identical to the original tested source.
 
 Do not attach an original tested hash to a modified public copy.
 
-Each sanitized derivative must receive its own SHA-256 at publication.
-
-Record the derivative hash in `SHA256SUMS.txt` and label the file as a sanitized derivative rather than the original tested source.
+Each published derivative receives its own SHA-256 in [`evidence/SHA256SUMS.txt`](evidence/SHA256SUMS.txt), labeled according to its source class.
 
 Example:
 
@@ -636,84 +414,74 @@ Example:
 <sha256>  fleet/baseline/firmware/esp32_multi_poll_main_v2.py
 ```
 
-This allows the published tree to be verified independently without confusing the derivative hash with the historical tested-source hash.
+## Network Configuration
 
-Changing credentials, addresses, persistence paths, timing parameters, or source structure creates a new source version.
+Public source should use explicit configuration placeholders:
 
-Rerun the affected test before claiming that the modified public copy reproduces the historical result.
+```python
+SSID = "YOUR_WIFI_SSID"
+PASSWORD = "YOUR_WIFI_PASSWORD"
+PI_IP = "YOUR_PI_IP"
+```
 
-## Evidence Policy
+The original bench used:
 
-Publish curated evidence, not every terminal capture.
+```text
+SSID: GL-MT300N-V2-94f
+Raspberry Pi: 192.168.8.234
+```
 
-Evidence should be included only when it materially supports a documented claim.
+Those values describe the tested environment and are not expected to work unchanged in another laboratory.
 
-For each published evidence file, record:
+Changing credentials, addresses, persistence paths, timing parameters, or source structure creates a different source version. A modified public copy should be rerun before being represented as equivalent to the historical tested source.
 
-- Filename
-- Test identifier
-- Date
-- File size
-- SHA-256
-- Relevant source files
-- Expected outcome
-- Observed outcome
-- Any anomaly or setup incident
+## Evidence
 
-Generated artifact files, runtime spent-state files, crash markers, private keys, and temporary files are not source evidence and should not be placed in the main public tree by default.
+The evidence directory contains selected material supporting specific claims.
 
-Provider-signed artifact packages are not private keys, but they are generated, test-bound fixtures.
+Curated evidence may include:
 
-Preserve them with the private evidence bundle unless a sanitized fixture is deliberately selected for publication.
+- Terminal logs
+- Test manifests
+- Source hashes
+- Evidence hashes
+- Run identifiers
+- Expected and observed results
+- Documented anomalies
+- Recovery confirmation
 
-## Reproduction Standard
+Generated authority artifacts, private keys, runtime spent-state, crash markers, PID files, caches, and unrelated development logs are excluded from the public source tree by default.
 
-Every supported test-folder README should contain:
-
-1. Purpose
-2. Architecture or invariant tested
-3. Exact public files used
-4. Any required withheld component or interface substitute
-5. Topology and ports
-6. Preconditions
-7. Configuration changes required
-8. Exact execution sequence
-9. Expected outcome
-10. Observed outcome
-11. PASS criteria
-12. Limitations
-13. Known failures or setup incidents
-14. Evidence filenames and SHA-256 values
-
-Test-specific READMEs should link back to this file rather than repeating the full laboratory description.
+See [`evidence/README.md`](evidence/README.md) for the evidence index and verification procedure.
 
 ## Known Development Failures
 
-The following failed or superseded approaches informed the supported implementation:
+The supported implementation resulted from several failed or superseded approaches:
 
 - Concurrent Windows `mpremote` control was unreliable across three serial ports.
-- Improved subprocess capture did not correct the concurrent serial-control failure.
+- Improved subprocess capture did not correct the concurrent serial-control problem.
 - Inbound UDP triggering was unreliable through the tested access-point path.
-- The original coordinator exchanged an incompatible absolute timestamp between Raspberry Pi Python and MicroPython.
+- The original coordinator used an incompatible absolute timestamp across Raspberry Pi Python and MicroPython.
 - Relative `wait_ms` coordination corrected the cross-epoch timing defect.
-- An early mixed-outcome launcher used an all-accept PASS oracle and incorrectly reported FAIL despite correct system outcomes.
-- The corrected mixed launcher requires per-device identity, decision, and reason matching.
+- An early mixed-outcome launcher used an all-accept PASS oracle and incorrectly reported FAIL despite correct endpoint outcomes.
 
-These failures may be documented without publishing every superseded script.
+The corrected mixed launcher requires per-device identity, decision, and reason matching.
 
-## Latency Incident
+The earlier oracle failure is preserved as a harness failure rather than being misclassified as an architectural failure:
 
-A later synchronized latency event was isolated through controlled comparison between the Mango path and house Wi-Fi.
+```text
+run_id=18c5b0a38b1d51b0
+system outcomes=correct
+launcher result=FAIL
+cause=all-accept PASS oracle
+classification=harness/oracle failure
+```
 
-Disposition:
+## Wireless Latency Incident
 
-- The incident is closed at the fault-domain level.
-- The access-point-specific wireless path was isolated.
-- The exact internal Mango mechanism remains unresolved.
-- Do not attribute the behavior to a specific driver function or hardware defect without further evidence.
-- The degraded Mango event is engineering incident evidence, not the normal NUVL product baseline.
+A later synchronized latency event was isolated through a controlled comparison between the Mango access-point path and house Wi-Fi.
 
-The house-Wi-Fi A/B comparison completed:
+House-Wi-Fi comparison:
 
 ```text
 13/13 runs PASS
@@ -724,46 +492,47 @@ approximately 49.9 ms mean
 zero reproduction of the synchronized approximately 900 ms event
 ```
 
-## Not Yet Tested
+Disposition:
 
-The following items remain open and should not be inferred from the PASS results above:
+- The incident is closed at the fault-domain level.
+- The access-point-specific wireless path was isolated.
+- The exact internal Mango mechanism remains unresolved.
+- No specific driver function or hardware defect is claimed.
+- The degraded Mango event is engineering incident evidence, not the normal product baseline.
+
+## Limitations and Open Work
+
+The current results should not be interpreted as proving behavior outside the tested paths.
+
+Items not yet demonstrated include:
 
 - Additional persistence crash points outside the POC006A and WP2-T1 windows
-- Startup behavior with corrupt, truncated, or structurally invalid persistent spent-state
-- Recovery behavior when persistent-state corruption is detected
+- Startup with corrupt, truncated, or structurally invalid persistent state
+- Recovery after persistent-state corruption is detected
 - Cross-process or multi-boundary contention beyond the tested in-process serialization path
 - Long-duration repeated power-cycle campaigns
 - Independent reproduction by an external laboratory
-- Generalization of observed latency to other access points, firmware versions, or radio environments
+- Generalization of latency results to other access points, firmware versions, or radio environments
 
-This section should be updated as new tests are completed.
+These limitations are part of the engineering record and will be updated as additional testing is completed.
 
-## Release Rules
+## Reproduction Notes
 
-A file belongs in this public laboratory tree only when one or more of the following are true:
+Each test-folder README provides the test-specific information needed to reproduce or evaluate that case:
 
-- It is required for a supported reproduction path.
-- It is the exact source used in a documented successful test.
-- It is a sanitized derivative clearly labeled as such.
-- It is curated evidence supporting a specific claim.
-- It documents a material limitation, anomaly, or corrective action.
-- Its publication has passed any required intellectual-property review.
+- Purpose
+- Invariant or property tested
+- Included files
+- Withheld components, when applicable
+- Topology and ports
+- Preconditions
+- Required configuration
+- Execution sequence
+- Expected outcome
+- Observed outcome
+- PASS criteria
+- Limitations
+- Known setup incidents
+- Evidence names and hashes
 
-A file does not belong here merely because it exists in the original working directory.
-
-The original `esp32-main` folder should remain untouched and should not be treated as the public release tree.
-
-## Initial Publishing Order
-
-1. Root README and `.gitignore`
-2. Original fleet baseline
-3. Fleet README
-4. Endpoint identity examples
-5. POC003 after selecting the correct provider version
-6. POC004B clients, interface documentation, and curated evidence
-7. POC005 clients, interface documentation, and curated evidence
-8. POC006A clients, interface documentation, and curated evidence
-9. WP2-T1 clients, interface documentation, and curated evidence
-10. Verification-boundary implementations only after a separate, explicit publication and intellectual-property decision
-11. Archer fleet validation after environment-specific setup is documented
-12. Remaining evidence only when it materially supports a published claim
+Begin with the original fleet baseline before attempting the disconnected-authority or crash-injection tests.
