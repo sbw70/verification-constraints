@@ -1,16 +1,18 @@
 # NUVL Edge Fleet
 
-This directory contains the multi-endpoint NUVL Edge Lab tests.
+This directory contains the multi-endpoint tests for the NUVL Edge Lab.
 
-The fleet consists of three physical ESP32-S3 endpoints using one Raspberry Pi coordinator and one shared NUVL verification boundary. The tests evaluate whether endpoint identity, requested mode, decision, denial reason, timing, and recovery behavior remain correctly bound when multiple constrained devices operate through the same path.
+The fleet consists of three physical ESP32-S3 endpoints using one Raspberry Pi coordinator and one shared NUVL verification boundary.
 
-The fleet work demonstrates that endpoint capability and execution authority can remain separate:
+The tests examine whether endpoint identity, assigned request mode, decision, denial reason, timing, and recovery behavior remain correctly bound when multiple constrained devices operate through the same path.
+
+The fleet demonstrates a separation between endpoint capability and provider-controlled authority:
 
 > Each endpoint can create a request, receive a provider-bound result, and display that result without independently creating or retaining provider authority.
 
-## What the Fleet Tests Cover
+## What the Fleet Tests Demonstrate
 
-The current fleet test set includes:
+The current fleet work covers:
 
 - Three physical ESP32-S3 endpoints
 - One shared Raspberry Pi verification boundary
@@ -18,40 +20,41 @@ The current fleet test set includes:
 - Three accepted outcomes in one run
 - Mixed accepted and denied outcomes in one run
 - Per-device decision and reason binding
-- Missing-endpoint isolation
-- Endpoint restoration
-- Shared-boundary outage
-- Shared-boundary recovery
+- Single-endpoint diagnostics
+- Endpoint isolation and restoration
+- Shared-boundary outage and recovery
 - Stage-level latency measurement
 - Wireless-path comparison
 - Fail-unavailable behavior without fallback acceptance
 
-The tests do not claim that the Raspberry Pi boundary processes requests in parallel. The original boundary uses Python `HTTPServer` and is single-threaded.
+The original Raspberry Pi boundary uses Python `HTTPServer` and is single-threaded.
 
-The demonstrated property is coordinated fleet behavior through one shared boundary, not parallel execution inside the boundary.
+The demonstrated property is coordinated fleet behavior through one shared boundary. The tests do not claim parallel request processing inside that boundary.
 
 ## Fleet Architecture
 
 ```text
 Windows control host
         |
-        | starts the fleet launcher
+        | starts fleet launcher
         v
 Raspberry Pi fleet coordinator
         |
-        | assigns run_id, mode, and relative wait_ms
+        | assigns run_id
+        | assigns request mode
+        | assigns relative wait_ms
         v
 Three ESP32-S3 endpoints
         |
-        | create and submit provider-bound requests
+        | create and submit requests
+        | POST /nuvl
         v
 Raspberry Pi NUVL verification boundary
         |
         | returns decision and reason
         v
-ESP32-S3 endpoints
+ESP32-S3 endpoint reports
         |
-        | report result to coordinator
         v
 Fleet launcher validates:
 device identity
@@ -85,24 +88,15 @@ Each endpoint stores its durable identity in:
 device_id.txt
 ```
 
-The firmware is deployed to each board as:
+The deployed firmware is stored on each endpoint as:
 
 ```text
 main.py
 ```
 
-The public identity examples are stored as:
+The same fleet firmware can be used on all three devices. The `device_id.txt` file distinguishes the physical endpoints.
 
-```text
-baseline/endpoint-config/
-├── esp32-field-01/device_id.txt
-├── esp32-s3-02/device_id.txt
-└── esp32-s3-03/device_id.txt
-```
-
-COM port assignments are temporary bench mappings and are not durable identities.
-
-A recorded Windows mapping was:
+A recorded Windows USB mapping was:
 
 ```text
 COM5  -> esp32-field-01
@@ -110,7 +104,9 @@ COM9  -> esp32-s3-02
 COM12 -> esp32-s3-03
 ```
 
-Those COM numbers may change after reconnect, reboot, driver changes, or moving the devices to different USB ports.
+COM port numbers are temporary bench mappings. They may change after reconnecting the boards, moving USB ports, rebooting Windows, or reinstalling drivers.
+
+The durable identity is the value in `device_id.txt`, not the COM port number.
 
 ## Directory Structure
 
@@ -130,29 +126,13 @@ fleet/
     └── README.md
 ```
 
-### [`baseline/`](baseline/)
+## Baseline Fleet
 
-Contains the original pre-latency-investigation fleet implementation.
+The [`baseline/`](baseline/) directory contains the original three-endpoint fleet implementation.
 
-This is the correct starting point for understanding or reproducing the fleet path.
+This is the starting point for understanding and reproducing the fleet path.
 
-### [`archer-validation/`](archer-validation/)
-
-Contains later environment-specific validation for:
-
-- Stage-level timing
-- Single-endpoint isolation
-- Single-endpoint restoration
-- Shared-boundary outage
-- Shared-boundary recovery
-- House-Wi-Fi comparison
-- Access-point fault-domain isolation
-
-These files are validation extensions. They are not substitutes for the original fleet baseline.
-
-## Original Fleet Baseline
-
-The original supported fleet implementation consists of:
+The baseline includes:
 
 ```text
 nuvl_local_hardened.py
@@ -163,78 +143,55 @@ run_three_esp32_poll.py
 run_three_esp32_mixed.py
 ```
 
-Recommended placement:
+The baseline established:
 
-```text
-baseline/
-├── README.md
-├── boundary/
-│   └── nuvl_local_hardened.py
-├── coordinator/
-│   └── multi_endpoint_coordinator_v2.py
-├── firmware/
-│   ├── esp32_multi_poll_main_v2.py
-│   └── esp32_multi_once.py
-├── launchers/
-│   ├── run_three_esp32_poll.py
-│   └── run_three_esp32_mixed.py
-└── endpoint-config/
-    ├── esp32-field-01/device_id.txt
-    ├── esp32-s3-02/device_id.txt
-    └── esp32-s3-03/device_id.txt
-```
+- Three physical endpoint responses
+- Correct durable endpoint identities
+- Correct endpoint IP associations
+- Three accepted outcomes in one run
+- Mixed accepted and denied outcomes in one run
+- Correct per-device decision and reason binding
+- No cross-assigned results
+- Relative `wait_ms` coordination
+- Endpoint-originated outbound HTTP polling
 
-## File Roles
+See [`baseline/README.md`](baseline/README.md) for component roles, setup, test commands, PASS criteria, and recorded runs.
 
-| File | Role |
-|---|---|
-| `nuvl_local_hardened.py` | Shared Raspberry Pi verification boundary |
-| `multi_endpoint_coordinator_v2.py` | Assigns run state, endpoint mode, and relative release timing |
-| `esp32_multi_poll_main_v2.py` | Main fleet firmware for each ESP32-S3 |
-| `esp32_multi_once.py` | Single-endpoint diagnostic client |
-| `run_three_esp32_poll.py` | Three-endpoint accepted-outcome launcher |
-| `run_three_esp32_mixed.py` | Three-endpoint mixed-outcome launcher |
-| `device_id.txt` | Durable identity for one physical endpoint |
+## Archer Validation
 
-## Coordinator Timing
+The [`archer-validation/`](archer-validation/) directory contains the later validation work performed after the baseline was established.
 
-The supported coordinator uses:
+The Archer validation set extends the baseline with:
 
-```text
-wait_ms
-```
+- Stage-level endpoint timing
+- Repeated three-endpoint timing runs
+- Single-endpoint isolation
+- Single-endpoint restoration
+- Shared-boundary outage
+- Shared-boundary recovery
+- House-Wi-Fi comparison
+- Access-point fault-domain isolation
 
-This is a relative delay assigned to each endpoint.
+It also documents the synchronized latency incident observed through the Mango access-point path.
 
-An earlier coordinator used an absolute timestamp. That failed because Raspberry Pi Python and MicroPython did not use compatible epoch representations.
-
-The corrected sequence is:
-
-```text
-coordinator assigns relative wait_ms
-endpoint receives wait_ms
-endpoint waits locally
-endpoint submits request
-```
-
-The original absolute-time coordinator and endpoint firmware are superseded.
+See [`archer-validation/README.md`](archer-validation/README.md) for the timing campaign, outage tests, recovery results, and wireless-path comparison.
 
 ## Endpoint Firmware Behavior
 
-The baseline ESP32 fleet firmware:
+The fleet firmware follows this sequence:
 
-1. Reads `device_id.txt`
-2. Connects to Wi-Fi
-3. Polls the coordinator over outbound HTTP
-4. Receives a `run_id`, requested mode, and `wait_ms`
-5. Waits for the relative release interval
-6. Creates the request
-7. Posts the request to `/nuvl`
-8. Receives a decision and reason
-9. Reports the result to the coordinator
-10. Returns to polling for the next run
+1. Read `device_id.txt`
+2. Connect to Wi-Fi
+3. Poll the Raspberry Pi coordinator
+4. Receive a `run_id`, request mode, and relative `wait_ms`
+5. Wait for the assigned release interval
+6. Create the request
+7. Submit the request to `/nuvl`
+8. Receive a decision and reason
+9. Report the result to the coordinator
+10. Return to polling for the next run
 
-The endpoint report includes the fields needed by the launcher to validate the run, including:
+Endpoint reports include the information needed to evaluate the fleet run, including:
 
 ```text
 run_id
@@ -247,7 +204,28 @@ nonce
 memory delta
 ```
 
-The exact field set may vary slightly between baseline and later stage-timing firmware.
+Later stage-timing firmware includes additional timing fields.
+
+## Coordinator Timing
+
+The supported fleet coordinator uses:
+
+```text
+wait_ms
+```
+
+This is a relative delay assigned to each endpoint.
+
+An earlier coordinator used an absolute timestamp. That approach failed because Raspberry Pi Python and MicroPython did not use compatible epoch representations.
+
+The supported sequence is:
+
+```text
+coordinator assigns relative wait_ms
+endpoint receives wait_ms
+endpoint waits locally
+endpoint submits request
+```
 
 ## LED States
 
@@ -264,9 +242,9 @@ The onboard RGB LED provides a physical indication of endpoint state.
 | Orange | Stale, replay, or malformed denial |
 | White | Provider, network, boundary, or execution path unavailable |
 
-LED output is an endpoint rendering mechanism. It is not the source of authority.
+The LED displays the result returned through the tested path. It is not the source of authority.
 
-## Baseline Test 1: Three Accepted Outcomes
+## Baseline Test: Three Accepted Outcomes
 
 Launcher:
 
@@ -296,16 +274,14 @@ result=PASS
 PASS requires:
 
 - All three expected endpoints respond
-- Each endpoint reports its expected identity
-- Each endpoint result is associated with the expected IP
+- Each endpoint reports its correct identity
+- Each result is associated with the expected endpoint IP
 - All three decisions are `accepted`
 - All three reasons are `provider_admissible`
 - No result is missing
 - No result is assigned to the wrong endpoint
 
-This test establishes the basic three-endpoint path.
-
-## Baseline Test 2: Mixed Outcomes
+## Baseline Test: Mixed Outcomes
 
 Launcher:
 
@@ -335,7 +311,7 @@ result=PASS
 
 This is the stronger baseline fleet test.
 
-A correct aggregate count is not sufficient. PASS requires the correct decision and reason to remain bound to the correct physical endpoint.
+A correct aggregate count is not enough. PASS requires the correct decision and reason to remain bound to the correct physical endpoint.
 
 The required relationship is:
 
@@ -353,7 +329,7 @@ expected per-device result
 
 A decision associated with the wrong endpoint is a failure even when the aggregate accepted and denied counts are correct.
 
-## Harness-Oracle Failure
+## Preserved Harness Failure
 
 An earlier mixed-outcome run produced the correct endpoint results but was marked FAIL because the launcher still used an all-accept PASS rule.
 
@@ -367,21 +343,23 @@ cause=all-accept PASS oracle
 classification=harness/oracle failure
 ```
 
-The failure was in the test oracle, not the endpoint or boundary behavior.
+The failure was in the test oracle, not the endpoint or verification-boundary behavior.
 
-The corrected mixed launcher validates the expected outcome for each device individually.
+The corrected mixed launcher validates the expected decision and reason for each endpoint individually.
 
-This record is retained because test-harness failures are part of the engineering history and should not be silently removed.
+This record remains part of the engineering history because a test harness can misclassify a correct system result.
 
 ## Single-Endpoint Diagnostic
 
-Firmware:
+The baseline includes:
 
 ```text
 esp32_multi_once.py
 ```
 
-The single-endpoint client is used to isolate one board from the fleet and verify:
+This client validates one endpoint independently before the full fleet is run.
+
+It can be used to check:
 
 - Device identity
 - Wi-Fi connection
@@ -392,9 +370,9 @@ The single-endpoint client is used to isolate one board from the fleet and verif
 - Basic latency
 - Endpoint recovery
 
-This diagnostic should be used before modifying fleet logic when only one endpoint is missing or late.
+A single-endpoint diagnostic is useful when only one endpoint is missing, late, or unable to complete the normal fleet path.
 
-## Fleet Validation Matrix
+## Fleet Validation Results
 
 | Test | Result | Property exercised |
 |---|---|---|
@@ -402,71 +380,52 @@ This diagnostic should be used before modifying fleet logic when only one endpoi
 | Three-endpoint mixed outcomes | PASS | Different decisions remain bound to the correct endpoints |
 | Single-endpoint diagnostic | PASS | One board can be validated independently |
 | Single-endpoint isolation | PASS | One unavailable endpoint does not corrupt the other results |
-| Single-endpoint restoration | PASS | The isolated endpoint can resume participation |
+| Single-endpoint restoration | PASS | The isolated endpoint resumes participation |
 | Shared-boundary outage | PASS | All endpoints fail unavailable without accepted action |
-| Shared-boundary recovery | PASS with anomaly | Shared services recover; one endpoint required reset for timely participation |
-| House-Wi-Fi comparison | PASS | Access-point-specific latency fault domain isolated |
-
-## Archer Validation
-
-The Archer validation set was created after the original fleet baseline.
-
-Known files include:
-
-```text
-nuvl_local_hardened_latency.py
-esp32_multi_poll_main_v2_pm_none_stage_v2_archer.py
-esp32_multi_poll_main_v2_pm_none_stage_v2_archer_isolate_com9.py
-run_three_esp32_poll_archer.py
-run_three_esp32_mixed_archer.py
-run_three_esp32_poll_isolate_com9_archer.py
-run_three_esp32_poll_shared_boundary_outage_archer.py
-```
-
-These variants add or support:
-
-- Stage-level timing
-- House-network configuration
-- Endpoint isolation
-- Shared-boundary outage testing
-- Recovery validation
-- Later latency diagnosis
-
-The `COM9` designation records the temporary Windows mapping used during the isolation test. It does not identify the endpoint independently of `device_id.txt`.
+| Shared-boundary recovery | PASS with anomaly | Shared services recover; one endpoint required reset |
+| Twenty-run stage-timing series | 13 PASS / 7 PASS_DEGRADED | Correct results remain preserved during latency variation |
+| House-Wi-Fi comparison | 13/13 PASS | Access-point-specific latency fault domain isolated |
 
 ## Endpoint Isolation
 
-The isolation test removes one endpoint from normal participation while the remaining endpoints continue through the shared coordinator and boundary.
+The isolation test removes one endpoint from normal participation while the remaining endpoints continue through the shared coordinator and verification boundary.
 
 The test checks that:
 
 - Missing participation is detected
 - Results from available endpoints remain correctly bound
 - The absent endpoint does not cause identity reassignment
-- The absent endpoint does not cause another endpoint’s result to be duplicated
+- The absent endpoint does not duplicate another endpoint's result
 - Available endpoints are not converted into false accepted results
-- The launcher distinguishes an unavailable endpoint from an incorrect endpoint result
+- The launcher distinguishes unavailability from an incorrect result
 
-A correct isolation result is not the same as a full three-endpoint PASS. It is evaluated against the expected degraded-state oracle.
+The recorded isolation target was:
+
+```text
+esp32-s3-02
+temporary Windows mapping: COM9
+```
+
+A correct isolation result is evaluated against the expected degraded state. It is not represented as a normal three-endpoint PASS.
 
 ## Endpoint Restoration
 
-After isolation, the removed endpoint is restored to normal participation.
+After isolation, the removed endpoint was returned to normal participation.
 
-PASS requires:
+The restoration test checks that:
 
 - The endpoint reconnects
 - The endpoint reports its correct durable identity
 - The endpoint receives the intended mode
 - The endpoint result is correctly bound
 - The other endpoints remain correct
-- No service restart is required unless the test explicitly includes one
+- No identity or result cross-assignment occurs
 
 The recorded restoration test passed.
 
 ## Shared-Boundary Outage
 
-The shared-boundary outage test removes the verification path used by all endpoints.
+The shared-boundary outage test removes the verification path used by all three endpoints.
 
 Expected behavior:
 
@@ -486,16 +445,17 @@ no fallback acceptance
 PASS requires:
 
 - No endpoint reports an accepted action
-- No cached or previous acceptance is reused
-- The unavailable condition is visible
+- No previous acceptance is reused
+- No local fallback acceptance occurs
+- The unavailable condition remains visible
 - Endpoint identities remain distinguishable
-- The fleet launcher does not reinterpret missing decisions as success
+- Missing or timed-out decisions are not interpreted as success
 
 The shared-boundary outage test passed in the tested path.
 
 ## Shared-Boundary Recovery
 
-After restoring the verification boundary and coordinator, the fleet was returned to service without rebuilding the entire environment.
+After restoring the verification boundary and coordinator, the fleet was returned to service.
 
 Observed result:
 
@@ -509,13 +469,13 @@ Classification:
 PASS with anomaly
 ```
 
-The endpoint reset does not invalidate the shared-boundary fail-closed result.
+The endpoint reset does not invalidate the fail-unavailable result.
 
-It is retained as an operational recovery limitation.
+It remains a documented operational recovery limitation.
 
-## Latency Measurements
+## Timing Results
 
-Original warmed fleet behavior was generally observed in the following range:
+Original warmed fleet behavior was generally observed around:
 
 ```text
 approximately 32–48 ms
@@ -533,27 +493,31 @@ The original mixed-outcome run completed in:
 29–38 ms
 ```
 
-Later stage-timing tests separated portions of the endpoint request path, including connection time and total elapsed time.
-
-A 20-run stage-timing series completed:
+The later Stage-Timing V2 campaign completed:
 
 ```text
-20/20 runs completed
+20/20 fleet runs completed
 60/60 endpoint transactions correct
 13 PASS
 7 PASS_DEGRADED
+```
+
+Across that campaign:
+
+```text
 0 identity failures
 0 decision failures
 0 reason failures
-0 missing results
-0 late-result classification failures
+0 missing-result failures
 ```
 
 The degraded classifications were based on latency budget, not incorrect authorization outcomes.
 
 ## Synchronized Latency Incident
 
-One degraded run showed nearly identical connection-stage delays across all three endpoints:
+One degraded run showed nearly identical connection-stage delays across all three endpoints.
+
+Recorded behavior:
 
 ```text
 connect_ms approximately 866–868 ms
@@ -571,13 +535,13 @@ The exact internal Mango mechanism remains unresolved.
 No claim is made about:
 
 - A specific Mango driver function
-- A specific firmware defect
-- A hardware defect
+- A confirmed firmware defect
+- A confirmed hardware defect
 - A universal ESP32 compatibility problem
 
-## House-Wi-Fi A/B Comparison
+## House-Wi-Fi Comparison
 
-The same three endpoints, firmware logic, Raspberry Pi services, coordinator path, and provider path were tested through house Wi-Fi.
+The same three endpoints, firmware logic, Raspberry Pi services, coordinator path, and verification-boundary path were tested through house Wi-Fi.
 
 Observed comparison:
 
@@ -602,15 +566,19 @@ exact internal mechanism unresolved
 
 The Mango latency incident is engineering evidence. It is not the normal NUVL fleet baseline.
 
-## Network Configuration
+## Configuration
 
-Public source should use explicit placeholders:
+The ESP32 firmware requires the local Wi-Fi and Raspberry Pi settings.
+
+Example:
 
 ```python
 SSID = "YOUR_WIFI_SSID"
 PASSWORD = "YOUR_WIFI_PASSWORD"
 PI_IP = "YOUR_PI_IP"
 ```
+
+The Raspberry Pi address must point to the system running the coordinator and verification-boundary services.
 
 The original Mango bench used:
 
@@ -619,60 +587,17 @@ SSID: GL-MT300N-V2-94f
 Raspberry Pi: 192.168.8.234
 ```
 
-The original test files may contain bench-specific values.
-
-A sanitized public copy is not byte-identical to the original tested source.
-
-Do not reuse the tested-source hash for a modified copy.
-
-Each published derivative should receive its own SHA-256 in:
-
-```text
-../evidence/SHA256SUMS.txt
-```
-
-## Source Classes
-
-Fleet source should be labeled as one of the following.
-
-### Original tested source
-
-The exact file used during the recorded test.
-
-### Sanitized public derivative
-
-A copy modified to remove credentials, private values, or environment-specific configuration.
-
-### Rerun-confirmed public source
-
-A sanitized or reorganized copy executed again and confirmed against the documented PASS criteria.
-
-Changing any of the following creates a new source version:
-
-- SSID
-- Password
-- Raspberry Pi address
-- Coordinator address
-- Port
-- Timeout
-- Release timing
-- Endpoint identity handling
-- PASS oracle
-- Decision mapping
-- Reason mapping
-- Source structure
-
-Configuration-only changes may not alter the intended architecture, but they still change the file bytes and therefore require a new hash.
+The house-Wi-Fi comparison used a different local network.
 
 ## Known Failed or Superseded Approaches
 
-The fleet implementation includes several corrected development failures.
+Several earlier approaches were tested and replaced.
 
 ### Concurrent Windows `mpremote`
 
 Attempting to control all three serial ports concurrently through Windows `mpremote` produced timeouts.
 
-This approach was replaced with endpoint-originated outbound polling.
+This approach was replaced by endpoint-originated outbound polling.
 
 ### Inbound UDP Triggering
 
@@ -696,34 +621,6 @@ It reported FAIL even though the endpoint outcomes were correct for the assigned
 
 The corrected launcher uses per-device expected decisions and reasons.
 
-## Evidence
-
-Fleet run IDs and summarized results are documented here, but run IDs are not substitutes for evidence files.
-
-Current recorded runs:
-
-```text
-Three-accept baseline:
-run_id=18c565fc0e9dfd5c
-
-Mixed outcomes:
-run_id=18c5b11e874cd4cc
-
-Harness-oracle failure:
-run_id=18c5b0a38b1d51b0
-```
-
-Fleet logs should be added to [`../evidence/`](../evidence/) only after:
-
-- The exact file is identified
-- The associated run is confirmed
-- The file is classified as original or sanitized
-- The SHA-256 is calculated
-- Any anomaly is documented
-- The applicable fleet README links to it
-
-See [`../evidence/README.md`](../evidence/README.md) for the evidence policy.
-
 ## Limitations
 
 The fleet results apply to the tested topology and paths.
@@ -731,10 +628,10 @@ The fleet results apply to the tested topology and paths.
 They do not establish:
 
 - Parallel processing inside the original single-threaded boundary
-- Behavior with arbitrary endpoint counts
-- Behavior across arbitrary Wi-Fi access points
-- Behavior under sustained RF interference
+- Correct operation with arbitrary endpoint counts
+- Correct operation across arbitrary wireless networks
 - Behavior under deliberate wireless jamming
+- Behavior under sustained RF interference
 - Long-duration repeated endpoint dropout and restoration
 - Multi-boundary coordination
 - Independent reproduction by an external laboratory
@@ -742,29 +639,59 @@ They do not establish:
 - Safety certification
 - Authorization correctness outside the implemented request modes
 
-The endpoint trusts the downstream Raspberry Pi decision in the original fleet architecture.
+The ESP32-S3 endpoints trust the downstream result returned by the Raspberry Pi verification boundary.
 
-The ESP32 does not independently verify the provider signature.
+The endpoints do not independently verify the provider signature.
 
-A compromised Raspberry Pi boundary could therefore fabricate a result to the trusting endpoint in this implementation.
+The Raspberry Pi holds the provider public trust anchor, while the provider retains the private signing key.
 
-That limitation is architectural and must not be omitted.
+The endpoints do not hold the provider private key and do not independently mint provider authority.
 
-## Recommended Reproduction Order
+However, a compromised Raspberry Pi could fabricate a downstream result to a trusting endpoint in this implementation.
 
-1. Validate one endpoint with `esp32_multi_once.py`
-2. Start `nuvl_local_hardened.py`
-3. Start `multi_endpoint_coordinator_v2.py`
-4. Deploy `esp32_multi_poll_main_v2.py` as `main.py`
-5. Confirm all three `device_id.txt` files
-6. Run `run_three_esp32_poll.py`
-7. Confirm the three-accept baseline
-8. Run `run_three_esp32_mixed.py`
-9. Confirm per-device mixed-outcome binding
-10. Attempt endpoint isolation
-11. Restore the isolated endpoint
-12. Test shared-boundary outage
-13. Restore the shared boundary
-14. Attempt stage-timing and wireless-path comparisons only after the baseline is stable
+That limitation is part of the tested architecture.
+
+## Recommended Test Order
+
+1. Validate one endpoint with `esp32_multi_once.py`.
+2. Start `nuvl_local_hardened.py`.
+3. Start `multi_endpoint_coordinator_v2.py`.
+4. Deploy `esp32_multi_poll_main_v2.py` as `main.py`.
+5. Confirm all three `device_id.txt` values.
+6. Run `run_three_esp32_poll.py`.
+7. Confirm the three-accept baseline.
+8. Run `run_three_esp32_mixed.py`.
+9. Confirm per-device mixed-outcome binding.
+10. Move to endpoint isolation and restoration.
+11. Test shared-boundary outage and recovery.
+12. Attempt stage-timing and wireless-path comparisons only after the baseline is stable.
 
 Begin with [`baseline/`](baseline/) before using the Archer validation variants.
+
+## Recorded Runs
+
+Three-accept baseline:
+
+```text
+run_id=18c565fc0e9dfd5c
+```
+
+Mixed-outcome PASS:
+
+```text
+run_id=18c5b11e874cd4cc
+```
+
+Mixed-outcome harness failure:
+
+```text
+run_id=18c5b0a38b1d51b0
+```
+
+Additional logs and manifests are indexed under:
+
+```text
+../evidence/
+```
+
+See [`../evidence/README.md`](../evidence/README.md) for the current evidence set.
