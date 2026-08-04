@@ -1,26 +1,22 @@
 # NUVL Edge Lab Evidence
 
-This directory contains the curated evidence supporting the test claims documented in the NUVL Edge Lab.
+This directory contains selected evidence from the NUVL Edge Lab test campaign.
 
-The evidence set is intentionally selective. It is not a complete export of the original development directory, terminal history, generated runtime state, or every experimental run.
+The evidence supports specific results documented elsewhere in the repository, including:
 
-Each included file must support a specific documented result and must be identifiable by filename, test, and SHA-256.
-
-## What the Evidence Establishes
-
-The files in this directory support observed behavior from the tested paths, including:
-
-- Correct three-endpoint identity and result binding
+- Three-endpoint identity and result binding
 - Mixed accepted and denied fleet outcomes
 - Replay denial after process restart
 - Replay denial after abrupt Raspberry Pi power loss
 - Exactly one accepted result under overlapping attempts
 - Replay denial after a crash following persistent commit
 - Successful retry after a crash before atomic state replacement
-- Fleet service recovery after a shared-boundary power cycle
-- Documented anomalies, including an endpoint reset required during one restoration sequence
+- Fleet recovery after a shared-boundary power cycle
+- Documented recovery anomalies
 
-Evidence of a successful test does not establish behavior outside the documented topology, configuration, fault point, or PASS criteria.
+The evidence set is intentionally curated. It is not a complete copy of the original development directory, terminal history, generated runtime state, or every experimental run.
+
+A successful test record applies to the documented topology, configuration, fault point, and PASS criteria. It does not establish behavior outside those tested conditions.
 
 ## Directory Contents
 
@@ -34,39 +30,71 @@ evidence/
 └── wp2_t1_final_evidence_20260801_010225.log
 ```
 
-Additional evidence should be added only after its filename, test association, source version, and SHA-256 have been confirmed.
+## Evidence Index
 
-## Current Evidence Index
+| Test | Evidence file | Purpose |
+|---|---|---|
+| POC004B | [`poc004b_archer_evidence_20260730_225507.log`](poc004b_archer_evidence_20260730_225507.log) | Records the abrupt-power-loss persistence sequence and replay result |
+| POC004B recovery | [`post_powercycle_fleet_restoration_20260730_231251.log`](post_powercycle_fleet_restoration_20260730_231251.log) | Records restoration of the Raspberry Pi services and three-endpoint fleet |
+| POC004B manifest | [`poc004b_local_manifest_20260731_232149.txt`](poc004b_local_manifest_20260731_232149.txt) | Records the local evidence manifest associated with the POC004B package |
+| WP2-T1 | [`wp2_t1_final_evidence_20260801_010225.log`](wp2_t1_final_evidence_20260801_010225.log) | Records the pre-replacement crash, restart, retry, successful commit, and final replay denial |
 
-| Test | Evidence file | SHA-256 | Purpose |
-|---|---|---|---|
-| POC004B | [`poc004b_archer_evidence_20260730_225507.log`](poc004b_archer_evidence_20260730_225507.log) | `9E60FF57BA28E53E081E768C04B298053B5653A505DF76F78D3F9D20837F73F1` | Records the abrupt-power-loss persistence sequence and replay result |
-| POC004B restoration | [`post_powercycle_fleet_restoration_20260730_231251.log`](post_powercycle_fleet_restoration_20260730_231251.log) | `0087276A01D749938D92A3FF8EB059EA28F0017A4EEB8586C7BD95564F6A91A8` | Records restoration of the fleet after the Raspberry Pi power-cycle test |
-| POC004B manifest | [`poc004b_local_manifest_20260731_232149.txt`](poc004b_local_manifest_20260731_232149.txt) | `14D17FA75B08240BFCF38EC2430EDFDEEA8AD3E4CB941926661C2595116EC8C1` | Records the local evidence manifest associated with the POC004B package |
-| WP2-T1 | [`wp2_t1_final_evidence_20260801_010225.log`](wp2_t1_final_evidence_20260801_010225.log) | `5BB1053A0AF88831F59D8D346D524F10F1E432C5B6D7A3A2A2342312120BBF20` | Records the pre-replacement crash, retry, successful commit, and final replay denial |
+## Published Evidence Hashes
 
-Known WP2-T1 evidence size:
+### POC004B Power-Loss Evidence
 
 ```text
-wp2_t1_final_evidence_20260801_010225.log
-5,374 bytes
+File:
+poc004b_archer_evidence_20260730_225507.log
+
+SHA-256:
+9E60FF57BA28E53E081E768C04B298053B5653A505DF76F78D3F9D20837F73F1
 ```
 
-The smaller WP2-T1 phase logs are not listed until their exact filenames, sizes, and hashes are captured.
+### POC004B Fleet-Restoration Evidence
 
-## POC004B Evidence
+```text
+File:
+post_powercycle_fleet_restoration_20260730_231251.log
+
+SHA-256:
+0087276A01D749938D92A3FF8EB059EA28F0017A4EEB8586C7BD95564F6A91A8
+```
+
+### POC004B Local Manifest
+
+```text
+File:
+poc004b_local_manifest_20260731_232149.txt
+
+SHA-256:
+14D17FA75B08240BFCF38EC2430EDFDEEA8AD3E4CB941926661C2595116EC8C1
+```
+
+### WP2-T1 Final Evidence
+
+```text
+File:
+wp2_t1_final_evidence_20260801_010225.log
+
+Size:
+5,374 bytes
+
+SHA-256:
+5BB1053A0AF88831F59D8D346D524F10F1E432C5B6D7A3A2A2342312120BBF20
+```
+
+The same values are listed in:
+
+```text
+SHA256SUMS.txt
+```
+
+## POC004B — Abrupt Power-Loss Persistence
 
 POC004B tested whether a completed persistent spent-state commit remained effective after abrupt Raspberry Pi power loss.
 
-The relevant evidence files are:
-
-```text
-poc004b_archer_evidence_20260730_225507.log
-post_powercycle_fleet_restoration_20260730_231251.log
-poc004b_local_manifest_20260731_232149.txt
-```
-
-The tested sequence was:
+The test sequence was:
 
 ```text
 prepare single-use artifact
@@ -81,21 +109,37 @@ confirm replay denial
 restore fleet services
 ```
 
-Observed property:
+Observed result:
 
 > A completed persistent-state commit remained effective after abrupt Raspberry Pi power loss.
 
-The restoration evidence also records an operational anomaly:
+The relevant evidence files are:
 
-> The shared boundary and coordinator recovered, and the three-endpoint fleet eventually returned to normal operation. One endpoint required reset before timely participation resumed.
+```text
+poc004b_archer_evidence_20260730_225507.log
+post_powercycle_fleet_restoration_20260730_231251.log
+poc004b_local_manifest_20260731_232149.txt
+```
 
-The anomaly does not invalidate the persistent replay result. It remains relevant to recovery behavior and is retained rather than omitted.
+### Recovery Anomaly
 
-## WP2-T1 Evidence
+The Raspberry Pi verification boundary and coordinator recovered after power restoration.
 
-WP2-T1 tested the persistence window before atomic state replacement.
+The three-endpoint fleet eventually returned to normal operation, but one endpoint required reset before timely participation resumed.
 
-The tested sequence was:
+The recovery result is therefore recorded as:
+
+```text
+PASS with anomaly
+```
+
+The endpoint reset does not invalidate the persistent replay result. It remains relevant to operational recovery behavior.
+
+## WP2-T1 — Crash Before Atomic Replacement
+
+WP2-T1 tested the persistence window before atomic replacement of the spent-state file.
+
+The test sequence was:
 
 ```text
 prepare artifact
@@ -109,11 +153,17 @@ attempt replay
 confirm replay denial
 ```
 
-Observed property:
+Observed result:
 
 > A crash before atomic replacement did not falsely consume the artifact. The interrupted commit could be retried after restart, after which replay remained denied.
 
-The tested verification boundary was:
+The final evidence file is:
+
+```text
+wp2_t1_final_evidence_20260801_010225.log
+```
+
+The verification boundary used in the recorded test was:
 
 ```text
 wp2_t1_pre_replace_boundary_archer.py
@@ -125,42 +175,91 @@ Confirmed source SHA-256:
 87351DBDF539E0E44480B28B205AE04FAD796D9C60DA9C4084FDEFDA49A9BFC8
 ```
 
-Do not substitute:
+Do not confuse it with:
 
 ```text
 wp2_t1_temp_fsync_boundary_archer.py
 ```
 
-That similarly named file has different contents and was not the tested boundary.
+That similarly named file has different contents and was not the boundary used in the recorded WP2-T1 test.
 
-## Evidence Integrity
+## Fleet Run Records
 
-SHA-256 is used to identify the exact bytes of each published evidence file.
+The original fleet baseline and mixed-outcome tests are currently identified by run ID and summarized result.
 
-The canonical repository hash list is:
+### Three-Accept Baseline
 
 ```text
-SHA256SUMS.txt
+run_id=18c565fc0e9dfd5c
+responses=3/3
+accepted=3
+identity_or_ip_mismatch=0
+elapsed=33–34 ms
+result=PASS
 ```
 
-A hash confirms file identity. It does not independently prove that the contents are truthful, complete, or produced under the stated conditions.
+### Mixed-Outcome Fleet Run
 
-Evidence credibility depends on the combined record:
+```text
+run_id=18c5b11e874cd4cc
+responses=3/3
+accepted=1
+denied=2
+identity_or_ip_mismatch=0
+elapsed=29–38 ms
+result=PASS
+```
 
-- Exact filename
-- SHA-256
-- Test identifier
+### Preserved Harness-Oracle Failure
+
+```text
+run_id=18c5b0a38b1d51b0
+system outcomes=correct
+launcher result=FAIL
+cause=all-accept PASS oracle
+classification=harness/oracle failure
+```
+
+The harness-oracle failure is retained because the system produced the expected mixed endpoint results, but the original launcher evaluated them using an incorrect all-accept PASS rule.
+
+The corrected launcher evaluates the expected decision and reason for each endpoint individually.
+
+## What a SHA-256 Establishes
+
+SHA-256 provides a fingerprint of the exact bytes in a file.
+
+When a published file produces the expected SHA-256, it confirms that the file has not changed from the version represented in `SHA256SUMS.txt`.
+
+A matching hash does not independently prove:
+
+- That the test was performed
+- That the test conditions were correctly described
+- That the log is complete
+- That the result applies outside the tested path
+
+The hash identifies the file. The engineering claim depends on the complete record:
+
+- Test description
 - Source version
-- Test procedure
-- Expected outcome
-- Observed outcome
+- Execution sequence
+- Expected result
+- Observed result
 - PASS criteria
-- Known anomaly or setup incident
-- Consistency with related logs and manifests
+- Evidence file
+- Known anomalies
+- Limitations
 
 ## Verify on Windows
 
-From the `evidence` directory in PowerShell:
+Open PowerShell in the `evidence` directory.
+
+Verify one file:
+
+```powershell
+Get-FileHash .\poc004b_archer_evidence_20260730_225507.log -Algorithm SHA256
+```
+
+Verify the current evidence files:
 
 ```powershell
 Get-FileHash .\poc004b_archer_evidence_20260730_225507.log -Algorithm SHA256
@@ -169,7 +268,7 @@ Get-FileHash .\poc004b_local_manifest_20260731_232149.txt -Algorithm SHA256
 Get-FileHash .\wp2_t1_final_evidence_20260801_010225.log -Algorithm SHA256
 ```
 
-To hash every file in the directory:
+Hash every evidence file except the README and hash list:
 
 ```powershell
 Get-ChildItem -File |
@@ -178,7 +277,11 @@ Get-ChildItem -File |
     Sort-Object Path
 ```
 
-Compare the returned values with `SHA256SUMS.txt`.
+Compare the returned values with:
+
+```text
+SHA256SUMS.txt
+```
 
 ## Verify on Linux or Raspberry Pi
 
@@ -188,80 +291,46 @@ From the `evidence` directory:
 sha256sum -c SHA256SUMS.txt
 ```
 
-To calculate one file directly:
-
-```bash
-sha256sum wp2_t1_final_evidence_20260801_010225.log
-```
-
 A successful verification reports:
 
 ```text
 filename: OK
 ```
 
-## Source and Evidence Classes
+To calculate one file directly:
 
-Files in the repository are distinguished by their relationship to the original test.
-
-### Original tested source
-
-The exact source file used during the recorded test.
-
-### Sanitized public derivative
-
-A modified copy with credentials, private values, or environment-specific configuration removed.
-
-### Rerun-confirmed public source
-
-A sanitized or reorganized source file that was executed again and confirmed against its documented PASS criteria.
-
-### Original evidence
-
-An unmodified log, manifest, or capture produced during or immediately after a recorded test.
-
-### Sanitized evidence derivative
-
-A copy modified to remove information not required to evaluate the result.
-
-A sanitized derivative must receive a new SHA-256. It must not reuse the hash of the original file.
-
-Entries in `SHA256SUMS.txt` should identify sanitized derivatives explicitly.
-
-Example:
-
-```text
-# Sanitized evidence derivative — not byte-identical to original evidence
-<sha256>  sanitized_example.log
+```bash
+sha256sum wp2_t1_final_evidence_20260801_010225.log
 ```
 
-## Evidence Chain Rules
+## Withheld Verification Boundaries
 
-For every new evidence file:
+Some disconnected-authority tests do not include the complete verification-boundary implementation in the public repository.
 
-1. Preserve the original file separately.
-2. Do not edit the original in place.
-3. Calculate its SHA-256 before making a sanitized copy.
-4. Create a separately named derivative when redaction is required.
-5. Calculate a new SHA-256 for the derivative.
-6. Record the test identifier and relevant source files.
-7. Record the expected and observed outcomes.
-8. Record anomalies and setup incidents.
-9. Add the public file to `SHA256SUMS.txt`.
-10. Link the evidence from the applicable test-folder README.
+Those test folders may still include:
 
-Do not silently replace a file while keeping the same filename and documentation.
+- Client sequence
+- Boundary interface
+- Request and response behavior
+- Failure-injection point
+- Expected result
+- Observed result
+- PASS criteria
+- Evidence
+- Source hashes
+- Known limitations
+
+This allows the documented behavior to be evaluated without publishing every mechanism-level implementation detail.
+
+Evidence of a recorded result is not the same as a complete independent reproduction package.
+
+See the [Publication Boundary](../README.md#publication-boundary) section in the main NUVL Edge Lab README.
 
 ## Evidence Naming
 
-Evidence filenames should identify:
+Evidence filenames identify the test, purpose, and capture time where available.
 
-- Test or work-package identifier
-- Purpose or phase
-- Date
-- Time when available
-
-Preferred format:
+The general form is:
 
 ```text
 <test>_<purpose>_YYYYMMDD_HHMMSS.<extension>
@@ -275,24 +344,17 @@ post_powercycle_fleet_restoration_20260730_231251.log
 wp2_t1_final_evidence_20260801_010225.log
 ```
 
-Avoid generic names such as:
+This makes each file easier to associate with the relevant test and phase.
 
-```text
-output.log
-test.txt
-results-final.txt
-new-log.log
-```
+## Excluded Runtime Material
 
-## What Is Not Included
-
-The public evidence directory does not include, by default:
+The evidence directory does not include:
 
 ```text
 private signing keys
 provider secret material
 active credentials
-generated runtime spent-state
+generated spent-state
 temporary commit files
 crash markers
 PID files
@@ -304,98 +366,20 @@ superseded evidence copies
 raw development-directory exports
 ```
 
-Generated authority artifacts are not private keys, but they contain test-specific signatures and bindings. They remain outside the public evidence set unless a sanitized fixture is deliberately selected for publication.
-
-## Withheld Boundary Implementations
-
-Some disconnected-authority tests intentionally omit the verification-boundary implementation from the public repository.
-
-In those cases, the evidence may still document:
-
-- Client sequence
-- Boundary interface
-- Request and response behavior
-- Failure-injection point
-- Expected outcome
-- Observed outcome
-- PASS criteria
-- Relevant source hashes
-- Known limitations
-
-Evidence of the recorded result is not the same as a complete independent reproduction package.
-
-Each affected test-folder README identifies the withheld component and explains what remains available for evaluation.
-
-See the [Publication Boundary](../README.md#publication-boundary) section in the main NUVL Edge Lab README.
-
-## Fleet Evidence
-
-The original fleet baseline and mixed-outcome runs are currently identified in the fleet documentation by run ID and observed result.
-
-Three-accept baseline:
-
-```text
-run_id=18c565fc0e9dfd5c
-responses=3/3
-accepted=3
-identity_or_ip_mismatch=0
-elapsed=33–34 ms
-result=PASS
-```
-
-Mixed-outcome run:
-
-```text
-run_id=18c5b11e874cd4cc
-responses=3/3
-accepted=1
-denied=2
-identity_or_ip_mismatch=0
-elapsed=29–38 ms
-result=PASS
-```
-
-Harness-oracle failure:
-
-```text
-run_id=18c5b0a38b1d51b0
-system outcomes=correct
-launcher result=FAIL
-cause=all-accept PASS oracle
-classification=harness/oracle failure
-```
-
-Fleet logs should be added to this directory only after the exact evidence files associated with those runs have been identified and hashed.
-
-The run IDs should not be treated as substitutes for the underlying evidence files.
+Provider-signed artifacts are not private keys, but they contain test-specific bindings and signatures. They are not required for the current public evidence set.
 
 ## Limitations
 
-The current public evidence set does not establish:
+The current evidence does not establish:
 
-- Independent external reproduction
-- Behavior at persistence crash points not tested
-- Correct startup behavior with corrupt persistent state
-- Correct recovery from truncated or structurally invalid state
-- Cross-process or multi-boundary contention behavior
+- Independent reproduction by an external laboratory
+- Behavior at persistence crash points that were not tested
+- Startup behavior with corrupt persistent state
+- Recovery from truncated or structurally invalid persistent state
+- Cross-process contention
+- Multi-boundary contention
 - Long-duration repeated power-cycle endurance
-- General performance across arbitrary access points or radio environments
+- General performance across arbitrary access points
+- General performance across arbitrary radio environments
 
-The evidence supports the documented tests and fault points only.
-
-## Adding Evidence
-
-A new file belongs here only when it materially supports a documented claim.
-
-Before adding it, confirm:
-
-- The exact test it supports
-- Whether it is original or sanitized
-- Its SHA-256
-- Its file size
-- Its relevant source version
-- Its expected and observed outcomes
-- Its PASS or failure classification
-- Any anomaly that affects interpretation
-
-Do not add a file merely because it exists in the original working directory.
+The evidence supports the documented tests and fault-injection points only.
