@@ -3,7 +3,7 @@ import json
 import time
 import urllib.request
 
-COORD_BASE = "http://192.168.8.234:19052"
+COORD_BASE = "YOUR PI IP:19052"
 
 ENDPOINTS = {
     "esp32-field-01": "192.168.8.215",
