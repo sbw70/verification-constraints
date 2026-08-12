@@ -1,635 +1,131 @@
-# NUVL Edge Lab
-
-NUVL Edge Lab is a physical test environment for provider-controlled validation and bounded authority on low-resource endpoints.
-
-The laboratory uses:
-
-- Three ESP32-S3 endpoints
-- A Raspberry Pi fleet coordinator
-- A Raspberry Pi verification boundary
-- Local wireless infrastructure
-- A Windows control host
-- A provider that retains its Ed25519 private signing key
-
-The tests examine whether constrained endpoints can request, receive, and display provider-bound decisions without independently acquiring reusable authorization authority.
-
-The central architectural distinction is:
-
-> The endpoint may request, observe, display, or act on a bounded result, but it does not independently create, enlarge, or reuse provider authority.
-
-## What Has Been Tested
-
-The current laboratory work includes:
-
-- Three physical endpoints using one shared verification boundary
-- Per-device identity, decision, and reason binding
-- Mixed accepted and denied outcomes in the same fleet run
-- Endpoint isolation and restoration
-- Shared-boundary outage and recovery
-- Fail-unavailable behavior without fallback acceptance
-- Stage-level endpoint timing
-- Wireless-path fault isolation
-- Provider-issued authority bounded for disconnected use
-- Replay rejection across process restart and Raspberry Pi power loss
-- Exactly one successful exercise under overlapping attempts
-- Crash after persistent commit but before response
-- Crash before atomic state replacement
-
-The results apply to the tested paths, configurations, and fault-injection points.
-
-## Laboratory Architecture
-
-The original fleet path is:
-
-```text
-Windows control host
-        |
-        | starts fleet launcher
-        v
-Raspberry Pi fleet coordinator
-        |
-        | assigns run_id
-        | assigns request mode
-        | assigns relative wait_ms
-        v
-Three ESP32-S3 endpoints
-        |
-        | create requests
-        | POST /nuvl
-        v
-Raspberry Pi verification boundary
-        |
-        | returns decision and reason
-        v
-ESP32-S3 endpoint reports
-        |
-        v
-Fleet launcher validates:
-identity
-IP
-decision
-reason
-timing
-```
-
-Primary services:
-
-| Port | Service |
-|---:|---|
-| `8089` | NUVL verification boundary |
-| `19052` | Fleet coordinator |
-
-The original Raspberry Pi boundary uses Python `HTTPServer` and is single-threaded.
-
-The fleet tests demonstrate coordinated fan-in through one shared boundary. They do not claim parallel processing inside that boundary.
-
-## Repository Structure
-
-```text
-labs/nuvl-edge/
-├── README.md
-├── .gitignore
-│
-├── fleet/
-│   ├── README.md
-│   ├── baseline/
-│   └── archer-validation/
-│
-├── disconnected-authority/
-│   ├── README.md
-│   ├── poc003-single-use/
-│   ├── poc004b-power-loss/
-│   ├── poc005-double-spend/
-│   ├── poc006a-commit-before-accept/
-│   └── wp2-t1-pre-replace/
-│
-└── evidence/
-    ├── README.md
-    └── SHA256SUMS.txt
-```
+NUVL Edge Lab
 
-### [`fleet/`](fleet/)
+NUVL Edge Lab is a physical validation environment for testing NUVL and related provider-controlled verification constraint architectures under real-world edge conditions.
 
-Contains the three-endpoint fleet implementation and the later timing, isolation, outage, recovery, and wireless-comparison tests.
+The lab is designed to evolve. Endpoint types, execution targets, network conditions, enabled modules, and test methods may change without altering the purpose of the environment.
 
-Begin with:
+Purpose
 
-```text
-fleet/baseline/
-```
+The lab evaluates whether architectural authority constraints remain intact when implemented across distributed and resource-constrained systems.
 
-### [`disconnected-authority/`](disconnected-authority/)
+Testing focuses on conditions such as:
 
-Contains the bounded disconnected-use, replay-prevention, power-loss, overlapping-attempt, and crash-window tests.
+- constrained and embedded endpoints
+- heterogeneous distributed systems
+- intermittent or unavailable connectivity
+- shared infrastructure failures
+- endpoint isolation and recovery
+- overlapping and repeated requests
+- bounded provider-established authority
+- persistent enforcement
+- physical execution interfaces
+- load and fault conditions
+- degraded operating environments
 
-### [`evidence/`](evidence/)
+The objective is not simply to demonstrate successful operation.
 
-Contains selected logs and manifests supporting specific test results.
+The objective is to determine whether the defined authority boundaries remain intact when the surrounding system becomes more complex, unreliable, distributed, or adversarial.
 
-## Original Fleet Baseline
+NUVL Core
 
-The original fleet implementation uses:
+NUVL is a stateless intermediary designed to preserve a structural separation between distributed system components and provider-controlled execution authority.
 
-```text
-nuvl_local_hardened.py
-multi_endpoint_coordinator_v2.py
-esp32_multi_poll_main_v2.py
-esp32_multi_once.py
-run_three_esp32_poll.py
-run_three_esp32_mixed.py
-```
+NUVL does not independently:
 
-Each ESP32-S3 contains:
+- establish authorization policy
+- originate provider authority
+- hold provider signing authority
+- enlarge or reinterpret authority
+- convert observation into authorization
+- acquire execution authority through proximity to execution
 
-```text
-main.py
-device_id.txt
-```
+The governing invariant is:
 
-The same fleet firmware is deployed to all three endpoints as `main.py`.
+«Execution authority remains scoped to the provider-controlled boundary.»
 
-The durable endpoint identity is stored separately in `device_id.txt`.
+A request, representation, observation, or result passing through an intermediary does not grant that intermediary independent authority to determine execution meaning.
 
-Confirmed endpoint identities:
+Enabled Capabilities
 
-```text
-esp32-field-01
-esp32-s3-02
-esp32-s3-03
-```
+The lab also validates optional architectural modules and integrations that may operate alongside NUVL.
 
-COM port numbers are temporary Windows bench mappings and are not endpoint identities.
+These may introduce additional functions such as:
 
-## Fleet Operation
+- request-bound artifact exchange
+- disconnected or air-gapped operation
+- provider-established bounded authority
+- persistent usage-state enforcement
+- replay and temporal constraints
+- constrained endpoint participation
+- multi-domain or multi-provider operation
+- downstream execution binding
+- physical effectors
 
-The baseline firmware follows this sequence:
+These capabilities are not the NUVL core.
 
-1. Read `device_id.txt`
-2. Connect to Wi-Fi
-3. Poll the Raspberry Pi coordinator
-4. Receive a `run_id`, request mode, and relative `wait_ms`
-5. Wait for the assigned release interval
-6. Create a request
-7. Submit the request to `/nuvl`
-8. Receive a decision and reason
-9. Report the result to the coordinator
-10. Return to polling
+An integrated implementation may become stateful, persistent, or execution-aware because a particular capability requires those properties while NUVL itself remains stateless.
 
-The coordinator uses relative `wait_ms` timing.
+The relevant architectural question is whether the added capability preserves the original authority boundary.
 
-This replaced an earlier absolute-timestamp design that failed because Raspberry Pi Python and MicroPython used incompatible epoch representations.
+Edge Validation
 
-## Endpoint LED States
+The edge lab provides a controlled environment for moving constraint architectures beyond abstract or software-only examples.
 
-The ESP32-S3 onboard RGB LED displays the endpoint state.
+Tests may combine real endpoints, intermediaries, execution boundaries, network faults, provider unavailability, physical consequences, and intentionally adverse behavior.
 
-| LED | Meaning |
-|---|---|
-| Blue | Ready or idle |
-| Cyan | Wi-Fi connected |
-| Yellow | Request created |
-| Purple | Verification pending |
-| Green | Accepted |
-| Red | Denied |
-| Orange | Stale, replay, or malformed denial |
-| White | Network, provider, boundary, or execution path unavailable |
+This allows individual properties to be exercised independently before they are combined into more representative operational conditions.
 
-The LED displays the result returned through the tested path. It is not the source of authority.
+Where appropriate, tests distinguish between:
 
-## Three-Accept Fleet Baseline
+- core architecture validation
+- optional capability integration
+- implementation behavior
+- architecture changes
 
-Launcher:
+An architecture change occurs when authority placement, trust relationships, architectural invariants, or component responsibilities change.
 
-```text
-run_three_esp32_poll.py
-```
+Adding a new endpoint, execution interface, fault condition, or optional capability does not by itself constitute an architecture change.
 
-Expected binding:
+Validation Principles
 
-```text
-esp32-field-01 -> accepted / provider_admissible
-esp32-s3-02    -> accepted / provider_admissible
-esp32-s3-03    -> accepted / provider_admissible
-```
+A passing test supports only the property exercised by that test.
 
-Recorded successful run:
+The lab maintains a distinction between:
 
-```text
-run_id=18c565fc0e9dfd5c
-responses=3/3
-accepted=3
-identity_or_ip_mismatch=0
-elapsed=33–34 ms
-result=PASS
-```
+- expected behavior
+- observed behavior
+- software-reported behavior
+- physical observation
+- test-harness behavior
+- architectural inference
 
-PASS requires:
+Failures and unresolved anomalies are retained when they materially affect interpretation of a result.
 
-- All three expected endpoints respond
-- Each endpoint reports its correct identity
-- Each result is associated with the expected endpoint IP
-- All three decisions are `accepted`
-- All three reasons are `provider_admissible`
-- No endpoint result is missing
-- No result is assigned to the wrong endpoint
+Observed behavior is not generalized beyond the tested configuration without additional evidence.
 
-## Mixed-Outcome Fleet Test
+Claim Discipline
 
-Launcher:
+The lab does not treat implementation proximity as proof of authority.
 
-```text
-run_three_esp32_mixed.py
-```
+For example:
 
-Expected binding:
+- an endpoint reporting successful execution does not independently prove physical execution
+- a stored representation does not become authority merely because it can be verified
+- successful operation under one failure condition does not establish behavior under all failure conditions
+- coordinated activity does not necessarily demonstrate parallel execution
+- replay rejection in one state model does not establish persistence under another
+- recovery from a tested interruption does not establish recovery from every possible interruption point
 
-```text
-esp32-field-01 -> accepted / provider_admissible
-esp32-s3-02    -> denied / unauthorized_request
-esp32-s3-03    -> denied / stale_replay_malformed
-```
+Broader claims require separate validation.
 
-Recorded successful run:
+Scope
 
-```text
-run_id=18c5b11e874cd4cc
-responses=3/3
-accepted=1
-denied=2
-identity_or_ip_mismatch=0
-elapsed=29–38 ms
-result=PASS
-```
+NUVL Edge Lab is an engineering validation environment.
 
-This is the stronger original fleet test.
+It is used to test how provider-controlled verification constraints behave as they are applied to increasingly realistic distributed systems and operating conditions.
 
-A correct aggregate count is not sufficient. PASS requires the correct decision and reason to remain attached to the correct physical endpoint.
+Individual experiments document their own implementation details, test procedures, evidence, limitations, and supported conclusions.
 
-## Preserved Harness Failure
+The lab itself remains centered on one question:
 
-An earlier mixed-outcome run produced the correct endpoint results but was marked FAIL because the launcher still applied an all-accept PASS rule.
-
-```text
-run_id=18c5b0a38b1d51b0
-system outcomes=correct
-launcher result=FAIL
-cause=all-accept PASS oracle
-classification=harness/oracle failure
-```
-
-The failure was in the test oracle, not the endpoint or verification-boundary behavior.
-
-The corrected launcher validates the expected result for each endpoint individually.
-
-## Archer Fleet Validation
-
-The Archer validation work extends the original baseline with:
-
-- Stage-level endpoint timing
-- Repeated three-endpoint runs
-- Mixed per-device outcomes
-- Single-endpoint isolation
-- Single-endpoint restoration
-- Shared-boundary outage
-- Shared-boundary recovery
-- House-Wi-Fi comparison
-- Wireless fault-domain isolation
-
-A twenty-run stage-timing campaign completed:
-
-```text
-20/20 fleet runs completed
-60/60 endpoint transactions correct
-13 PASS
-7 PASS_DEGRADED
-```
-
-Across the campaign:
-
-```text
-0 identity failures
-0 decision failures
-0 reason failures
-0 missing-result failures
-```
-
-The degraded classifications were caused by latency-budget behavior, not incorrect authorization outcomes.
-
-## Wireless Latency Incident
-
-One degraded run showed nearly identical connection-stage delays across all three endpoints:
-
-```text
-connect_ms approximately 866–868 ms
-total elapsed approximately 891–893 ms
-```
-
-A Raspberry Pi Ethernet capture showed the endpoint TCP SYN traffic arriving together after the delay.
-
-The fleet was then moved to house Wi-Fi for comparison.
-
-Observed house-Wi-Fi results:
-
-```text
-13/13 runs PASS
-39/39 endpoint transactions correct
-33–147 ms endpoint latency
-approximately 49.9 ms mean
-41.5 ms median
-0 results above the 250 ms budget
-0 reproductions of the synchronized approximately 900 ms event
-```
-
-The incident was closed at the fault-domain level.
-
-Supported conclusion:
-
-> The access-point-specific wireless path was isolated as the fault domain.
-
-The exact internal Mango mechanism remains unresolved.
-
-No claim is made about a specific driver function, firmware defect, or hardware defect.
-
-## Disconnected Authority
-
-The disconnected-authority tests examine whether a provider-issued artifact remains bounded when the provider is temporarily unavailable.
-
-The general path is:
-
-```text
-Provider
-   |
-   | issues signed, bounded artifact
-   v
-ESP32-S3 endpoint or test client
-   |
-   | presents artifact and request
-   v
-Raspberry Pi verification boundary
-   |
-   | verifies provider signature
-   | verifies explicit bounds
-   | checks single-use state
-   v
-Accepted once or denied
-```
-
-The provider retains the Ed25519 private signing key.
-
-The Raspberry Pi boundary uses provider public verification material.
-
-The endpoint does not receive the provider private key and does not independently mint provider authority.
-
-## POC003 — Bounded Disconnected Single Use
-
-POC003 establishes the base disconnected-authority behavior.
-
-The provider file is:
-
-```text
-poc003_ed25519_provider_1h.py
-```
-
-The provider issues an Ed25519-signed, single-use artifact before disconnection.
-
-The Raspberry Pi boundary verifies and enforces that artifact while the provider is unavailable.
-
-The tested matrix includes:
-
-- Valid bounded use
-- Replay
-- Context mismatch
-- Action mismatch
-- Nonce mismatch
-- Device mismatch
-- Tampered artifact
-- Unsigned artifact
-- Expired artifact
-- Missing artifact
-
-Expected behavior:
-
-```text
-valid bounded use        -> accepted once
-replay                   -> denied
-context mismatch         -> denied
-action mismatch          -> denied
-nonce mismatch           -> denied
-device mismatch          -> denied
-tampering                -> denied
-unsigned material        -> denied
-expired artifact         -> denied
-missing artifact         -> denied
-```
-
-## POC004 — Replay State Across Process Restart
-
-POC004 tested whether spent-state enforcement survived restart of the Raspberry Pi verification-boundary process.
-
-Observed result:
-
-> Replay remained denied after process restart.
-
-POC004 remains part of the recorded test history.
-
-## POC004B — Replay State Across Power Loss
-
-POC004B extends the persistence test from process restart to abrupt Raspberry Pi power loss.
-
-Observed result:
-
-> A completed persistent-state commit remained effective after abrupt Raspberry Pi power loss.
-
-After power restoration:
-
-- The verification boundary recovered
-- The fleet coordinator recovered
-- The fleet eventually returned to three-endpoint operation
-- One endpoint required reset before timely participation resumed
-
-The recovery result is recorded as:
-
-```text
-PASS with anomaly
-```
-
-The endpoint reset does not invalidate the persistent replay result.
-
-## POC005 — Overlapping Attempts
-
-POC005 submits two overlapping attempts against one single-use artifact.
-
-Expected result:
-
-```text
-attempts started:  2
-accepted:          1
-denied:            1
-duplicate accept:  0
-```
-
-Observed result:
-
-> Exactly one attempt succeeded and no duplicate acceptance occurred.
-
-The test demonstrates single-use enforcement under near-concurrent competing attempts.
-
-It does not claim mathematically simultaneous execution.
-
-## POC006A — Crash After Commit
-
-POC006A injects a crash after persistent spent-state has been committed but before the successful response is returned.
-
-Observed result:
-
-> The missing response did not permit the committed artifact to be accepted again.
-
-After restart, replay of the same artifact remained denied.
-
-## WP2-T1 — Crash Before Atomic Replacement
-
-WP2-T1 injects a crash after temporary state has been written and synchronized but before atomic replacement of the committed state file.
-
-Observed result:
-
-> The interrupted replacement did not falsely consume the artifact. The commit could be retried after restart, after which replay remained denied.
-
-The verification boundary used in the recorded test was:
-
-```text
-wp2_t1_pre_replace_boundary_archer.py
-```
-
-Confirmed source SHA-256:
-
-```text
-87351DBDF539E0E44480B28B205AE04FAD796D9C60DA9C4084FDEFDA49A9BFC8
-```
-
-The similarly named file:
-
-```text
-wp2_t1_temp_fsync_boundary_archer.py
-```
-
-was not the boundary used in the recorded test.
-
-## Test Summary
-
-| Test | Location | Result | Property exercised |
-|---|---|---|---|
-| Three-endpoint baseline | [`fleet/baseline/`](fleet/baseline/) | PASS | Correct identity and result binding |
-| Mixed fleet outcomes | [`fleet/baseline/`](fleet/baseline/) | PASS | Different outcomes remain bound to the correct devices |
-| Single-endpoint isolation | [`fleet/archer-validation/`](fleet/archer-validation/) | PASS | One unavailable endpoint does not corrupt the other results |
-| Single-endpoint restoration | [`fleet/archer-validation/`](fleet/archer-validation/) | PASS | The isolated endpoint resumes participation |
-| Shared-boundary outage | [`fleet/archer-validation/`](fleet/archer-validation/) | PASS | All endpoints fail unavailable without accepted action |
-| Shared-boundary recovery | [`fleet/archer-validation/`](fleet/archer-validation/) | PASS with anomaly | Services recover; one endpoint required reset |
-| POC003 | [`disconnected-authority/poc003-single-use/`](disconnected-authority/poc003-single-use/) | PASS | Bounded disconnected single use |
-| POC004B | [`disconnected-authority/poc004b-power-loss/`](disconnected-authority/poc004b-power-loss/) | PASS | Completed commit survives abrupt power loss |
-| POC005 | [`disconnected-authority/poc005-double-spend/`](disconnected-authority/poc005-double-spend/) | PASS | Competing attempts produce exactly one acceptance |
-| POC006A | [`disconnected-authority/poc006a-commit-before-accept/`](disconnected-authority/poc006a-commit-before-accept/) | PASS | Crash after commit remains replay-denied |
-| WP2-T1 | [`disconnected-authority/wp2-t1-pre-replace/`](disconnected-authority/wp2-t1-pre-replace/) | PASS | Crash before replacement does not falsely consume the artifact |
-
-## Configuration
-
-The ESP32 firmware requires local Wi-Fi and Raspberry Pi settings.
-
-Example:
-
-```python
-SSID = "YOUR_WIFI_SSID"
-PASSWORD = "YOUR_WIFI_PASSWORD"
-PI_IP = "YOUR_PI_IP"
-```
-
-The Raspberry Pi address must point to the system running the coordinator and verification-boundary services.
-
-The recorded Mango environment used:
-
-```text
-SSID: GL-MT300N-V2-94f
-Raspberry Pi: 192.168.8.234
-```
-
-Other networks will require different values.
-
-## Evidence
-
-Selected evidence is stored under:
-
-```text
-evidence/
-```
-
-The current evidence set includes:
-
-```text
-poc004b_archer_evidence_20260730_225507.log
-post_powercycle_fleet_restoration_20260730_231251.log
-poc004b_local_manifest_20260731_232149.txt
-wp2_t1_final_evidence_20260801_010225.log
-```
-
-See [`evidence/README.md`](evidence/README.md) for descriptions, recorded hashes, and verification commands.
-
-## Public Boundary Coverage
-
-Some disconnected-authority test folders do not include the complete mechanism-level verification-boundary implementation.
-
-Those folders still document:
-
-- The client sequence
-- The boundary interface
-- The request and response behavior
-- The failure-injection point
-- The expected result
-- The observed result
-- The PASS criteria
-- The supporting evidence
-- The known limitations
-
-Where a boundary implementation is not included, the applicable test README states that directly.
-
-## Limitations
-
-The current results do not establish:
-
-- Parallel processing inside the original single-threaded boundary
-- Correct operation with arbitrary endpoint counts
-- Correct operation across arbitrary wireless networks
-- Behavior under deliberate radio jamming
-- Behavior under sustained RF interference
-- Every possible persistence crash point
-- Startup with corrupt or truncated persistent state
-- Cross-process contention
-- Multi-boundary contention
-- Long-duration repeated power-cycle endurance
-- Independent reproduction by an external laboratory
-- Production readiness
-- Safety certification
-
-The ESP32-S3 endpoints trust the downstream result returned by the Raspberry Pi verification boundary.
-
-The endpoints do not independently verify the provider signature.
-
-A compromised Raspberry Pi could therefore fabricate a downstream result to a trusting endpoint in this implementation.
-
-That limitation is part of the tested architecture.
-
-## Where to Begin
-
-Start with the original fleet baseline:
-
-```text
-fleet/baseline/
-```
-
-After confirming the three-accept and mixed-outcome fleet tests, continue with:
-
-1. Archer endpoint isolation and restoration
-2. Shared-boundary outage and recovery
-3. POC003 bounded disconnected single use
-4. POC004B power-loss persistence
-5. POC005 overlapping attempts
-6. POC006A crash after commit
-7. WP2-T1 crash before atomic replacement
+«Can distributed systems gain additional capability without allowing execution authority to migrate to components that were never intended to possess it?»
