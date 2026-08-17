@@ -41,7 +41,7 @@ NUVL does not independently:
 
 The governing invariant is:
 
-«Execution authority remains scoped to the provider-controlled boundary.»
+Execution authority remains scoped to the provider-controlled boundary.»
 
 A request, representation, observation, or result passing through an intermediary does not grant that intermediary independent authority to determine execution meaning.
 
@@ -128,4 +128,4 @@ Individual experiments document their own implementation details, test procedure
 
 The lab itself remains centered on one question:
 
-«Can distributed systems gain additional capability without allowing execution authority to migrate to components that were never intended to possess it?»
+Can distributed systems gain additional capability without allowing execution authority to migrate to components that were never intended to possess it?»
