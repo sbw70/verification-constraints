@@ -1,337 +1,568 @@
-# NUVL Edge Fleet — Five-Endpoint Heterogeneous Configuration
+# NUVL Edge Lab — Five-Endpoint Fleet
 
-This directory contains the five-endpoint heterogeneous fleet tests for the NUVL Edge Lab.
+This directory contains the five-endpoint NUVL Edge Lab implementation, test procedures, firmware, supporting utilities, and retained evidence for heterogeneous autonomous fleet testing.
 
-The configuration extends the earlier three-endpoint fleet into a larger physical testbed containing three ESP32-S3 status/load endpoints and two XIAO ESP32-S3 physical-effector endpoints.
+The five-endpoint configuration extends the NUVL Edge Lab from the earlier three-endpoint fleet to a physical fleet containing both status/load endpoints and physical effectors.
 
-The purpose of this series is to evaluate whether provider-controlled authorization, endpoint identity, outcome binding, physical execution, recovery behavior, and autonomous request generation remain correct as the fleet becomes larger and more heterogeneous.
+The expansion changes fleet size, workload, timing, and fault conditions.
 
-This is a laboratory implementation.
+It does not change the underlying authority architecture.
 
-It is not a geographically distributed deployment, tactical network qualification, or production fleet implementation.
+The tested authority path remains:
+
+```text
+endpoint
+  ->
+network
+  ->
+NUVL boundary
+  ->
+provider-controlled decision
+  ->
+endpoint action
+```
+
+An endpoint may originate a request, perform local computation, or operate autonomously, but request origination is not itself execution authority.
+
+For physical-effector endpoints, consequential execution remains downstream of an accepted authorization result.
 
 ---
 
 ## Test Classification
 
-The five-endpoint fleet tests are:
+The five-endpoint fleet work is primarily:
 
-**NUVL core — no architecture change.**
+**Category 1 — NUVL core / no architecture change**
 
-The authority path remains:
+Tests in this directory may vary:
 
-    endpoint
-       |
-       v
-    NUVL boundary
-       |
-       v
-    provider-controlled decision
-       |
-       v
-    endpoint result
-       |
-       v
-    physical execution when applicable
+- fleet workload;
+- endpoint-local timing;
+- endpoint behavior;
+- authorization outcome;
+- network availability;
+- authority-path availability;
+- endpoint connectivity;
+- endpoint restart behavior;
+- shared-boundary load; and
+- physical-effector participation.
 
-The fleet tests change the number, type, power arrangement, and request-generation behavior of the endpoints.
+These changes exercise the existing NUVL authority model rather than introducing a different one.
 
-They do not transfer provider authority into the endpoints.
+Optional modules, distributed-provider configurations, independently administered domains, and other architecture extensions are separate test tracks unless explicitly documented otherwise.
 
 ---
 
 ## Physical Fleet
 
-The tested fleet consists of:
+The five-endpoint laboratory fleet consists of:
 
-    esp32-field-01
-    esp32-s3-02
-    esp32-s3-03
-    esp32-xiao-servo-01
-    esp32-xiao-servo-02
+### Status / Load Endpoints
 
-Hardware:
+- `esp32-field-01` — ESP32-S3 DevKitC-1
+- `esp32-s3-02` — ESP32-S3 DevKitC-1
+- `esp32-s3-03` — ESP32-S3 DevKitC-1
 
-- 3 × ESP32-S3 DevKitC-1 endpoints
-- 2 × Seeed XIAO ESP32-S3 endpoints
-- 2 × physical servo effectors
-- Raspberry Pi 5 boundary/coordinator
-- Archer Wi-Fi infrastructure
-- separate laptop used as launcher/observer where required
+### Physical-Effector Endpoints
 
-During qualified untethered runtime, the endpoint boards were not connected by USB to the laptop, Chromebook, or Raspberry Pi.
+- `esp32-xiao-servo-01` — Seeed XIAO ESP32-S3 with servo actuator
+- `esp32-xiao-servo-02` — Seeed XIAO ESP32-S3 with servo actuator
 
-The five endpoints were powered independently from external USB power sources.
+### Shared Laboratory Infrastructure
 
----
+The tested fleet may use:
 
-# FLEET-005 — Untethered Heterogeneous Baseline
+- Raspberry Pi boundary/coordinator services;
+- local network infrastructure;
+- provider-controlled authorization logic;
+- independently powered ESP32 endpoints; and
+- an external workstation for observation, configuration, or evidence collection.
 
-FLEET-005 established the initial qualified five-endpoint physical baseline.
+Exact hardware and software configuration for a specific test is documented in the corresponding file under:
 
-The test used coordinated release timing while all five physical endpoints were untethered from controlling hosts.
-
-Launcher:
-
-    run_five_endpoint_accept_archer.py
-
-### Results
-
-    20 / 20 coordinated runs PASS
-    100 / 100 endpoint transactions correct
-    0 missing results
-    0 unavailable results
-    0 identity/IP mismatches
-    0 outcome mismatches
-    0 actuator-report mismatches
-    0 late results
-    0 stragglers
-
-Observed authorization latency across the campaign:
-
-    minimum: 30 ms
-    maximum: 49 ms
-
-Both XIAO servo endpoints physically moved during every qualified run.
-
-### Physical Anomaly
-
-Intermittent shortened servo travel was observed.
-
-The affected servo did not consistently complete the same apparent mechanical stroke, although physical movement was observed and the endpoint reported successful actuator invocation and completion.
-
-The exact mechanical or electrical cause was not isolated.
-
-No independent position, PWM, or actuator-command witness was used.
-
-Accordingly, FLEET-005 supports physical movement following accepted authorization but does not support a calibrated-position, full-stroke, or exactly-once physical-execution claim.
+```text
+tests/
+```
 
 ---
 
-## FLEET-005 Supported Result
+## Authority Model
 
-The tested configuration demonstrated:
+The five-endpoint fleet preserves the NUVL separation between:
 
-> Five untethered heterogeneous ESP32-S3 endpoints participated in a coordinated provider-controlled authorization workload with correct endpoint identity and outcome binding across 100 endpoint transactions, while both physical-effector endpoints produced authorized movement in every qualified run.
+```text
+request origination
+```
 
-FLEET-005 does not establish autonomous endpoint request generation.
+and:
 
-That is addressed by FLEET-006.
+```text
+execution authority
+```
 
----
+An endpoint may:
 
-# FLEET-006 — Autonomous Asynchronous Operation
+- generate a request;
+- determine when to issue it;
+- generate transaction identifiers;
+- perform local computation;
+- classify or propose an action; or
+- operate on an autonomous schedule.
 
-FLEET-006 removed coordinator-controlled release timing from the endpoint request path.
+Those capabilities do not independently authorize consequential execution.
 
-Each endpoint generated its own transaction identifiers and originated authorization requests according to its own local schedule.
+The applicable authority path evaluates the request and returns an outcome.
 
-The laptop was no longer responsible for triggering individual endpoint requests.
+For a physical-effector endpoint, the intended execution sequence is:
 
-This changes the fleet workload model but does not change the NUVL authority architecture.
+```text
+request generated
+  ->
+authority evaluation
+  ->
+decision returned
+  ->
+accepted
+  ->
+physical execution permitted
+```
 
----
-
-## Autonomous Firmware
-
-DevKit firmware:
-
-    esp32_autonomous_async_archer.py
-
-SHA-256:
-
-    BE3103D0958AAB49EF325982C02A43CCD702544764526448B9CD77C8F684D954
-
-XIAO servo firmware:
-
-    FLEET006_xiao_autonomous_async_archer.py
-
-SHA-256:
-
-    B34E5A910E8ED91D6E303A1532CC7D8D6DFB72D614767AF7DD93C40732375048
-
-Endpoint transaction identifiers were generated locally using the endpoint identity, local timing value, and endpoint-local counter.
-
-The XIAO firmware preserved the physical authority boundary:
-
-    physical execution occurs only after an accepted decision
+A denied, invalid, stale, replayed, malformed, or unavailable result does not authorize physical execution.
 
 ---
 
-# FLEET-006 Primary Sustained Window
+## Operating Models
 
-The primary sustained autonomous observation captured:
+The five-endpoint fleet supports multiple workload and control models.
 
-    2,125 transactions
-    2,125 unique run IDs
-    0 duplicate run IDs
-    2,125 accepted
-    2,125 provider_admissible
+### Coordinated Operation
 
-All five endpoint identities were represented.
+A launcher or coordinator may initiate or synchronize requests for controlled fleet tests.
 
-Both physical-effector endpoints were observed repeatedly actuating during autonomous operation.
+This mode is useful for:
 
-Physical observation was intermittent rather than continuous.
+- baseline comparison;
+- synchronized fleet observations;
+- mixed-outcome testing;
+- controlled release timing; and
+- repeatable test setup.
 
-Occasional shortened servo swings remained visible, so complete mechanical stroke for every accepted transaction was not established.
+### Autonomous Operation
 
----
+Endpoints may originate requests according to endpoint-local schedules.
 
-## Latency-Degradation Observation
+In this mode:
 
-The sustained autonomous run developed a pronounced latency-degradation condition late in the observation window.
+- transaction release is decentralized across the fleet;
+- endpoints generate their own request timing;
+- endpoint-local transaction identifiers may be used;
+- the workstation is not required to release every transaction; and
+- the same authority boundary remains in force.
 
-Authorization correctness remained intact.
+Autonomous request origination does not create autonomous authorization authority.
 
-The degradation affected multiple endpoint identities and persisted into a subsequent diagnostic observation.
+### Fault and Adversarial Conditions
 
-The exact internal mechanism was not identified.
+Individual endpoints or shared infrastructure may be deliberately placed into abnormal conditions.
 
-Diagnostic work found no evidence of:
+Examples include:
 
-- Raspberry Pi CPU exhaustion
-- Raspberry Pi memory exhaustion
-- swap exhaustion
-- TCP resource exhaustion
-- persistent provider/boundary processing degradation
-- general laptop-to-Pi LAN degradation
-- persistent corrupted runtime state in the continuously operating `esp32-field-01`
+- elevated request frequency;
+- repeated unauthorized requests;
+- malformed requests;
+- stale or replayed requests;
+- endpoint disconnect or reconnect;
+- endpoint reboot loops;
+- authority-path outage;
+- boundary outage;
+- restoration after failure;
+- degraded network behavior; and
+- increased shared-boundary load.
 
-Removing other fleet endpoints coincided with recovery of normal latency on `esp32-field-01` without restarting that endpoint.
-
-However, restoring the full five-endpoint workload did not immediately reproduce the degraded state.
-
-The anomaly therefore remains unresolved.
-
-It is preserved as a test finding rather than attributed to a specific component.
-
----
-
-# FLEET-006-D8 — Five-Endpoint Restoration Run
-
-After the degradation investigation, the full five-endpoint autonomous workload was restored.
-
-Results:
-
-    599 transactions
-    599 unique run IDs
-    0 duplicate run IDs
-    599 / 599 accepted
-    599 / 599 provider_admissible
-
-Fleet median:
-
-    35 ms
-
-Only two transactions exceeded 250 ms, both early in the observation window.
-
-The sustained degradation observed earlier did not reproduce during this run.
+Each such condition is documented as a separate test.
 
 ---
 
-# FLEET-006-D9 — Overnight Endurance
+## Repository Structure
 
-The full autonomous five-endpoint fleet was then left running overnight.
+```text
+five-endpoint/
+├── README.md
+│
+├── firmware/
+│   └── endpoint firmware and sanitized publication derivatives
+│
+├── launchers/
+│   └── fleet launch and controlled-release utilities
+│
+├── support/
+│   └── boundary, coordinator, and supporting laboratory utilities
+│
+├── tests/
+│   └── test definitions, procedures, results, claims, and limitations
+│
+└── evidence/
+    ├── README.md
+    ├── SHA256SUMS.txt
+    └── retained test-specific evidence artifacts
+```
 
-Observation duration:
+The authoritative description of each test belongs under:
 
-    7 hours 17 minutes 53 seconds
+```text
+tests/
+```
 
-Results:
+The corresponding retained evidence belongs under:
 
-    27,080 transactions
-    27,080 unique run IDs
-    0 duplicate run IDs
-    27,080 / 27,080 accepted
-    27,080 / 27,080 provider_admissible
+```text
+evidence/
+```
 
-Fleet median:
-
-    35 ms
-
-Five transactions exceeded 250 ms.
-
-One exceeded one second.
-
-Neither physical XIAO endpoint exceeded 250 ms during the overnight observation.
-
-The earlier sustained degraded state did not reproduce.
-
-Two brief multi-endpoint latency clusters were observed, but they did not develop into a persistent degraded condition.
-
----
-
-## FLEET-006 Endurance Finding
-
-The overnight run materially weakened several simple explanations for the earlier degradation.
-
-The previously observed persistent latency state was not reproduced despite substantially greater elapsed runtime and transaction count.
-
-The evidence therefore does not support the conclusion that any one of the following alone was sufficient to cause the earlier degradation:
-
-- five-endpoint autonomous load
-- elapsed runtime
-- transaction accumulation
-
-The underlying mechanism remains unresolved.
-
-No claim is made that the network was free of latency disturbances.
+Firmware or utilities required for reproduction or inspection belong in their respective implementation directories.
 
 ---
 
-# What the Five-Endpoint Series Demonstrates
+## Test Documentation
 
-The combined five-endpoint testing supports the following laboratory-scale findings:
+Each test document should identify, as applicable:
 
-- five heterogeneous physical endpoints can operate through the same provider-controlled authority path;
-- endpoints can operate untethered from controlling hosts;
-- endpoint identity and provider outcomes remain correctly bound across the tested fleet;
-- physical-effect endpoints execute only after accepted decisions in the tested path;
-- mixed endpoint types can coexist in the same fleet;
-- autonomous endpoint-local request generation can replace coordinated launcher release timing;
-- endpoint-generated transaction identifiers remain unique across sustained operation;
-- authorization correctness remained intact during the observed latency-degradation event;
-- the fleet recovered from the observed degraded condition without requiring restart of the continuously operating isolated endpoint;
-- the restored five-endpoint fleet completed a later overnight endurance run without reproducing the sustained degradation.
+- test classification;
+- module or use case;
+- objective;
+- hardware and software configuration;
+- modified test condition;
+- procedure;
+- observation window;
+- PASS criteria;
+- results;
+- supported claim;
+- limitations;
+- restoration or final disposition; and
+- evidence references.
 
----
+A test document is the primary source for interpreting its associated evidence.
 
-# What the Five-Endpoint Series Does Not Establish
-
-The current evidence does not establish:
-
-- geographically distributed deployment
-- independently hosted provider infrastructure
-- tactical RF performance
-- contested-spectrum performance
-- deterministic authorization latency
-- true parallel processing by the current boundary implementation
-- calibrated servo position
-- full mechanical stroke for every accepted transaction
-- exactly-once physical execution
-- independently witnessed actuator command
-- operational UAS or C-UAS integration
-- production reliability or availability
-- TACOS operational performance
-- the internal cause of the observed latency-degradation event
-
-All results are bounded to the tested NUVL Edge Lab hardware, software, network, and test conditions.
+Directory-level documentation should not substitute for the individual test record.
 
 ---
 
-# Relationship to the Three-Endpoint Fleet
+## Test Areas
 
-The original three-endpoint fleet remains separately documented.
+The five-endpoint test series may cover the following areas.
 
-The five-endpoint series does not replace that baseline.
+### Untethered Operation
 
-It extends the test environment from a three-endpoint fleet into a heterogeneous five-endpoint configuration with physical effectors and autonomous request generation.
+Tests may determine whether all five physical endpoints can operate without runtime USB attachment to the observation workstation.
 
-Repository organization:
+### Autonomous Request Origination
 
-    fleet/
-    ├── three-endpoint/
-    └── five-endpoint/
+Tests may evaluate independently scheduled endpoint-local request generation across the heterogeneous fleet.
 
-Each configuration should retain its own firmware, launcher, procedures, evidence, hashes, results, and limitations so that observed behavior remains traceable to the exact tested configuration.
+### Sustained Operation
+
+Longer observation windows may evaluate continued participation, transaction uniqueness, authorization correctness, timing behavior, and runtime stability.
+
+### Participant Load Isolation
+
+One endpoint may generate disproportionate request traffic while the behavior of the remaining participants is observed.
+
+### Authorization Isolation
+
+Different endpoints may simultaneously receive different authorization outcomes.
+
+This includes conditions in which one participant is repeatedly denied while others remain provider-admissible.
+
+### Invalid or Adversarial Requests
+
+Tests may exercise:
+
+- malformed requests;
+- stale requests;
+- replay attempts;
+- wrong-context requests;
+- unauthorized requests; and
+- other documented invalid conditions.
+
+### Connectivity Faults
+
+Individual participants may be disconnected, reconnected, restarted, or otherwise made temporarily unavailable.
+
+### Shared Authority-Path Failure
+
+Tests may deliberately remove access to the applicable provider or boundary authority path.
+
+Such tests may evaluate:
+
+- fail-closed behavior;
+- absence of fallback acceptance;
+- behavior of physical-effectors during unavailability; and
+- recovery after restoration.
+
+### Shared-Boundary Load
+
+The common boundary may be exposed to increasing aggregate fleet load to observe authorization correctness, timing, failure behavior, and saturation effects.
+
+### Physical Execution
+
+Physical-effector endpoints may be used to examine whether consequential action remains downstream of accepted authorization.
+
+Dedicated actuator tests provide stronger evidence for physical execution than software-only fleet logs.
+
+---
+
+## Evidence
+
+Primary retained evidence is located under:
+
+```text
+evidence/
+```
+
+Depending on the test, evidence may include:
+
+- START and END markers;
+- phase-transition markers;
+- extracted coordinator logs;
+- extracted boundary logs;
+- analysis utilities;
+- transaction counts;
+- endpoint participation records;
+- authorization decisions;
+- decision reasons;
+- transaction-identifier uniqueness checks;
+- latency observations;
+- failure searches; and
+- restoration evidence.
+
+Evidence interpretation, sanitization rules, and publication boundaries are documented in:
+
+```text
+evidence/README.md
+```
+
+Published evidence integrity values are maintained in:
+
+```text
+evidence/SHA256SUMS.txt
+```
+
+---
+
+## Evidence Integrity
+
+Evidence is preserved before unnecessary publication-specific modification.
+
+Where an artifact contains local deployment information that is not required for technical review, a sanitized publication derivative may be created.
+
+Examples include removal or replacement of:
+
+- Wi-Fi credentials;
+- private credentials;
+- environment-specific secrets;
+- unnecessary local addressing;
+- machine-specific filesystem paths; and
+- unrelated laboratory configuration.
+
+A modified publication copy receives its own SHA-256 digest.
+
+The digest of an original tested or collected artifact is not reused for a modified file.
+
+Where provenance matters, the applicable test document may record both:
+
+- the original tested or collected hash; and
+- the sanitized publication-copy hash.
+
+---
+
+## Physical Execution Boundary
+
+Two fleet participants contain servo actuators:
+
+```text
+esp32-xiao-servo-01
+esp32-xiao-servo-02
+```
+
+Their inclusion allows the fleet to exercise the relationship between authorization outcome and consequential physical action.
+
+Coordinator and boundary records can establish:
+
+- endpoint participation;
+- software-observed authorization outcome;
+- decision reason;
+- transaction identity; and
+- timing.
+
+Those records are not, by themselves, independent physical witnesses of every actuator movement.
+
+Unless a test includes independent actuation evidence, the fleet record should not be interpreted as establishing:
+
+- exactly-once physical execution;
+- independently witnessed movement for every accepted transaction;
+- calibrated actuator position;
+- guaranteed completion of every mechanical action; or
+- absence of every possible post-authorization execution failure.
+
+Dedicated actuator testing provides the applicable physical-execution evidence.
+
+---
+
+## Latency Interpretation
+
+Latency values reported by this test series are empirical observations from specific laboratory configurations and measured windows.
+
+They are not deterministic timing guarantees.
+
+The technical record may contain:
+
+- normal low-latency operation;
+- isolated outliers;
+- sustained degradation;
+- timeout conditions;
+- unavailable conditions; and
+- recovery observations.
+
+Material anomalies remain part of the record even when subsequent tests do not reproduce them.
+
+Where an internal mechanism has not been established, the corresponding test documentation should state that limitation directly.
+
+A later successful run does not retroactively eliminate an earlier anomaly.
+
+---
+
+## Failure Interpretation
+
+Failure-oriented tests are intended to determine how the authority path behaves under a defined adverse condition.
+
+A clean unavailable or denied result may be an expected secure outcome.
+
+A PASS result therefore does not necessarily mean uninterrupted service.
+
+Depending on the test objective, PASS may instead require:
+
+- no unauthorized acceptance;
+- no fallback authority;
+- no cross-endpoint authorization leakage;
+- preservation of endpoint identity;
+- continued operation by unaffected participants;
+- clean fail-closed behavior; or
+- successful restoration without prohibited intervention.
+
+The applicable PASS definition is specified by each test document.
+
+---
+
+## Publication Boundary
+
+Public repository material is intended to expose enough implementation detail and evidence to make the tested behavior inspectable without publishing unnecessary local deployment information.
+
+Publication sanitization should not obscure:
+
+- where authority resides;
+- where authorization is evaluated;
+- what condition permits physical execution;
+- what condition causes denial;
+- what condition causes unavailability;
+- whether a fault occurred;
+- whether an anomaly remains unresolved; or
+- what limitations apply to the test.
+
+Sanitization is a publication-control measure, not a mechanism for improving apparent test results.
+
+---
+
+## Current Capability Scope
+
+The five-endpoint test series is intended to establish progressively stronger evidence for a heterogeneous autonomous edge fleet operating under a common provider-controlled authority model.
+
+Depending on completed tests, supported laboratory findings may include:
+
+- independently powered endpoint operation;
+- untethered runtime participation;
+- autonomous endpoint-local request generation;
+- unique transaction origination;
+- heterogeneous physical fleet participation;
+- sustained autonomous workload;
+- mixed authorization outcomes;
+- participant-specific authorization isolation;
+- asymmetric participant-load isolation;
+- fail-closed behavior under authority-path loss;
+- restoration following failure;
+- continued operation by unaffected fleet members; and
+- physical-effector participation downstream of authorization.
+
+Only findings supported by completed tests and retained evidence should be asserted.
+
+---
+
+## Claim Boundary
+
+The five-endpoint laboratory series does not, by itself, establish:
+
+- arbitrary fleet scalability;
+- unlimited throughput;
+- deterministic latency;
+- guaranteed availability;
+- geographically distributed operation;
+- independently hosted provider infrastructure;
+- independent administrative domains;
+- tactical-network qualification;
+- operational UAS or C-UAS performance;
+- arbitrary denial-of-service resistance;
+- arbitrary Byzantine fault tolerance;
+- resistance to every hostile-client behavior;
+- resistance to every network degradation mode;
+- exactly-once physical execution;
+- production operational readiness;
+- certification;
+- qualification outside the documented laboratory environment; or
+- performance under untested hardware, software, workload, or network conditions.
+
+Broader claims require separate evidence.
+
+---
+
+## Relationship to Other NUVL Edge Tests
+
+The five-endpoint fleet builds on earlier NUVL Edge laboratory work while preserving separate evidence boundaries.
+
+Earlier test series may provide evidence for:
+
+- three-endpoint fleet behavior;
+- provider-unavailable behavior;
+- persistent single-use artifacts;
+- replay resistance;
+- crash and power-loss behavior;
+- mixed authorization outcomes; and
+- physical actuator gating.
+
+Those results are not automatically reproduced by the five-endpoint fleet.
+
+Where a capability is exercised again at five-endpoint scale, the corresponding five-endpoint test provides the applicable evidence.
+
+Where it has not yet been exercised, the earlier result remains separate.
+
+---
+
+## Reproduction and Review
+
+Repository users reviewing or reproducing a test should begin with the corresponding file under:
+
+```text
+tests/
+```
+
+That document identifies the relevant:
+
+- firmware;
+- support utilities;
+- test condition;
+- evidence artifacts;
+- expected outcomes;
+- integrity hashes; and
+- limitations.
+
+The top-level README defines the fleet and repository boundary.
+
+The individual test documents define what was actually tested.
