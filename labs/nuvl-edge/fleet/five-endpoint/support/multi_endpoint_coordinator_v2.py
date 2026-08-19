@@ -77,13 +77,20 @@ class Handler(BaseHTTPRequestHandler):
                 )
                 return
 
+            now_ms = int(time.time() * 1000)
+            offset_ms = int(current.get("offsets_ms", {}).get(device_id, 0))
+            device_not_before_ms = current["not_before_ms"] + offset_ms
+            wait_ms = max(0, device_not_before_ms - now_ms)
+
             self.send_json(
                 200,
                 {
                     "armed": True,
                     "run_id": current["run_id"],
                     "mode": mode,
-                    "not_before_ms": current["not_before_ms"],
+                    "wait_ms": wait_ms,
+                    "offset_ms": offset_ms,
+                    "device_not_before_ms": device_not_before_ms,
                 },
             )
             return
@@ -121,11 +128,24 @@ class Handler(BaseHTTPRequestHandler):
                 delay_ms = int(payload.get("delay_ms", 1500))
                 not_before_ms = int(time.time() * 1000) + delay_ms
 
+                offsets_ms = payload.get("offsets_ms", {})
+                if offsets_ms is None:
+                    offsets_ms = {}
+                if not isinstance(offsets_ms, dict):
+                    raise ValueError("invalid_offsets_ms")
+                offsets_ms = {
+                    str(device_id): int(offset_ms)
+                    for device_id, offset_ms in offsets_ms.items()
+                }
+                if any(device_id not in modes for device_id in offsets_ms):
+                    raise ValueError("unknown_offset_device")
+
                 with LOCK:
                     CURRENT_RUN = {
                         "run_id": run_id,
                         "modes": dict(modes),
                         "not_before_ms": not_before_ms,
+                        "offsets_ms": offsets_ms,
                     }
                     RESULTS[run_id] = {}
 
