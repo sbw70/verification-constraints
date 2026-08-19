@@ -1,125 +1,222 @@
 # Five-Endpoint Fleet Evidence
 
-This directory contains the primary evidence retained for the five-endpoint autonomous NUVL Edge Lab fleet tests.
+This directory contains retained evidence from the five-endpoint NUVL Edge Lab fleet test series.
 
-The evidence supports the FLEET-006 autonomous asynchronous test series and its subsequent restoration and overnight endurance observations.
-
-The five-endpoint configuration consisted of:
+The five-endpoint configuration consists of:
 
 - three ESP32-S3 DevKitC-1 status/load endpoints; and
 - two Seeed XIAO ESP32-S3 physical-effector endpoints.
 
-The endpoints independently generated requests according to endpoint-local schedules while remaining subject to the same provider-controlled authority path.
+Depending on the test condition, endpoints may operate independently, generate requests according to endpoint-local schedules, exercise different authorization outcomes, or experience deliberately introduced fault conditions.
 
-This directory contains preserved observation windows, observation-boundary markers, and the analysis utilities used to derive the reported results.
+All tests remain subject to the documented NUVL authority path for the applicable test configuration.
+
+The directory contains preserved observation windows, test-boundary markers, analysis utilities, and related artifacts supporting results documented under:
+
+```text
+../tests/
+```
 
 ---
 
 ## Evidence Scope
 
-The public evidence set focuses on three primary observation windows:
+Evidence retained here may support tests involving:
 
-### FLEET-006 Autonomous Observation
+- untethered five-endpoint operation;
+- autonomous asynchronous request generation;
+- sustained fleet operation;
+- endpoint-local workload variation;
+- mixed authorization outcomes;
+- repeated unauthorized activity;
+- participant fault isolation;
+- authority-path unavailability;
+- recovery following authority-path restoration;
+- endpoint disconnect and reconnect behavior;
+- endpoint restart or reboot behavior;
+- malformed, stale, or replay-related request handling;
+- shared-boundary load conditions;
+- physical-effector authorization behavior; and
+- other documented five-endpoint test conditions.
 
-The initial sustained autonomous five-endpoint observation.
-
-This window established endpoint-local asynchronous request generation across the heterogeneous fleet.
-
-The observation also captured a sustained latency-degradation condition.
-
-Authorization outcomes remained correct during the observed degradation.
-
-The exact internal cause of the latency condition was not established.
-
-### FLEET-006-D8 Restoration Observation
-
-A subsequent observation after diagnostic isolation and restoration of the full five-endpoint autonomous workload.
-
-The earlier sustained latency-degradation condition did not reproduce during this window.
-
-D8 is retained as restoration evidence rather than as proof that the earlier condition was permanently resolved.
-
-### FLEET-006-D9 Overnight Endurance Observation
-
-An extended overnight observation of the restored five-endpoint autonomous fleet.
-
-The analyzed window covered approximately 7 hours 18 minutes and contained 27,080 unique transactions.
-
-All 27,080 transactions produced the expected provider-controlled authorization outcome.
-
-The earlier sustained latency-degradation condition did not reproduce.
-
-Brief latency outliers remained present and are preserved in the evidence.
+Evidence artifacts support only the findings established by their corresponding test documentation.
 
 ---
 
 ## Evidence Organization
 
-Each primary observation may include:
+A test evidence set may include:
 
-- a START marker defining the beginning of the analyzed window;
-- an END marker defining the end of the analyzed window;
-- the extracted log corresponding to that window; and
-- an analysis utility used to derive transaction counts, endpoint participation, decision outcomes, uniqueness, and timing observations.
+- START and END markers defining an observation window;
+- phase or transition markers where required;
+- extracted coordinator or boundary logs;
+- analysis utilities;
+- transaction counts;
+- endpoint participation records;
+- authorization decisions and reasons;
+- transaction-identifier uniqueness checks;
+- latency observations;
+- failure and error searches; and
+- other test-specific artifacts identified by the corresponding test document.
 
-The extracted windows are retained so reported results can be traced to the underlying transaction record without requiring publication of unrelated laboratory logs.
+Not every test requires every artifact type.
+
+Extracted windows are retained where practical so reported results can be traced to the underlying transaction record without publishing unrelated laboratory logs.
+
+---
+
+## Test Documentation
+
+The corresponding files under:
+
+```text
+../tests/
+```
+
+define the applicable:
+
+- test classification;
+- objective;
+- configuration;
+- procedure;
+- PASS criteria;
+- observed results;
+- supported claim;
+- limitations; and
+- evidence references.
+
+Where a test contains multiple operational phases, the retained evidence identifies the relevant boundaries where necessary.
+
+Example:
+
+```text
+normal operation
+->
+introduced fault
+->
+faulted operation
+->
+restoration
+->
+recovered operation
+```
 
 ---
 
 ## Evidence Interpretation
 
-The evidence is intended to support narrow laboratory findings.
+The evidence supports narrow laboratory findings from specifically documented test conditions.
 
-It demonstrates that the tested five-endpoint configuration:
+Depending on the test, retained evidence may demonstrate that the five-endpoint configuration:
 
-- operated autonomously using endpoint-local request generation;
+- operated without endpoint runtime USB tethering;
+- generated requests autonomously;
 - maintained endpoint identity and result binding;
-- generated unique transaction identifiers across the analyzed windows;
+- generated unique transaction identifiers;
 - remained subject to provider-controlled authorization;
-- preserved expected authorization outcomes during the observed autonomous runs; and
-- sustained an extended overnight workload after restoration of the full fleet.
+- produced expected endpoint-specific authorization outcomes;
+- continued operating while another participant experienced a different authorization or workload condition;
+- failed closed when the applicable authority path was unavailable;
+- recovered following authority-path restoration;
+- preserved authorization correctness during measured latency variation; or
+- sustained operation over an extended observation period.
 
-The evidence does not establish:
-
-- geographically distributed operation;
-- independently hosted provider infrastructure;
-- tactical-network performance;
-- deterministic latency;
-- guaranteed availability;
-- production fleet scalability;
-- operational UAS or C-UAS performance; or
-- the internal cause of the observed FLEET-006 latency-degradation condition.
+Results from one test condition do not establish behavior under untested fault modes, workloads, deployment environments, or fleet sizes.
 
 ---
 
 ## Physical Execution
 
-Two endpoints in the five-endpoint fleet were connected to physical servo actuators.
+Two endpoints in the five-endpoint fleet are connected to physical servo actuators.
 
-Physical execution behavior is documented by the dedicated actuator test series and the five-endpoint test documentation.
+Five-endpoint tests may therefore include physical-effector participants.
 
-The autonomous evidence logs establish participation and authorization outcomes for those endpoints.
+Coordinator and boundary evidence records software-observed endpoint participation, authorization decisions, reasons, and timing.
 
-They should not be interpreted as independent physical witnesses of every actuator movement.
+Unless a test includes an independent physical witness, those records are not independent proof of every actuator movement.
+
+Dedicated actuator tests and test-specific observations provide the applicable physical-execution evidence.
+
+An accepted software result alone does not establish exactly-once physical execution.
+
+---
+
+## Latency and Availability
+
+Latency values retained in this directory are observations from specific laboratory configurations and measured windows.
+
+They are not deterministic timing guarantees.
+
+Material latency anomalies, timeouts, unavailable results, recovery events, or other abnormal conditions remain part of the technical record even when later tests do not reproduce them.
+
+Where an internal cause has not been established, that limitation remains explicitly documented.
 
 ---
 
 ## Diagnostic Material
 
-Additional diagnostic observations were performed while investigating the FLEET-006 latency-degradation condition.
+Additional diagnostic observations may be produced during fault isolation or investigation.
 
-Those intermediate diagnostic windows are not required to reproduce the primary five-endpoint capability findings and are not included in this evidence directory.
+Intermediate diagnostic artifacts are not necessarily included when they are not required to support a published test result.
 
-Their exclusion does not change the disposition of the observed anomaly.
+Material failures, anomalies, and unresolved conditions remain documented regardless of whether every intermediate diagnostic artifact is published.
 
-The sustained latency-degradation event remains part of the technical record, and its exact internal mechanism remains unresolved.
+---
+
+## Publication Boundary
+
+Public evidence excludes unnecessary local deployment information, including:
+
+- Wi-Fi credentials;
+- private local credentials;
+- environment-specific secrets;
+- unnecessary internal addressing;
+- machine-specific filesystem paths; and
+- unrelated laboratory configuration.
+
+When an artifact is modified for publication, the publication copy receives its own SHA-256 digest.
+
+A sanitized or otherwise modified artifact does not retain the digest of the original collected or tested artifact.
+
+Where relevant, test documentation distinguishes between:
+
+- the original collected or tested artifact; and
+- the sanitized publication derivative.
+
+---
+
+## Integrity
+
+Published evidence artifacts are tracked using SHA-256 digests in:
+
+```text
+SHA256SUMS.txt
+```
+
+Each digest applies to the exact published file identified by that entry.
+
+Any modification to a published artifact requires recalculation of its SHA-256 digest.
+
+Original tested-source hashes may also be retained in corresponding test documentation where necessary to preserve provenance.
 
 ---
 
 ## Evidence Boundary
 
-These files represent laboratory evidence from the tested NUVL Edge Lab configuration.
+These files represent laboratory evidence from documented NUVL Edge Lab five-endpoint tests.
 
-They are provided to make the reported five-endpoint results inspectable and reproducible at the evidence-analysis level.
+They are provided to preserve traceability between reported findings and the underlying observation record.
 
-They are not presented as certification evidence, operational qualification, or proof of performance outside the documented laboratory environment.
+They are not presented as:
+
+- certification evidence;
+- operational qualification;
+- proof of arbitrary fleet scalability;
+- proof of geographically distributed operation;
+- proof of deterministic latency;
+- proof of tactical-network performance;
+- proof of arbitrary Byzantine or hostile-client tolerance;
+- proof of resistance to every denial-of-service condition; or
+- proof of performance outside the documented laboratory configuration.
+
+Broader claims require separate evidence.
