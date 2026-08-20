@@ -1,0 +1,6 @@
+pre_outage_start_line=77261
+last_pre_outage_accepted_line=77288
+first_unavailable_line=77289
+last_unavailable_line=77595
+first_recovered_accepted_line=77596
+recovery_end_line=77785
