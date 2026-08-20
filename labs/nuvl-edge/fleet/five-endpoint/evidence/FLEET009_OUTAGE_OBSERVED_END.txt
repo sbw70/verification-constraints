@@ -1,0 +1,2 @@
+outage_observed_end=2026-08-19T21:37:29,828477452-04:00
+outage_observed_end_line=77531
