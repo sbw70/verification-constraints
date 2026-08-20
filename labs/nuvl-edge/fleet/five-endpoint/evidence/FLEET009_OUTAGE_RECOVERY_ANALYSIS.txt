@@ -1,0 +1,55 @@
+FLEET009_OUTAGE_RECOVERY_DATASET_SUMMARY
+parsed_transactions= 525
+unique_run_ids= 525
+duplicate_run_ids= 0
+
+PHASE PRE_OUTAGE
+transactions= 28
+decisions= {'accepted': 28}
+reasons= {'provider_admissible': 28}
+latency_min_ms= 30
+latency_mean_ms= 35.93
+latency_median_ms= 34.0
+latency_max_ms= 65
+over_250_ms= 0
+over_1000_ms= 0
+over_3000_ms= 0
+device esp32-field-01 transactions= 11 decisions= {'accepted': 11} reasons= {'provider_admissible': 11}
+device esp32-s3-02 transactions= 7 decisions= {'accepted': 7} reasons= {'provider_admissible': 7}
+device esp32-s3-03 transactions= 5 decisions= {'accepted': 5} reasons= {'provider_admissible': 5}
+device esp32-xiao-servo-01 transactions= 3 decisions= {'accepted': 3} reasons= {'provider_admissible': 3}
+device esp32-xiao-servo-02 transactions= 2 decisions= {'accepted': 2} reasons= {'provider_admissible': 2}
+
+PHASE OUTAGE
+transactions= 307
+decisions= {'unavailable': 307}
+reasons= {'OSError(104,)': 307}
+latency_min_ms= 12
+latency_mean_ms= 14.79
+latency_median_ms= 13
+latency_max_ms= 57
+over_250_ms= 0
+over_1000_ms= 0
+over_3000_ms= 0
+device esp32-field-01 transactions= 114 decisions= {'unavailable': 114} reasons= {'OSError(104,)': 114}
+device esp32-s3-02 transactions= 82 decisions= {'unavailable': 82} reasons= {'OSError(104,)': 82}
+device esp32-s3-03 transactions= 51 decisions= {'unavailable': 51} reasons= {'OSError(104,)': 51}
+device esp32-xiao-servo-01 transactions= 34 decisions= {'unavailable': 34} reasons= {'OSError(104,)': 34}
+device esp32-xiao-servo-02 transactions= 26 decisions= {'unavailable': 26} reasons= {'OSError(104,)': 26}
+
+PHASE RECOVERY
+transactions= 190
+decisions= {'accepted': 190}
+reasons= {'provider_admissible': 190}
+latency_min_ms= 30
+latency_mean_ms= 38.45
+latency_median_ms= 36.0
+latency_max_ms= 90
+over_250_ms= 0
+over_1000_ms= 0
+over_3000_ms= 0
+device esp32-field-01 transactions= 71 decisions= {'accepted': 71} reasons= {'provider_admissible': 71}
+device esp32-s3-02 transactions= 52 decisions= {'accepted': 52} reasons= {'provider_admissible': 52}
+device esp32-s3-03 transactions= 34 decisions= {'accepted': 34} reasons= {'provider_admissible': 34}
+device esp32-xiao-servo-01 transactions= 19 decisions= {'accepted': 19} reasons= {'provider_admissible': 19}
+device esp32-xiao-servo-02 transactions= 14 decisions= {'accepted': 14} reasons= {'provider_admissible': 14}
