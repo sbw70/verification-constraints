@@ -1,0 +1,3 @@
+outage_applied=2026-08-19T21:34:03,834042133-04:00
+outage_line=77312
+boundary_process=not_running
