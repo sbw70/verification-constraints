@@ -1,0 +1,16 @@
+restore_marker_line=77594
+last_unavailable_line=77595
+first_accepted_line=77596
+
+RESULT run_id=esp32-field-01-13404007-5173 device_id=esp32-field-01 decision=unavailable reason=OSError(104,) elapsed_ms=13
+RESULT run_id=esp32-s3-03-16144298-2889 device_id=esp32-s3-03 decision=accepted reason=provider_admissible elapsed_ms=39
+RESULT run_id=esp32-s3-02-16139452-4495 device_id=esp32-s3-02 decision=accepted reason=provider_admissible elapsed_ms=37
+RESULT run_id=esp32-field-01-13406436-5174 device_id=esp32-field-01 decision=accepted reason=provider_admissible elapsed_ms=32
+RESULT run_id=esp32-field-01-13408937-5175 device_id=esp32-field-01 decision=accepted reason=provider_admissible elapsed_ms=42
+RESULT run_id=esp32-s3-02-16143383-4496 device_id=esp32-s3-02 decision=accepted reason=provider_admissible elapsed_ms=36
+RESULT run_id=esp32-s3-03-16150128-2890 device_id=esp32-s3-03 decision=accepted reason=provider_admissible elapsed_ms=39
+RESULT run_id=esp32-xiao-servo-01-92849484-9798 device_id=esp32-xiao-servo-01 decision=accepted reason=provider_admissible elapsed_ms=34
+RESULT run_id=esp32-field-01-13411589-5176 device_id=esp32-field-01 decision=accepted reason=provider_admissible elapsed_ms=73
+RESULT run_id=esp32-s3-02-16147256-4497 device_id=esp32-s3-02 decision=accepted reason=provider_admissible elapsed_ms=36
+RESULT run_id=esp32-field-01-13413934-5177 device_id=esp32-field-01 decision=accepted reason=provider_admissible elapsed_ms=33
+RESULT run_id=esp32-xiao-servo-02-92859482-7442 device_id=esp32-xiao-servo-02 decision=accepted reason=provider_admissible elapsed_ms=57
