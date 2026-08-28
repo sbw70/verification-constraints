@@ -1,0 +1,6 @@
+2026-08-21T21:26:47.9265173-04:00 POC003_ED25519_OFFLINE_PROVIDER
+2026-08-21T21:26:47.9330210-04:00 Listening on 0.0.0.0:8091
+2026-08-21T21:26:47.9340282-04:00 Issue: POST /issue-offline
+2026-08-21T21:26:47.9340282-04:00 Private key: C:\Users\holiw\esp32-main\poc002_ed25519_private.pem
+2026-08-21T21:26:47.9340282-04:00 ISSUED artifact_id=c0a45bcf966a2939d152b171 mode=valid device=esp32-xiao-servo-01 context=field_led_demo action=accept expiry=1787365607
+2026-08-21T22:48:20.1599039-04:00 ISSUED artifact_id=03233823a3b533017c200616 mode=valid device=esp32-xiao-servo-01 context=field_led_demo action=accept expiry=1787370500
