@@ -1,0 +1,3 @@
+source=/home/seth/FLEET015_POST_OUTAGE_COORDINATOR.log
+source_line=12906
+RESULT run_id=esp32-xiao-servo-01-345012-40 device_id=esp32-xiao-servo-01 decision=unavailable reason=ValueError('invalid_http_response',) elapsed_ms=84
