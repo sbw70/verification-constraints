@@ -9,16 +9,16 @@
 
 FLEET-014 coupled the previously demonstrated persistent single-use authority mechanism to a physical actuator command path.
 
-The test asked whether one provider-signed, single-use authority could:
+The test evaluated whether one provider-issued, single-use authority could:
 
 1. produce an actuator command on its first admissible spend;
 2. be denied when the same authority was presented again;
 3. remain denied after restart of the persistent enforcement boundary; and
 4. prevent additional actuator commands on the denied replay paths.
 
-An independent ESP32 PWM witness was used to observe the actuator control signal.
+An independent ESP32 PWM witness observed the actuator control signal.
 
-The witness was observational only and was not part of the authority or enforcement path.
+The witness was observational only and was not part of the authority, decision, or enforcement path.
 
 ## Module / Use Case
 
@@ -46,7 +46,7 @@ The actuator endpoint retained the previously tested execution invariant:
 
 ## Test Configuration
 
-The physical effector was:
+Physical effector:
 
 ```text
 esp32-xiao-servo-01
@@ -58,7 +58,7 @@ Qualified autonomous XIAO baseline SHA-256:
 B34E5A910E8ED91D6E303A1532CC7D8D6DFB72D614767AF7DD93C40732375048
 ```
 
-A controlled FLEET-014 endpoint derivative was used so the exact same bounded request could be replayed.
+A controlled FLEET-014 endpoint derivative was used so the same bounded request could be presented repeatedly.
 
 Test derivative:
 
@@ -72,25 +72,31 @@ Tested SHA-256:
 658D2B02628BC8B06F32BB79C5227719EAFBE1B8A3C00615948720C7333F785F
 ```
 
-Intentional changes from the qualified baseline were limited to:
+Intentional changes from the qualified autonomous baseline were limited to the isolated test path and controlled nonce required for the replay test.
 
 ```text
-NUVL test port:
-8089 -> isolated FLEET-014 port
+NUVL port:
+8089 -> 18089
 
-nonce generation:
-dynamic nonce -> FLEET014-SINGLE-USE-REPLAY-01
+nonce:
+dynamic -> FLEET014-SINGLE-USE-REPLAY-01
 ```
 
 The actuator gating logic was unchanged.
 
-FLEET-014 used isolated persistent state and a cached authority package so existing persistence evidence and normal fleet state were not repurposed for the test.
+The servo command remained reachable only from the accepted decision branch.
 
-## Test Sequence
+FLEET-014 used isolated persistent state and a cached authority package so normal fleet replay state was not reused for the test.
 
-### Phase 1 — Fresh Single-Use Authority
+## Provider-Issued Authority
 
-One provider-signed single-use authority was obtained for the controlled request.
+One provider-signed single-use authority was issued for:
+
+```text
+device=esp32-xiao-servo-01
+context=field_led_demo
+action=accept
+```
 
 Artifact identifier:
 
@@ -98,7 +104,23 @@ Artifact identifier:
 c0a45bcf966a2939d152b171
 ```
 
-The first presentation produced:
+Provider issuance timestamp:
+
+```text
+2026-08-21T21:26:47.9340282-04:00
+```
+
+Artifact expiry:
+
+```text
+1787365607
+```
+
+The provider issuance was recorded by the retained provider log.
+
+## Phase 1 — First Admissible Spend
+
+The first presentation of the single-use authority produced:
 
 ```text
 decision=accepted
@@ -108,17 +130,19 @@ spent_count=1
 replay_state_persisted_before_accept=True
 ```
 
-The persistent state was therefore committed before the accepted result was returned.
+The persistent replay state was committed before the accepted result was returned.
 
-### Independent Actuator-Command Observation
+Result:
 
-The independent PWM witness observed one command burst corresponding to the accepted transaction.
+**PASS**
 
-Accepted result timestamp:
+The fresh single-use authority was admitted once and recorded as consumed.
 
-```text
-2026-08-21T21:26:47.827569298-04:00
-```
+## Independent Actuator-Command Observation
+
+The independent GPIO5 PWM witness was active before the transaction and continuously reported an IDLE control line.
+
+Immediately following the first admissible spend, the witness observed one PWM command burst.
 
 Witness burst start:
 
@@ -137,23 +161,27 @@ Observed command:
 ```text
 pulses=50
 duration_ms=979
+pulse_min_us=802
+pulse_max_us=2001
 ```
 
-Approximate accepted-result-to-witnessed-command delay:
+The witness then returned to continuous IDLE observations.
+
+Observed command bursts associated with the first admissible spend:
 
 ```text
-183 ms
+1
 ```
 
 Result:
 
 **PASS**
 
-The first admissible spend produced one independently observed actuator-command burst.
+The first admissible spend was accompanied by one independently observed actuator-command burst.
 
 ## Phase 2 — Same-Authority Replay Before Restart
 
-The same authority and identical bounded request were presented repeatedly.
+The same authority and identical bounded request were then presented repeatedly.
 
 Observed replay results:
 
@@ -172,11 +200,11 @@ reason=replay_detected
 spent_count=1
 ```
 
-No new authority was issued for these attempts.
+No new authority was issued for these replay attempts.
 
-The independent witness remained IDLE after the single accepted burst.
+The independent PWM witness remained IDLE after the single initial command burst.
 
-Observed additional PWM bursts:
+Additional witnessed PWM bursts:
 
 ```text
 0
@@ -186,27 +214,15 @@ Result:
 
 **PASS**
 
-Reuse of the consumed authority was denied and produced no independently observed actuator command.
+Reuse of the consumed authority was denied and produced no additional independently observed actuator command.
 
 ## Phase 3 — Persistent Boundary Restart
 
-Before restart, the persistent evidence hashes were recorded.
-
-Spent-state SHA-256:
-
-```text
-cb672486bd8bebf8c982fb4e259201fc61e28f69b080d49ccfd139107741eac3
-```
-
-Cached authority-package SHA-256:
-
-```text
-a91fef96d60aae0f2fbe305e85d2197913423aeca374e00b3b1af490d80192cf
-```
-
 The persistent enforcement process was stopped and restarted.
 
-On restart it reported:
+On restart, the boundary recovered the previously persisted replay state and cached authority information.
+
+Observed recovery:
 
 ```text
 Persistent replay entries loaded: 1
@@ -214,11 +230,17 @@ Authority package loaded: True
 Artifact ID loaded: c0a45bcf966a2939d152b171
 ```
 
-The recovered replay state was loaded before the boundary resumed serving requests.
+The consumed authority therefore remained represented in persistent state before the boundary resumed serving requests.
+
+Result:
+
+**PASS**
+
+The persistent replay record survived process restart.
 
 ## Phase 4 — Same-Authority Replay After Restart
 
-The same authority was then presented again.
+The same consumed authority was presented again after recovery.
 
 Observed results:
 
@@ -242,12 +264,13 @@ spent_count=1
 
 The independent PWM witness remained IDLE across:
 
+- the pre-restart replay attempts;
 - boundary shutdown;
 - boundary restart;
 - persistent-state recovery; and
 - all seven observed post-restart replay attempts.
 
-Observed PWM bursts during post-restart replay:
+Additional witnessed PWM bursts after the original accepted transaction:
 
 ```text
 0
@@ -257,25 +280,52 @@ Result:
 
 **PASS**
 
-The consumed single-use authority remained consumed across process restart.
+The consumed single-use authority remained consumed across process restart and did not produce another actuator command.
+
+## Witness Summary
+
+The retained witness record shows:
+
+```text
+before first spend:       IDLE
+first admissible spend:   one PWM burst
+observed burst:           50 pulses / 979 ms
+pre-restart replays:      IDLE
+boundary restart period:  IDLE
+post-restart replays:     IDLE
+```
+
+The witness firmware identified itself as:
+
+```text
+FLEET015_WITNESS_READY
+```
+
+This is expected.
+
+FLEET-014 reused the previously established independent GPIO5 PWM witness implementation rather than creating a separate FLEET-014-specific observer.
+
+The witness remained outside the authority and enforcement path.
 
 ## Persistence Verification
 
-Final spent-state SHA-256:
+The persistent spent-state document and cached authority package were retained as test evidence.
+
+The replay state continued to report:
 
 ```text
-cb672486bd8bebf8c982fb4e259201fc61e28f69b080d49ccfd139107741eac3
+spent_count=1
 ```
 
-Final cached authority-package SHA-256:
+before and after boundary restart.
+
+The same artifact identifier remained associated with the recovered authority package:
 
 ```text
-a91fef96d60aae0f2fbe305e85d2197913423aeca374e00b3b1af490d80192cf
+c0a45bcf966a2939d152b171
 ```
 
-Both hashes were unchanged from their pre-restart values.
-
-This confirmed that the tested persisted authority state survived the process restart without reopening the consumed authority.
+Their exact retained-file SHA-256 values are tracked in the repository evidence ledger rather than duplicated here.
 
 ## Restoration
 
@@ -299,7 +349,11 @@ Normal endpoint operation was therefore restored.
 
 ## Setup Anomaly
 
-During preparation, a board initially believed to be the actuator endpoint was later identified as `esp32-field-01`.
+During preparation, a board initially believed to be the actuator endpoint was later identified as:
+
+```text
+esp32-field-01
+```
 
 The FLEET-014 endpoint derivative was temporarily written to that board.
 
@@ -319,7 +373,7 @@ Restored `esp32-field-01` SHA-256:
 BE3103D0958AAB49EF325982C02A43CCD702544764526448B9CD77C8F684D954
 ```
 
-The anomaly is retained in the test record rather than omitted.
+The preparation anomaly is retained in the test record rather than omitted.
 
 ## Result
 
@@ -328,21 +382,29 @@ The anomaly is retained in the test record rather than omitted.
 Observed sequence:
 
 ```text
-fresh single-use authority
+provider-issued single-use authority
+        |
+        v
+first presentation
         |
         v
 ACCEPT
         |
-        +--> persistent spent state committed
+        +--> spent state persisted
+        |
+        +--> spent_count=1
         |
         +--> one independently witnessed PWM command burst
 
 same authority
         |
         v
+4 pre-restart attempts
+        |
+        v
 DENY / replay_detected
         |
-        +--> zero additional witnessed PWM bursts
+        +--> zero additional PWM bursts
 
 persistent boundary restart
         |
@@ -353,43 +415,98 @@ spent state recovered
 same authority
         |
         v
+7 post-restart attempts
+        |
+        v
 DENY / replay_detected
         |
-        +--> zero witnessed PWM bursts
+        +--> zero additional PWM bursts
+```
+
+Final observed totals:
+
+```text
+initial admissible spends:     1
+accepted:                      1
+pre-restart replay denials:    4
+post-restart replay denials:   7
+total replay denials:          11
+witnessed PWM command bursts:  1
+additional PWM bursts:         0
+persistent spent_count:        1
 ```
 
 ## Supported Claim
 
-> A provider-signed single-use authority produced an independently witnessed actuator command on its first admissible spend. Reuse of that same authority was denied without an observed actuator command, and that replay denial survived restart of the persistent enforcement boundary.
+> A provider-issued single-use authority produced one independently witnessed actuator command on its first admissible spend. Reuse of that same authority was denied without an additional observed actuator command, and the replay denial remained effective after restart of the persistent enforcement boundary.
+
+## What This Test Establishes
+
+For the tested configuration, FLEET-014 demonstrates the coupling of:
+
+```text
+provider-bounded authority
+        +
+single-use enforcement
+        +
+persistent replay state
+        +
+physical actuator-command gating
+```
+
+The test shows that consuming the authority once did not enlarge it into reusable execution authority.
+
+Persistent replay enforcement continued to prevent reuse after boundary restart.
+
+The independent witness also establishes that the replay-denied paths did not present additional PWM commands on the observed actuator control line.
 
 ## Not Established
 
 FLEET-014 does **not** establish:
 
 - exactly-once mechanical execution;
-- mechanical position or motion verification;
-- general exactly-once electrical execution;
+- mechanical position or movement verification;
+- universal exactly-once electrical execution;
 - crash-safe physical execution;
 - arbitrary actuator behavior;
-- distributed consensus; or
+- distributed consensus;
+- multi-boundary coordination; or
 - general exactly-once actuator semantics.
 
 The independent witness measured the electrical PWM command presented to the actuator control line.
 
 It did not independently measure mechanical servo movement.
 
+Crash behavior around durable consumption and physical execution is evaluated separately.
+
+## Evidence
+
+Retained FLEET-014 evidence includes:
+
+- the endpoint test derivative;
+- provider issuance log;
+- independent witness log;
+- final witness log;
+- generated single-use authority package;
+- generated persistent spent-state document; and
+- repository SHA-256 evidence entries.
+
+The enforcement-side FLEET-014 bridge implementation is retained separately from the public repository.
+
 ## Publication Boundary
 
 The public repository may contain:
 
 - this test description;
-- the sanitized endpoint test derivative;
-- curated result evidence;
-- independent witness evidence; and
-- publication-copy SHA-256 values.
+- the endpoint test derivative;
+- provider issuance evidence;
+- independent witness evidence;
+- the generated authority package;
+- the generated spent-state document; and
+- SHA-256 values for the retained evidence.
 
-Persistent enforcement-boundary implementation source is retained separately and is not required for publication of this test result.
+The persistent enforcement-boundary / bridge implementation source is retained separately and is not required for publication of this result.
 
-Generated persistent state and the real signed authority package are also retained as private test evidence rather than published as runtime artifacts.
+Actual credentials, passwords, or private key material must not be committed to the public repository.
 
-If any source or evidence file is sanitized for publication, the sanitized derivative must receive a new SHA-256. Original tested-source hashes must not be attached to modified publication copies.
+Test artifact identifiers, non-secret test state, timestamps, local test addressing, and other evidentiary metadata do not require removal merely because they describe the test environment.
