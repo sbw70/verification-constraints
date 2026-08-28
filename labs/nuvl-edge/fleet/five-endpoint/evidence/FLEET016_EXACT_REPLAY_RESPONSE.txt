@@ -1,0 +1,3 @@
+measured_at=2026-08-21T23:02:10.442279-04:00
+request={"context":"field_led_demo","device_id":"esp32-xiao-servo-01","nonce":"esp32-xiao-servo-01-esp32-xiao-servo-01-345012-40-345015807","requested_action":"accept"}
+response={"artifact_id":"03233823a3b533017c200616","boundary":"fleet016_crash_actuator_bridge","decision":"denied","provider_contacted_for_spend":false,"provider_verified":true,"reason":"replay_detected","timestamp":1787367730}
