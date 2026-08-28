@@ -1,0 +1,12 @@
+nohup: ignoring input
+FLEET016_CRASH_ACTUATOR_BRIDGE
+Listening on 0.0.0.0:18090
+Target device: esp32-xiao-servo-01
+Provider: http://192.168.0.50:8091
+Spent state: /home/seth/FLEET016_spent_state.json
+Crash stage: /home/seth/FLEET016_crash_stage.txt
+Persistent replay entries loaded: 0
+Authority package: /home/seth/FLEET016_authority_package.json
+Authority package loaded: False
+Artifact ID loaded: None
+POC006_CONTROLLED_SIGKILL stage=after_persist_before_accept
