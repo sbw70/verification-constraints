@@ -1,0 +1,10 @@
+POC004_PERSISTENT_REPLAY_PI_BOUNDARY
+Listening on 0.0.0.0:8092
+Provider: http://192.168.0.50:8091
+Public key: /home/seth/poc002_ed25519_public.pem
+Private key present on Pi: False
+Replay state: /home/seth/fleet017_spent_state.json
+Persistent replay entries loaded: 0
+ISSUE decision=issued reason=provider_signed_bounded_artifact verified=True artifact_id=7d49dbc8f35c5a4c263b4d68
+SPEND decision=accepted reason=offline_artifact_admissible verified=True artifact_id=7d49dbc8f35c5a4c263b4d68 spent_count=1 persisted=True
+SPEND decision=denied reason=replay_detected verified=True artifact_id=7d49dbc8f35c5a4c263b4d68 spent_count=1 persisted=None
