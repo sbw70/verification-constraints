@@ -1,0 +1,10 @@
+2026-08-19T23:59:56,417920310-04:00 RESULT run_id=esp32-xiao-servo-01-589092-69 device_id=esp32-xiao-servo-01 decision=denied reason=unauthorized_request elapsed_ms=33
+2026-08-20T00:00:05,097834702-04:00 RESULT run_id=esp32-xiao-servo-01-597769-70 device_id=esp32-xiao-servo-01 decision=denied reason=unauthorized_request elapsed_ms=35
+2026-08-20T00:00:13,754404565-04:00 RESULT run_id=esp32-xiao-servo-01-606387-71 device_id=esp32-xiao-servo-01 decision=denied reason=unauthorized_request elapsed_ms=67
+2026-08-20T00:00:22,457097978-04:00 RESULT run_id=esp32-xiao-servo-01-615126-72 device_id=esp32-xiao-servo-01 decision=denied reason=unauthorized_request elapsed_ms=33
+2026-08-20T00:00:30,831486357-04:00 RESULT run_id=esp32-xiao-servo-01-623505-73 device_id=esp32-xiao-servo-01 decision=denied reason=unauthorized_request elapsed_ms=34
+2026-08-20T00:00:39,568457450-04:00 RESULT run_id=esp32-xiao-servo-01-632215-74 device_id=esp32-xiao-servo-01 decision=denied reason=unauthorized_request elapsed_ms=45
+2026-08-20T00:00:47,912644329-04:00 RESULT run_id=esp32-xiao-servo-01-640586-75 device_id=esp32-xiao-servo-01 decision=denied reason=unauthorized_request elapsed_ms=32
+2026-08-20T00:00:56,678101910-04:00 RESULT run_id=esp32-xiao-servo-01-649351-76 device_id=esp32-xiao-servo-01 decision=denied reason=unauthorized_request elapsed_ms=34
+2026-08-20T00:01:04,980578163-04:00 RESULT run_id=esp32-xiao-servo-01-657655-77 device_id=esp32-xiao-servo-01 decision=denied reason=unauthorized_request elapsed_ms=33
+2026-08-20T00:01:13,333491108-04:00 RESULT run_id=esp32-xiao-servo-01-666007-78 device_id=esp32-xiao-servo-01 decision=denied reason=unauthorized_request elapsed_ms=32
