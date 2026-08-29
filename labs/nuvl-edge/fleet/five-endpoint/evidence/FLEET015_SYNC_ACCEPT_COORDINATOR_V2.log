@@ -1,0 +1,20 @@
+2026-08-20T00:23:59,427591905-04:00 RESULT run_id=esp32-xiao-servo-01-562534-59 device_id=esp32-xiao-servo-01 decision=accepted reason=provider_admissible elapsed_ms=33
+2026-08-20T00:24:09,215284763-04:00 RESULT run_id=esp32-xiao-servo-01-572300-60 device_id=esp32-xiao-servo-01 decision=accepted reason=provider_admissible elapsed_ms=30
+2026-08-20T00:24:18,401778408-04:00 RESULT run_id=esp32-xiao-servo-01-581503-61 device_id=esp32-xiao-servo-01 decision=accepted reason=provider_admissible elapsed_ms=37
+2026-08-20T00:24:28,196810055-04:00 RESULT run_id=esp32-xiao-servo-01-591304-62 device_id=esp32-xiao-servo-01 decision=accepted reason=provider_admissible elapsed_ms=32
+2026-08-20T00:24:37,970679399-04:00 RESULT run_id=esp32-xiao-servo-01-601075-63 device_id=esp32-xiao-servo-01 decision=accepted reason=provider_admissible elapsed_ms=31
+2026-08-20T00:24:47,471822054-04:00 RESULT run_id=esp32-xiao-servo-01-610578-64 device_id=esp32-xiao-servo-01 decision=accepted reason=provider_admissible elapsed_ms=34
+2026-08-20T00:24:56,818179973-04:00 RESULT run_id=esp32-xiao-servo-01-619923-65 device_id=esp32-xiao-servo-01 decision=accepted reason=provider_admissible elapsed_ms=33
+2026-08-20T00:25:06,220031472-04:00 RESULT run_id=esp32-xiao-servo-01-629325-66 device_id=esp32-xiao-servo-01 decision=accepted reason=provider_admissible elapsed_ms=35
+2026-08-20T00:25:15,358539898-04:00 RESULT run_id=esp32-xiao-servo-01-638462-67 device_id=esp32-xiao-servo-01 decision=accepted reason=provider_admissible elapsed_ms=37
+2026-08-20T00:25:24,815239755-04:00 RESULT run_id=esp32-xiao-servo-01-647923-68 device_id=esp32-xiao-servo-01 decision=accepted reason=provider_admissible elapsed_ms=33
+2026-08-20T00:25:34,565656685-04:00 RESULT run_id=esp32-xiao-servo-01-657653-69 device_id=esp32-xiao-servo-01 decision=accepted reason=provider_admissible elapsed_ms=29
+2026-08-20T00:25:44,071296902-04:00 RESULT run_id=esp32-xiao-servo-01-667179-70 device_id=esp32-xiao-servo-01 decision=accepted reason=provider_admissible elapsed_ms=32
+2026-08-20T00:25:53,684494299-04:00 RESULT run_id=esp32-xiao-servo-01-676793-71 device_id=esp32-xiao-servo-01 decision=accepted reason=provider_admissible elapsed_ms=32
+2026-08-20T00:26:03,386189654-04:00 RESULT run_id=esp32-xiao-servo-01-686491-72 device_id=esp32-xiao-servo-01 decision=accepted reason=provider_admissible elapsed_ms=33
+2026-08-20T00:26:13,166086745-04:00 RESULT run_id=esp32-xiao-servo-01-696265-73 device_id=esp32-xiao-servo-01 decision=accepted reason=provider_admissible elapsed_ms=37
+2026-08-20T00:26:22,686412388-04:00 RESULT run_id=esp32-xiao-servo-01-705793-74 device_id=esp32-xiao-servo-01 decision=accepted reason=provider_admissible elapsed_ms=34
+2026-08-20T00:26:32,026577614-04:00 RESULT run_id=esp32-xiao-servo-01-715136-75 device_id=esp32-xiao-servo-01 decision=accepted reason=provider_admissible elapsed_ms=32
+2026-08-20T00:26:41,831800891-04:00 RESULT run_id=esp32-xiao-servo-01-724939-76 device_id=esp32-xiao-servo-01 decision=accepted reason=provider_admissible elapsed_ms=34
+2026-08-20T00:26:50,988396500-04:00 RESULT run_id=esp32-xiao-servo-01-734096-77 device_id=esp32-xiao-servo-01 decision=accepted reason=provider_admissible elapsed_ms=33
+
