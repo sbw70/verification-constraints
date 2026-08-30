@@ -1,0 +1,8 @@
+nohup: ignoring input
+POC004_PERSISTENT_REPLAY_PI_BOUNDARY
+Listening on 0.0.0.0:18091
+Provider: http://192.168.0.50:8091
+Public key: /home/seth/poc002_ed25519_public.pem
+Private key present on Pi: False
+Replay state: /home/seth/WP2_T2_spent_state.json
+Persistent replay entries loaded: 1
