@@ -1,0 +1,4 @@
+case=WP2_T2_CASE8_MISSING_STATE
+measured_at=2026-08-23T18:47:51,930977603-04:00
+active_state=ABSENT
+known_good_sha256=a1652b090c8145333b3546f62d8cdfabb42a3dc3ab53300a90ded8b4c24a01ce
