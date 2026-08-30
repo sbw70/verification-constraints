@@ -1,0 +1,4 @@
+case=WP2_T2_CASE9_UNREADABLE
+measured_at=2026-08-23T18:50:36,391723102-04:00
+---------- 1 seth seth 58 Aug 23 18:48 /home/seth/WP2_T2_spent_state.json
+known_good_sha256=a1652b090c8145333b3546f62d8cdfabb42a3dc3ab53300a90ded8b4c24a01ce
