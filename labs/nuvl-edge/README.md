@@ -1,10 +1,10 @@
-NUVL Edge Lab
+# NUVL Edge Lab
 
 NUVL Edge Lab is a physical validation environment for testing NUVL and related provider-controlled verification constraint architectures under real-world edge conditions.
 
 The lab is designed to evolve. Endpoint types, execution targets, network conditions, enabled modules, and test methods may change without altering the purpose of the environment.
 
-Purpose
+## Purpose
 
 The lab evaluates whether architectural authority constraints remain intact when implemented across distributed and resource-constrained systems.
 
@@ -26,7 +26,7 @@ The objective is not simply to demonstrate successful operation.
 
 The objective is to determine whether the defined authority boundaries remain intact when the surrounding system becomes more complex, unreliable, distributed, or adversarial.
 
-NUVL Core
+## NUVL Core
 
 NUVL is a stateless intermediary designed to preserve a structural separation between distributed system components and provider-controlled execution authority.
 
@@ -41,11 +41,11 @@ NUVL does not independently:
 
 The governing invariant is:
 
-Execution authority remains scoped to the provider-controlled boundary.»
+> **Execution authority remains scoped to the provider-controlled boundary.**
 
 A request, representation, observation, or result passing through an intermediary does not grant that intermediary independent authority to determine execution meaning.
 
-Enabled Capabilities
+## Enabled Capabilities
 
 The lab also validates optional architectural modules and integrations that may operate alongside NUVL.
 
@@ -67,7 +67,7 @@ An integrated implementation may become stateful, persistent, or execution-aware
 
 The relevant architectural question is whether the added capability preserves the original authority boundary.
 
-Edge Validation
+## Edge Validation
 
 The edge lab provides a controlled environment for moving constraint architectures beyond abstract or software-only examples.
 
@@ -86,7 +86,7 @@ An architecture change occurs when authority placement, trust relationships, arc
 
 Adding a new endpoint, execution interface, fault condition, or optional capability does not by itself constitute an architecture change.
 
-Validation Principles
+## Validation Principles
 
 A passing test supports only the property exercised by that test.
 
@@ -103,7 +103,7 @@ Failures and unresolved anomalies are retained when they materially affect inter
 
 Observed behavior is not generalized beyond the tested configuration without additional evidence.
 
-Claim Discipline
+## Claim Discipline
 
 The lab does not treat implementation proximity as proof of authority.
 
@@ -118,7 +118,7 @@ For example:
 
 Broader claims require separate validation.
 
-Scope
+## Scope
 
 NUVL Edge Lab is an engineering validation environment.
 
@@ -128,4 +128,4 @@ Individual experiments document their own implementation details, test procedure
 
 The lab itself remains centered on one question:
 
-Can distributed systems gain additional capability without allowing execution authority to migrate to components that were never intended to possess it?»
+> **Can distributed systems gain additional capability without allowing execution authority to migrate to components that were never intended to possess it?**
