@@ -1,0 +1,26 @@
+﻿=== HEALTH ===
+{"boundary":"poc004b_powercycle_persistence_pi","public_key_loaded":true,"replay_state_path":"/home/seth/poc004b_spent_state_powercycle_archer.json","replay_state_persistent":true,"spent_count":1,"status":"ok"}
+=== STATE ===
+{"spent":{"1f4d70941b8950d8e6edccc6":1785469065},"version":1}
+=== HASHES ===
+635d880e6988a95ff61bcf66346748f41c77b47f0b2ff96571718dc41fe9d16c  /home/seth/poc004b_pi_boundary_powercycle_archer.py
+a758b14c5194db812641d5114989a21177663f5310e2d6a30b321c3180a7f6b7  /home/seth/poc004b_spent_state_powercycle_archer.json
+b436d055ba02fa01a6adf98366d43f554aa15738c2d3a587a2853e2435f3d21d  /home/seth/poc004b_boundary_archer.log
+=== BOUNDARY LOG ===
+POC004B_POWERCYCLE_PERSISTENCE_PI_BOUNDARY
+Listening on 0.0.0.0:8089
+Provider: http://192.168.0.50:8091
+Public key: /home/seth/poc002_ed25519_public.pem
+Private key present on Pi: False
+Replay state: /home/seth/poc004b_spent_state_powercycle_archer.json
+Persistent replay entries loaded: 0
+ISSUE decision=issued reason=provider_signed_bounded_artifact verified=True artifact_id=1f4d70941b8950d8e6edccc6
+SPEND decision=accepted reason=offline_artifact_admissible verified=True artifact_id=1f4d70941b8950d8e6edccc6 spent_count=1 persisted=True
+POC004B_POWERCYCLE_PERSISTENCE_PI_BOUNDARY
+Listening on 0.0.0.0:8089
+Provider: http://192.168.0.50:8091
+Public key: /home/seth/poc002_ed25519_public.pem
+Private key present on Pi: False
+Replay state: /home/seth/poc004b_spent_state_powercycle_archer.json
+Persistent replay entries loaded: 1
+SPEND decision=denied reason=replay_detected verified=True artifact_id=1f4d70941b8950d8e6edccc6 spent_count=1 persisted=None
