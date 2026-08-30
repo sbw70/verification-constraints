@@ -1,0 +1,30 @@
+﻿=== WP2-T1 FINAL STATUS ===
+2026-08-01T01:02:32-04:00
+=== PROCESS ===
+984047 python3 -u /home/seth/wp2_t1_pre_replace_boundary_archer.py
+988878 bash -c echo '=== WP2-T1 FINAL STATUS ==='; date --iso-8601=seconds; echo '=== PROCESS ==='; pgrep -af '[w]p2_t1_pre_replace_boundary_archer.py'; echo '=== HEALTH ==='; curl -sS --max-time 3 http://127.0.0.1:8092/health; echo; echo '=== PROVIDER STATUS ==='; curl -sS --max-time 5 http://127.0.0.1:8092/provider-status; echo; echo '=== ACTIVE STATE ==='; cat /home/seth/wp2_t1_spent_state_archer.json; echo; sha256sum /home/seth/wp2_t1_spent_state_archer.json; echo '=== TEMP STATE ==='; if [ -f /home/seth/wp2_t1_spent_state_archer.json.tmp ]; then ls -l /home/seth/wp2_t1_spent_state_archer.json.tmp; else echo TEMP_STATE_ABSENT; fi; echo '=== FAILPOINT ==='; if [ -f /home/seth/wp2_t1_crash_stage.txt ]; then cat /home/seth/wp2_t1_crash_stage.txt; else echo FAILPOINT_CONSUMED; fi; echo '=== RESTART LOG ==='; cat /home/seth/wp2_t1_restart_20260801_005457.log; echo '=== PI FILE HASHES ==='; sha256sum /home/seth/wp2_t1_pre_replace_boundary_archer.py /home/seth/wp2_t1_spent_state_archer.json /home/seth/wp2_t1_restart_20260801_005457.log
+=== HEALTH ===
+{"boundary":"wp2_t1_pre_replace_pi","public_key_loaded":true,"replay_state_path":"/home/seth/wp2_t1_spent_state_archer.json","replay_state_persistent":true,"spent_count":1,"status":"ok"}
+=== PROVIDER STATUS ===
+{"provider_available":false,"provider_url":"http://192.168.0.50:8091"}
+=== ACTIVE STATE ===
+{"spent":{"57d8a3c1b82126ed7b276ad9":1785563424},"version":1}
+1e28f73eab786c2dba0a39b194bdc56daf56ede9b98b72eb50cb92b5d18342cb  /home/seth/wp2_t1_spent_state_archer.json
+=== TEMP STATE ===
+TEMP_STATE_ABSENT
+=== FAILPOINT ===
+FAILPOINT_CONSUMED
+=== RESTART LOG ===
+WP2_T1_PRE_REPLACE_PI_BOUNDARY
+Listening on 0.0.0.0:8092
+Provider: http://192.168.0.50:8091
+Public key: /home/seth/poc002_ed25519_public.pem
+Private key present on Pi: False
+Replay state: /home/seth/wp2_t1_spent_state_archer.json
+Persistent replay entries loaded: 0
+SPEND decision=accepted reason=offline_artifact_admissible verified=True artifact_id=57d8a3c1b82126ed7b276ad9 spent_count=1 persisted=True
+SPEND decision=denied reason=replay_detected verified=True artifact_id=57d8a3c1b82126ed7b276ad9 spent_count=1 persisted=None
+=== PI FILE HASHES ===
+87351dbdf539e0e44480b28b205ae04fad796d9c60da9c4084fdefda49a9bfc8  /home/seth/wp2_t1_pre_replace_boundary_archer.py
+1e28f73eab786c2dba0a39b194bdc56daf56ede9b98b72eb50cb92b5d18342cb  /home/seth/wp2_t1_spent_state_archer.json
+d81d6f8fb5fbdd714154690724068c220eafde9b65e60203104fd2b95ef4cc9b  /home/seth/wp2_t1_restart_20260801_005457.log
