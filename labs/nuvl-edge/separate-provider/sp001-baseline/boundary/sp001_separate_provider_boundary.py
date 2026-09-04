@@ -68,7 +68,7 @@ def persist_state(entries):
 
 def load_state():
     if not SPENT_STATE_PATH.exists():
-        return {}
+        raise RuntimeError("replay_state_missing")
 
     raw = json.loads(SPENT_STATE_PATH.read_text(encoding="utf-8"))
     if not isinstance(raw, dict) or raw.get("version") != 1:
