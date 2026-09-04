@@ -375,6 +375,121 @@ The request was corrected and the subsequent spend passed.
 
 This was an operator request-shape error before cryptographic validation and was not treated as a functional test failure.
 
+## Separate-Provider Availability Control
+
+After the initial SP-001 baseline passed, the same separate-provider topology was exercised through an online → unavailable → restored control sequence.
+
+The Raspberry Pi boundary remained running throughout the sequence.
+
+No boundary restart or reprovisioning was performed between conditions.
+
+### Online Precondition
+
+Boundary health reported:
+
+    status: ok
+    public_key_loaded: true
+    replay_state_persistent: true
+
+Provider status reported:
+
+    provider_available: true
+    provider_url: http://192.168.0.240:8091
+
+A fresh issuance request was submitted with:
+
+    nonce: sp001-evidence-online
+
+The boundary returned:
+
+    artifact_id: 4502634688e41c69557d9ad8
+    decision: issued
+    provider_verified: true
+    reason: provider_signed_bounded_artifact
+
+Result:
+
+**PASS**
+
+This established the positive precondition immediately before provider removal.
+
+### Provider Unavailable
+
+The provider process on `Xer0trust2` was stopped while the Raspberry Pi boundary remained operational.
+
+Provider status then reported:
+
+    provider_available: false
+    provider_url: http://192.168.0.240:8091
+
+A new authority request was submitted with:
+
+    nonce: sp001-evidence-offline
+
+The boundary returned:
+
+    artifact_id: null
+    decision: denied
+    provider_verified: false
+    reason: provider_unavailable
+
+Result:
+
+**PASS**
+
+No new provider artifact was issued while the separate provider was unavailable.
+
+The boundary did not substitute, synthesize, or fall back to locally originated authority.
+
+### Provider Restoration
+
+The same provider implementation was restarted on `Xer0trust2`.
+
+Provider status returned to:
+
+    provider_available: true
+    provider_url: http://192.168.0.240:8091
+
+The Raspberry Pi boundary was not restarted.
+
+A fresh authority request was submitted with:
+
+    nonce: sp001-evidence-restored
+
+The boundary returned:
+
+    artifact_id: d3ce2c5e0751d89e4a3f72ce
+    decision: issued
+    provider_verified: true
+    reason: provider_signed_bounded_artifact
+
+Result:
+
+**PASS**
+
+Verified provider issuance resumed after restoration without restarting or reprovisioning the NUVL boundary.
+
+## Captured Runtime Evidence
+
+The separate-provider availability control was repeated inside a terminal transcript and preserved as:
+
+`evidence/sp001_control_evidence.log`
+
+SHA-256:
+
+`13ea30307548cc0d4e80e19ce27dbc3b187d1b6bfa29f38572b05b459965b119`
+
+The captured sequence records:
+
+1. healthy boundary and reachable separate provider;
+2. successful verified issuance;
+3. separate provider unavailable;
+4. new issuance denied with `provider_unavailable`;
+5. separate provider restored;
+6. successful verified issuance resumed.
+
+The evidence transcript was captured independently of the initial interactive SP-001 baseline run.
+
 ## Result Summary
 
 | Test Condition | Result |
@@ -394,6 +509,13 @@ This was an operator request-shape error before cryptographic validation and was
 | Single bounded spend accepted | PASS |
 | Provider not contacted during spend | PASS |
 | Replay state persisted before acceptance | PASS |
+| Online control issuance | PASS |
+| Separate provider unavailable detected | PASS |
+| New authority denied while provider unavailable | PASS |
+| No artifact issued while provider unavailable | PASS |
+| Provider restored | PASS |
+| Verified issuance resumed without boundary restart | PASS |
+| Availability-control transcript captured and hashed | PASS |
 
 ## Overall Result
 
@@ -401,38 +523,60 @@ This was an operator request-shape error before cryptographic validation and was
 
 SP-001 demonstrated that the existing Ed25519 provider-controlled bounded-authority path continued to function when the provider and its private signing key were placed on a physically separate host from the Raspberry Pi verification/enforcement boundary.
 
-The successful authority path was:
+The completed availability control additionally demonstrated that loss of the separate provider prevented acquisition of new provider authority while the boundary remained operational.
 
-    Separate provider host
-            |
-            | signed Ed25519 bounded authority
-            v
-    Raspberry Pi NUVL boundary
-            |
-            | provider_verified = true
-            | bounds enforced
-            v
-    single admissible spend
-            |
-            v
-    ACCEPT
+After restoration of the same separate provider, verified issuance resumed without restarting or reprovisioning the boundary.
 
-## Supported Claim
+The observed authority behavior was:
 
-SP-001 supports the following claim:
+    PROVIDER ONLINE
+            |
+            | signed Ed25519 authority
+            v
+    boundary verifies
+            |
+            v
+    ISSUED
+
+    PROVIDER UNAVAILABLE
+            |
+            v
+    boundary remains operational
+            |
+            | no verified provider authority
+            v
+    DENIED
+    artifact_id: null
+
+    PROVIDER RESTORED
+            |
+            | signed Ed25519 authority
+            v
+    same running boundary verifies
+            |
+            v
+    ISSUED
+
+## Supported Claims
+
+SP-001 supports the following claims:
 
 > A provider-controlled Ed25519 authority source can operate on a physically separate host from the NUVL verification/enforcement boundary while preserving provider-authenticated bounded authority.
 
+> When the physically separate provider becomes unavailable, the running NUVL boundary does not obtain or originate new provider authority and denies new issuance.
+
+> When the same provider is restored, verified provider issuance resumes without restarting or reprovisioning the NUVL boundary.
+
 ## Current Limitations
 
-The completed SP-001 run does not yet demonstrate:
+The completed SP-001 test does not establish:
 
-- failure to obtain new authority when the separate provider is unavailable;
-- restoration after separate-provider outage;
 - rejection of an unauthorized substitute provider;
-- malicious forwarder resistance;
-- endpoint-side Ed25519 verification;
-- resistance to arbitrary compromise of the Pi boundary;
-- production key-management or infrastructure security.
+- resistance to a compromised or malicious network forwarder;
+- resistance to arbitrary compromise of the Pi enforcement boundary;
+- Ed25519 verification directly at the ESP32 endpoint;
+- production key-management security;
+- production network or infrastructure security;
+- provider high-availability behavior.
 
-Those conditions are outside the completed SP-001 result.
+Those properties require separate controls or adversarial validation.
