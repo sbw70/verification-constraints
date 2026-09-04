@@ -301,6 +301,90 @@ The requests were corrected before the successful SP-001 issuance and spend resu
 
 They are documented for completeness and are not treated as functional test failures.
 
+## Separate-Provider Availability Control
+
+After the initial interactive SP-001 baseline, the separate-provider topology was exercised through a captured online → unavailable → restored control sequence.
+
+The Raspberry Pi boundary remained running throughout the sequence.
+
+No boundary restart or reprovisioning occurred between the three conditions.
+
+### Online Precondition
+
+The captured control began with the boundary operational and the separate provider reachable.
+
+Boundary health reported:
+
+    status: ok
+    public_key_loaded: true
+    replay_state_persistent: true
+
+Provider status reported:
+
+    provider_available: true
+    provider_url: http://192.168.0.240:8091
+
+A fresh issuance request using:
+
+    nonce: sp001-evidence-online
+
+returned:
+
+    artifact_id: 4502634688e41c69557d9ad8
+    decision: issued
+    provider_verified: true
+    reason: provider_signed_bounded_artifact
+
+This established a successful provider-authenticated issuance immediately before the provider-unavailable condition.
+
+### Provider-Unavailable Condition
+
+The provider process on `Xer0trust2` was stopped while the Raspberry Pi boundary remained running.
+
+Provider status then reported:
+
+    provider_available: false
+    provider_url: http://192.168.0.240:8091
+
+A new issuance request using:
+
+    nonce: sp001-evidence-offline
+
+returned:
+
+    artifact_id: null
+    decision: denied
+    provider_verified: false
+    reason: provider_unavailable
+
+No new provider artifact was returned.
+
+This established that the running boundary did not obtain or originate new provider authority while the physically separate provider was unavailable.
+
+### Provider Restoration
+
+The same provider implementation was restarted on `Xer0trust2`.
+
+The Raspberry Pi boundary remained running without restart.
+
+Provider status returned to:
+
+    provider_available: true
+    provider_url: http://192.168.0.240:8091
+
+A fresh issuance request using:
+
+    nonce: sp001-evidence-restored
+
+returned:
+
+    artifact_id: d3ce2c5e0751d89e4a3f72ce
+    decision: issued
+    provider_verified: true
+    reason: provider_signed_bounded_artifact
+
+Verified issuance therefore resumed after provider restoration without restarting or reprovisioning the NUVL boundary.
+
 ## Evidence Classification
 
 SP-001 provenance consists of several evidence classes.
@@ -320,9 +404,9 @@ SHA-256 and source diff establish:
 - identity of the SP-001 derivative;
 - the provider-address change that created the derivative.
 
-### Runtime Observation
+### Initial Runtime Observation
 
-Interactive terminal output established:
+The initial interactive SP-001 execution established:
 
 - provider startup;
 - provider application reachability;
@@ -335,6 +419,37 @@ Interactive terminal output established:
 - successful bounded spend;
 - persistence-before-accept behavior.
 
+These observations were transcribed from the active test session.
+
+### Captured Availability-Control Evidence
+
+The subsequent separate-provider availability control was captured using a terminal transcript.
+
+Evidence file:
+
+`evidence/sp001_control_evidence.log`
+
+SHA-256:
+
+`13ea30307548cc0d4e80e19ce27dbc3b187d1b6bfa29f38572b05b459965b119`
+
+The captured transcript records:
+
+1. healthy Raspberry Pi boundary;
+2. separate provider reachable;
+3. successful verified issuance while the provider was online;
+4. separate provider unavailable;
+5. new issuance denied with `provider_unavailable`;
+6. `artifact_id: null`;
+7. `provider_verified: false`;
+8. separate provider restored;
+9. successful verified issuance resumed;
+10. no Raspberry Pi boundary restart between the unavailable and restored conditions.
+
+The transcript was captured after the initial interactive SP-001 baseline and is identified as a separate evidence-capture run.
+
+It is not represented as the original SP-001 terminal transcript.
+
 ### Repository Documentation
 
 The SP-001 repository package documents:
@@ -343,27 +458,40 @@ The SP-001 repository package documents:
 - architecture;
 - observed results;
 - provenance;
+- published source;
+- test key material;
+- captured runtime evidence;
 - published file integrity.
 
 ## Runtime Evidence Status
 
-The initial SP-001 execution was observed interactively.
+SP-001 contains two runtime-evidence classes.
 
-The documented outputs were transcribed from the active test session.
+### Initial Baseline
 
-A separately captured and hashed consolidated SP-001 runtime transcript was not part of the initial execution.
+The initial separate-provider baseline was observed interactively.
 
-If a later evidence-capture run is performed, that material should be added under:
+Its documented outputs were transcribed from the active test session.
 
-`evidence/`
+A complete raw terminal transcript of that initial execution was not retained.
 
-and identified separately from the original interactive SP-001 run.
+### Captured Availability Control
 
-A later capture must not be represented as the original runtime transcript.
+The subsequent online → unavailable → restored control was captured directly to:
+
+`evidence/sp001_control_evidence.log`
+
+The captured file was hashed immediately after the terminal transcript was closed.
+
+SHA-256:
+
+`13ea30307548cc0d4e80e19ce27dbc3b187d1b6bfa29f38572b05b459965b119`
+
+This file provides direct retained evidence for the separate-provider availability and restoration control.
 
 ## Publication Artifacts
 
-The intended SP-001 publication package may include:
+The SP-001 publication package may include:
 
     README.md
     RESULTS.md
@@ -372,7 +500,7 @@ The intended SP-001 publication package may include:
     provider/poc002_ed25519_private.pem
     trust/poc002_ed25519_public.pem
     boundary/sp001_separate_provider_boundary.py
-    evidence/
+    evidence/sp001_control_evidence.log
 
 `SHA256SUMS.txt` should be generated only after the final publication bytes are fixed.
 
@@ -388,11 +516,13 @@ If any source file is sanitized or otherwise modified for publication, the modif
 
 Original tested-source hashes must not be attached to modified publication copies.
 
+The captured evidence transcript should be published as the captured file rather than reconstructed manually.
+
 ## Supported Provenance Statement
 
 The available provenance supports the following statement:
 
-> SP-001 used a byte-verified provider implementation and byte-verified laboratory Ed25519 private key transferred to a physically separate Linux provider host. The Raspberry Pi boundary retained the corresponding public verification key without the provider private key. The SP-001 boundary was derived from the existing persistent-replay implementation by changing only the provider network location, and the resulting separate-host path successfully produced, verified, and consumed provider-signed bounded authority.
+> SP-001 used a byte-verified provider implementation and byte-verified laboratory Ed25519 private key transferred to a physically separate Linux provider host. The Raspberry Pi boundary retained the corresponding public verification key without the provider private key. The SP-001 boundary was derived from the existing persistent-replay implementation by changing only the provider network location. The resulting separate-host path successfully produced, verified, and consumed provider-signed bounded authority. A subsequent captured control demonstrated that new issuance was denied when the separate provider was unavailable and resumed after provider restoration without restarting the Raspberry Pi boundary.
 
 ## Limitations
 
@@ -404,7 +534,7 @@ This provenance record does not establish:
 - production identity assurance;
 - resistance to malicious network intermediaries;
 - endpoint-side signature verification;
-- separate-provider outage behavior;
-- unauthorized provider substitution behavior.
+- unauthorized provider substitution behavior;
+- provider high-availability behavior.
 
 Those properties require separate evidence.
