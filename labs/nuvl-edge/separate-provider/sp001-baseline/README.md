@@ -63,9 +63,13 @@ Individual test directories contain their own:
 
 Evidence generated during later validation should be identified separately from evidence produced during an original interactive run.
 
+Current validation:
+
+- `sp001-baseline/` — physically separate Ed25519 provider baseline, including provider-unavailable fail-closed behavior and restoration.
+
 ## Scope
 
-The separate-provider work evaluates provider placement and the preservation of bounded provider authority across that separation.
+The separate-provider work evaluates provider placement, trust separation, and the preservation of bounded provider authority across that separation.
 
 A completed test supports only the properties actually exercised by that test.
 
