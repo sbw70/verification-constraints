@@ -1,0 +1,25 @@
+Script started on 2026-09-03 21:24:04-04:00 [TERM="xterm-256color" TTY="/dev/pts/1" COLUMNS="116" LINES="31"]
+[?2004h]0;seth@xer0trust-pi: ~ [01;32mseth@xer0trust-pi[00m:[01;34m~ $[00m [7mcurl -sS http://127.0.0.1:8089/health && echo && curl -sS http://127.0.0.1:8089/provider-statu[27m[7ms[27m[A
+]0;seth@xer0trust-pi: ~ [01;32mseth@xer0trust-pi[00m:[01;34m~ $[00m curl -sS http://127.0.0.1:8089/health && echo && curl -sS http://127.0.0.1:8089/provider-status
+[?2004l
+{"boundary":"poc004_persistent_replay_pi","public_key_loaded":true,"replay_state_path":"/home/seth/poc004_spent_state_archer.json","replay_state_persistent":true,"spent_count":0,"status":"ok"}
+{"provider_available":true,"provider_url":"http://192.168.0.240:8091"}[?2004h]0;seth@xer0trust-pi: ~ [01;32mseth@xer0trust-pi[00m:[01;34m~ $[00m [7mcurl -sS -X POST http://127.0.0.1:8089/issue -H 'Content-Type: application/json' -d '{"device_[27m[7mi[27m[7md":"esp32-field-01","context":"field_led_demo","requested_action":"accept","nonce":"sp001-evidence-online"}'[27m[A
+[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Ccurl -sS -X POST http://127.0.0.1:8089/issue -H 'Content-Type: application/json' -d '{"device_id":"esp32-field-01","context":"field_led_demo","requested_action":"accept","nonce":"sp001-evidence-online"}'
+[?2004l
+{"artifact_id":"4502634688e41c69557d9ad8","boundary":"poc004_persistent_replay_pi","decision":"issued","package":{"artifact":{"alg":"Ed25519","artifact_id":"4502634688e41c69557d9ad8","context":"field_led_demo","decision":"accepted","device_id":"esp32-field-01","expiry":1788488705,"issued_at":1788485105,"max_uses":1,"nonce":"sp001-evidence-online","offline_allowed":true,"provider_id":"laptop-ed25519-provider-01","requested_action":"accept","version":1},"signature":"-41L30qN-hPCvuOiRTvwPrrj6GRG2Fcz-R_VFfjBA24dgh0fej3nCq35Y0a8sPIARBlga-vW6YmX2m0maduzBw"},"provider_verified":true,"reason":"provider_signed_bounded_artifact"}[?2004h]0;seth@xer0trust-pi: ~ [01;32mseth@xer0trust-pi[00m:[01;34m~ $[00m [7mcurl -sS http://127.0.0.1:8089/provider-status[27m
+[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Ccurl -sS http://127.0.0.1:8089/provider-status
+[?2004l
+{"provider_available":false,"provider_url":"http://192.168.0.240:8091"}[?2004h]0;seth@xer0trust-pi: ~ [01;32mseth@xer0trust-pi[00m:[01;34m~ $[00m [7mcurl -sS -X POST http://127.0.0.1:8089/issue -H 'Content-Type: application/json' -d '{"device_[27m[7mi[27m[7md":"esp32-field-01","context":"field_led_demo","requested_action":"accept","nonce":"sp001-evidence-offline"}'[27m[A
+[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Ccurl -sS -X POST http://127.0.0.1:8089/issue -H 'Content-Type: application/json' -d '{"device_id":"esp32-field-01","context":"field_led_demo","requested_action":"accept","nonce":"sp001-evidence-offline"}'
+[?2004l
+{"artifact_id":null,"boundary":"poc004_persistent_replay_pi","decision":"denied","provider_contacted_for_spend":false,"provider_verified":false,"reason":"provider_unavailable"}[?2004h]0;seth@xer0trust-pi: ~ [01;32mseth@xer0trust-pi[00m:[01;34m~ $[00m [7mcurl -sS http://127.0.0.1:8089/provider-status[27m
+[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Ccurl -sS http://127.0.0.1:8089/provider-status
+[?2004l
+{"provider_available":true,"provider_url":"http://192.168.0.240:8091"}[?2004h]0;seth@xer0trust-pi: ~ [01;32mseth@xer0trust-pi[00m:[01;34m~ $[00m [7mcurl -sS -X POST http://127.0.0.1:8089/issue -H 'Content-Type: application/json' -d '{"device_[27m[7mi[27m[7md":"esp32-field-01","context":"field_led_demo","requested_action":"accept","nonce":"sp001-evidence-restored"}'[27m[A
+[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Ccurl -sS -X POST http://127.0.0.1:8089/issue -H 'Content-Type: application/json' -d '{"device_id":"esp32-field-01","context":"field_led_demo","requested_action":"accept","nonce":"sp001-evidence-restored"}'
+[?2004l
+{"artifact_id":"d3ce2c5e0751d89e4a3f72ce","boundary":"poc004_persistent_replay_pi","decision":"issued","package":{"artifact":{"alg":"Ed25519","artifact_id":"d3ce2c5e0751d89e4a3f72ce","context":"field_led_demo","decision":"accepted","device_id":"esp32-field-01","expiry":1788488897,"issued_at":1788485297,"max_uses":1,"nonce":"sp001-evidence-restored","offline_allowed":true,"provider_id":"laptop-ed25519-provider-01","requested_action":"accept","version":1},"signature":"BRjFXP0aM3iGVMVDKtb0hKgVKuU59zZ9HQDxeyioIhX9-wD4E9l_yz-4dJAKgW3NW74wTJNCBOh2qbtvu-GyBQ"},"provider_verified":true,"reason":"provider_signed_bounded_artifact"}[?2004h]0;seth@xer0trust-pi: ~ [01;32mseth@xer0trust-pi[00m:[01;34m~ $[00m [7mexit[27mexit
+[?2004l
+exit
+
+Script done on 2026-09-03 21:29:00-04:00 [COMMAND_EXIT_CODE="0"]
