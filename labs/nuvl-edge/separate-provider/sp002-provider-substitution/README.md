@@ -127,6 +127,8 @@ This directory contains:
 
 `SHA256SUMS.txt` is the authoritative integrity manifest for the current published package.
 
+The legitimate provider requires poc002_ed25519_private.pem, which is published in ../sp001-baseline/provider/. It is not duplicated here.
+
 ## Supported Claim
 
 SP-002 supports the bounded claim that, within the tested configuration, an unauthorized provider occupying the expected provider position and reproducing the expected provider-facing artifact representation did not obtain accepted provider authority when it lacked the Ed25519 private key corresponding to the boundary's configured trust anchor.
