@@ -1,57 +1,107 @@
 # SP-002 — Unauthorized Provider Substitution
 
-## Overview
+## Purpose
 
-SP-002 evaluates whether an unauthorized provider can originate authority accepted by the NUVL verification boundary by occupying the expected provider network and service position while reproducing the expected provider-facing representation.
+SP-002 evaluates whether occupying the expected provider network and service position is sufficient to originate authority accepted by the NUVL verification boundary.
 
-The test preserves the verification boundary and its legitimate Ed25519 public trust anchor while replacing the legitimate provider with a substitute using a different signing key.
+The test replaces the legitimate provider with an unauthorized substitute while leaving the NUVL boundary and its configured Ed25519 public trust anchor unchanged.
 
-**Result: PASS**
+The substitute reproduces the expected provider-facing representation but signs with an unrelated Ed25519 private key.
 
-The legitimate provider produced verified authority.
+**Overall Result: PASS**
 
-The unauthorized substitute produced a structurally valid Ed25519-signed artifact but was rejected with:
+## Test Classification
 
-`invalid_provider_signature`
+**Category:** NUVL core — no architecture change  
+**Capability:** Separate-provider authenticity enforcement  
+**Primary objective:** Determine whether provider position or representation can substitute for cryptographic provider authority.
 
-Restoration of the legitimate provider restored verified issuance without changing the boundary trust anchor.
+## Architecture
 
-## Security Property
+The tested authority relationship was:
 
-SP-002 isolates provider position from provider authority.
+    Legitimate Provider
+    trusted Ed25519 private key
+            |
+            | signed authority
+            v
+    NUVL Verification Boundary
+    legitimate provider public key
+            |
+            v
+    VERIFIED
 
-The substitute provider reproduced relevant characteristics of the legitimate provider, including:
 
-- provider network and service position;
+    Unauthorized Substitute
+    unrelated Ed25519 private key
+            |
+            | structurally valid signed artifact
+            v
+    SAME NUVL Verification Boundary
+    SAME legitimate provider public key
+            |
+            v
+    REJECTED
+
+The boundary trust anchor was not changed during provider substitution.
+
+## Security Property Evaluated
+
+SP-002 isolates provider position and representation from cryptographic provider authority.
+
+The unauthorized substitute reproduced relevant characteristics of the legitimate provider interface, including:
+
+- expected network and service position;
 - provider identifier;
 - expected context;
 - artifact structure;
-- Ed25519 algorithm;
+- Ed25519 algorithm designation;
 - bounded-use fields.
 
-The substitute did not possess the private signing key corresponding to the public trust anchor configured at the verification boundary.
+The substitute did not possess the private signing key corresponding to the public verification key trusted by the NUVL boundary.
 
-The resulting authority was denied.
+The governing distinction evaluated by SP-002 is:
 
-Within the tested configuration:
+    provider position != provider authority
 
-`provider position != provider authority`
-
-`provider identity representation != cryptographic authority`
+    provider representation != cryptographic authority
 
 ## Test Sequence
 
-| Phase | Provider Condition | Expected Result | Observed Result |
-|---|---|---|---|
-| Baseline | Legitimate provider | Verified issuance | PASS |
-| Substitution | Unauthorized provider and signing key | Deny | PASS |
-| Restoration | Legitimate provider restored | Verified issuance restored | PASS |
+| Phase | Provider Condition | Expected |
+|---|---|---|
+| Baseline | Legitimate provider | Verified issuance |
+| Substitution | Unauthorized provider using unrelated signing key | DENY |
+| Restoration | Legitimate provider restored | Verified issuance |
 
-Overall result:
+All three expected conditions were observed.
 
-`3/3 expected conditions observed — PASS`
+Detailed runtime decisions and evidence are maintained in `RESULTS.md`.
 
-## Repository Contents
+## Distinction from POC-002A
+
+POC-002A and SP-002 exercise different trust conditions.
+
+POC-002A retained the legitimate provider and deliberately replaced the public verification key configured at the boundary.
+
+SP-002 does the inverse:
+
+    POC-002A
+    legitimate provider
+            +
+    incorrect boundary trust anchor
+
+
+    SP-002
+    unauthorized provider
+            +
+    unchanged legitimate boundary trust anchor
+
+SP-002 therefore evaluates unauthorized provider substitution rather than trust-anchor substitution.
+
+## Evidence Package
+
+This directory contains:
 
     sp002-provider-substitution/
     ├── README.md
@@ -69,26 +119,29 @@ Overall result:
     └── trust/
         └── poc002_ed25519_public.pem
 
-## Evidence
+`RESULTS.md` records the executed conditions and observed outcomes.
 
-`RESULTS.md` records the execution sequence, observed decisions, and demonstrated security property.
+`PROVENANCE.md` records artifact lineage, test-host relationships, cryptographic material, and evidence provenance.
 
-`PROVENANCE.md` records the test architecture, artifact identities, cryptographic relationships, execution provenance, and evidence boundaries.
+`evidence/sp002_rerun_evidence.log` contains the retained runtime record for the baseline, substitution, and restoration sequence.
 
-`evidence/sp002_rerun_evidence.log` is the canonical runtime record for the legitimate-provider, unauthorized-substitution, and legitimate-restoration sequence.
+`SHA256SUMS.txt` is the authoritative integrity manifest for the current published package.
 
-`SHA256SUMS.txt` provides integrity verification for the published package.
+## Supported Claim
 
-## Scope
+SP-002 supports the bounded claim that, within the tested configuration, an unauthorized provider occupying the expected provider position and reproducing the expected provider-facing artifact representation did not obtain accepted provider authority when it lacked the Ed25519 private key corresponding to the boundary's configured trust anchor.
 
-SP-002 demonstrates rejection of authority generated by an unauthorized provider signing key while the legitimate verification boundary and public trust anchor remain unchanged.
+Restoration of the legitimate provider restored verified issuance without changing the boundary trust anchor.
 
-SP-002 does not independently establish protection against:
+## Claim Boundary
 
-- privileged modification of the boundary trust anchor;
-- arbitrary compromise of the verification boundary;
+SP-002 does not establish:
+
+- protection of the boundary trust anchor against privileged modification;
+- security after arbitrary privileged compromise of the NUVL boundary;
 - endpoint-local Ed25519 verification;
-- denial-of-service at the provider network position;
-- every possible replay of previously legitimate authority.
+- resistance to denial-of-service at the provider network position;
+- rejection of every possible malicious intermediary behavior;
+- rejection of every possible replay of previously legitimate authority.
 
-Those properties require independent evidence.
+Those properties require separate evidence.
