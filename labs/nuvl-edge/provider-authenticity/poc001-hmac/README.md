@@ -1,397 +1,177 @@
 # POC-001 — HMAC Bounded Disconnected Authority
 
-## Overview
+## Purpose
 
-POC-001 tested a bounded provider-unavailable authorization path for NUVL.
+POC-001 evaluates bounded authorization during temporary provider unavailability.
 
-The proof established a provider-first validation model in which normal requests were evaluated by the provider while it remained reachable. Before provider loss, the provider could issue a time-limited, request-bound, single-use artifact for use during a bounded disconnected window.
+The test establishes an initial NUVL disconnected-authority model in which normal authorization remains provider-first while a previously issued, request-bound artifact may authorize one matching request during a temporary loss of provider connectivity.
 
-When the provider became unavailable, the Raspberry Pi NUVL boundary could validate that previously issued artifact and admit the corresponding request once.
-
-The experiment tested whether provider loss could be handled without introducing unrestricted local fallback authority.
-
-POC-001 used HMAC-SHA256 authentication and therefore intentionally preceded the asymmetric provider-authenticity model introduced in POC-002.
+POC-001 uses HMAC-SHA256 authentication. The shared-secret trust model is an intentional limitation of this proof and is superseded by the asymmetric provider-authenticity architecture introduced in POC-002.
 
 ## Test Classification
 
-**Category:** NUVL core — no architecture change.
+**Category:** NUVL core — no architecture change  
+**Capability:** Bounded disconnected authority  
+**Primary objective:** Determine whether temporary provider loss can be accommodated without introducing unrestricted local fallback authority.
 
-**Capability:** Bounded disconnected authority.
+## Architecture
 
-**Use case:** A constrained endpoint requires a narrowly scoped action during temporary provider unavailability without receiving unrestricted local authorization capability.
+The tested topology was:
 
-## Tested Architecture
+    ESP32-S3
+        |
+        | Wi-Fi
+        v
+    GL.iNet Mango GL-MT300N-V2
+        |
+        v
+    Raspberry Pi 5
+    NUVL boundary
+        |
+        v
+    Windows provider
 
-The tested path was:
+During normal operation, authorization followed the provider-first path:
 
-```text
-ESP32-S3
-    |
-    | Wi-Fi
-    v
-GL.iNet Mango GL-MT300N-V2
-    |
-    v
-Raspberry Pi 5
-NUVL boundary
-    |
-    v
-Windows provider
-```
+    endpoint request
+          |
+          v
+    NUVL boundary
+          |
+          v
+    provider validation
+          |
+          +---- admissible ----> ACCEPT
+          |
+          +---- inadmissible --> DENY
 
-Normal operation used a provider-first path:
+During provider unavailability, the boundary could evaluate a previously issued bounded artifact:
 
-```text
-endpoint request
-      |
-      v
-NUVL boundary
-      |
-      v
-provider reachable
-      |
-      v
-provider validates request
-      |
-      v
-ACCEPT or DENY
-```
+    provider unavailable
+          |
+          v
+    NUVL boundary
+          |
+          v
+    validate bounded artifact
+          |
+          +---- invalid ----> DENY
+          |
+          +---- valid ------> ACCEPT ONCE
 
-The disconnected path was:
+Provider unavailability alone did not create authorization.
 
-```text
-provider unavailable
-      |
-      v
-NUVL boundary
-      |
-      v
-validate previously issued
-bounded artifact
-      |
-      +---- invalid ----> DENY
-      |
-      +---- valid ------> ACCEPT ONCE
-```
+## Bounded Authority Model
 
-The disconnected artifact did not create a general local allow mode.
+The provider-issued artifact was authenticated using HMAC-SHA256 and bound to:
 
-## Bounded Artifact
-
-The provider implementation issued an HMAC-SHA256 authenticated artifact containing:
-
-- action;
+- requested action;
 - context;
+- request representation;
 - unique nonce;
 - issuance time;
 - expiration time;
-- maximum-use count;
-- request representation.
+- maximum-use count.
 
-The artifact was bound to the requested action and context.
+The tested artifact specified a maximum use count of one.
 
-The tested artifact specified:
+During provider unavailability, acceptance required successful validation of the complete bounded-artifact constraints. Missing, malformed, expired, mismatched, or previously consumed artifacts were denied.
 
-```text
-max_uses=1
-```
+Single-use replay state was maintained by the Raspberry Pi boundary for the lifetime of the running boundary process.
 
-The request representation was derived from the action and context and included in the authenticated artifact.
+## Test Matrix
 
-## Provider-First Operation
+POC-001 exercised the following conditions:
 
-While the provider was reachable, the boundary attempted normal provider validation.
-
-The provider returned acceptance only for the configured action and context.
-
-Requests outside that configured scope were denied by the provider.
-
-The bounded disconnected path was entered only after the normal provider request failed because the provider was unavailable.
-
-## Provider-Unavailable Validation
-
-During provider unavailability, the boundary evaluated the supplied artifact before admitting the request.
-
-Validation included:
-
-1. artifact presence;
-2. artifact decoding;
-3. HMAC authentication;
-4. action binding;
-5. context binding;
-6. request-representation binding;
-7. expiration;
-8. single-use constraint;
-9. nonce presence;
-10. replay state.
-
-A request was accepted through the disconnected path only after all checks succeeded.
-
-The accepted disconnected result was identified by:
-
-```text
-decision=accepted
-reason=bounded_artifact_valid_once
-path=provider_unavailable_bounded_window
-```
-
-Failure of artifact validation produced a denied result through:
-
-```text
-path=provider_unavailable_fail_closed
-```
-
-## Tested Conditions
-
-The POC-001 laboratory sequence exercised the following conditions:
-
-| Condition | Expected behavior |
+| Condition | Expected Result |
 |---|---|
-| Provider reachable with admissible request | ACCEPT |
-| Provider unavailable with valid unexpired artifact | ACCEPT once |
-| Replay of consumed artifact | DENY |
+| Provider reachable; admissible request | ACCEPT |
+| Provider unavailable; valid bounded artifact | ACCEPT once |
+| Consumed artifact replay | DENY |
 | Missing artifact | DENY |
-| Artifact for wrong context | DENY |
-| Artifact for wrong action | DENY |
+| Wrong context | DENY |
+| Wrong action | DENY |
 | Expired artifact | DENY |
-| Provider restored | Provider-backed ACCEPT restored |
+| Provider restored | Provider-backed operation restored |
 
-The valid disconnected artifact was accepted once.
+Detailed observations and recorded outcomes are maintained in `RESULTS.md`.
 
-Subsequent use of the same artifact was denied as replay.
+## Security Property Evaluated
 
-## Single-Use Enforcement
+POC-001 evaluates whether provider unavailability can be handled through previously bounded authority rather than unrestricted local fallback.
 
-Single-use state was maintained by the Raspberry Pi boundary.
+The tested implementation required affirmative validation of an existing bounded artifact before admitting a request while the provider was unavailable.
 
-After successful disconnected validation, the artifact nonce was entered into the boundary's used-nonce state.
+The disconnected path therefore remained constrained by previously established provider parameters rather than treating provider loss as an implicit authorization condition.
 
-A subsequent request containing the same artifact was rejected as:
+## Trust-Model Limitation
 
-```text
-artifact_replay
-```
+POC-001 uses a shared HMAC secret between the provider and Raspberry Pi boundary.
 
-Expired nonce entries could later be removed from the in-memory used-nonce set.
+This permits the boundary to authenticate provider-issued artifacts, but possession of the shared secret also provides the cryptographic capability required to generate valid HMAC authentication values.
 
-POC-001 therefore demonstrated single-use behavior during the running boundary process.
+POC-001 therefore does **not** establish exclusive provider cryptographic issuance authority.
 
-It did not demonstrate durable spent-state persistence across boundary restart or power loss.
+This limitation motivated the transition to Ed25519 asymmetric signatures in POC-002:
 
-Persistent replay protection was addressed by later NUVL experiments.
-
-## Fail-Closed Behavior
-
-Provider unavailability did not independently authorize an action.
-
-If the provider was unavailable and the supplied bounded artifact failed validation, the boundary returned a denied result.
-
-Relevant denial conditions included:
-
-```text
-missing_artifact
-artifact_decode_failed
-artifact_signature_invalid
-artifact_wrong_action
-artifact_wrong_context
-artifact_request_binding_invalid
-artifact_expired
-artifact_not_single_use
-artifact_missing_nonce
-artifact_replay
-```
-
-The tested disconnected path therefore required affirmative validation of previously issued bounded authority.
-
-## HMAC Trust Placement
-
-POC-001 used a shared HMAC secret.
-
-The provider required the secret to authenticate artifacts:
-
-```text
-provider
-    |
-    | shared HMAC secret
-    |
-    v
-signed bounded artifact
-```
-
-The Raspberry Pi boundary required the same secret to verify those artifacts:
-
-```text
-provider                  Raspberry Pi boundary
-   |                               |
-   |                               |
-   +------ shared HMAC secret -----+
-```
-
-This arrangement supported the behavioral objective of the initial bounded-disconnected-authority proof, but it did not preserve exclusive provider signing authority.
-
-Possession of the HMAC secret gives the boundary the cryptographic material required both to verify and to generate valid HMAC authentication values.
-
-Accordingly, POC-001 did **not** establish that the provider alone could originate cryptographically valid bounded artifacts.
-
-That limitation directly motivated POC-002.
-
-## Relationship to POC-002
-
-POC-002 replaced the shared HMAC trust relationship with Ed25519 asymmetric signatures.
-
-The transition was:
-
-```text
-POC-001
-
-provider:
+    POC-001
     shared HMAC secret
+    provider + boundary
+            |
+            v
+    POC-002
+    provider private signing key
+    boundary public verification key
+            |
+            v
+    POC-003
+    asymmetric bounded disconnected
+    single-use authority
 
-boundary:
-    same shared HMAC secret
+POC-002 separates signing authority from verification capability. POC-003 applies that asymmetric trust model to bounded disconnected authorization.
 
-property:
-    boundary can verify
-    boundary also possesses material capable of minting
+## Evidence Package
 
+This directory contains:
 
-            ↓
+- `ddil_provider.py` — provider implementation used by POC-001;
+- `RESULTS.md` — test conditions, observed behavior, and result assessment;
+- `PROVENANCE.md` — source lineage and retained-artifact provenance;
+- `SHA256SUMS.txt` — integrity manifest for published artifacts.
 
+The Raspberry Pi boundary implementation used for the original test is not published in this directory.
 
-POC-002
+The original interactive terminal transcript was not retained. No reconstructed terminal output is represented as original runtime evidence.
 
-provider:
-    Ed25519 private signing key
+## Supported Claims
 
-boundary:
-    provider public verification key only
+POC-001 supports the bounded claim that, within the tested configuration:
 
-property:
-    boundary can verify provider signatures
-    boundary does not possess provider private signing key
-```
+- normal authorization remained provider-first while the provider was available;
+- a previously issued bounded artifact could authorize one matching request during provider unavailability;
+- missing, invalid, expired, mismatched, and replayed artifacts were denied;
+- provider unavailability did not independently create authorization;
+- provider-backed operation resumed after provider restoration.
 
-POC-002 therefore addressed the principal trust-placement limitation identified by POC-001.
+## Limitations
 
-POC-003 subsequently combined asymmetric provider authority with bounded disconnected single-use behavior.
+POC-001 does not establish:
 
-## Public Files
-
-### `ddil_provider.py`
-
-Original provider implementation retained from the July 11, 2026 test.
-
-The retained publication copy is byte-identical to the original Windows test-host source identified in `PROVENANCE.md`.
-
-The provider implements:
-
-- normal provider validation;
-- bounded-artifact issuance;
-- action and context restrictions;
-- HMAC-SHA256 artifact authentication;
-- nonce generation;
-- issuance and expiration times;
-- single-use artifact declaration;
-- request binding.
-
-### `RESULTS.md`
-
-Recorded POC-001 behavioral results and evidence limitations.
-
-### `PROVENANCE.md`
-
-Artifact provenance, original source hashes, cross-host boundary correspondence, and publication status.
-
-### `SHA256SUMS.txt`
-
-SHA-256 manifest for files distributed in this public directory.
-
-## Publication Boundary
-
-The Raspberry Pi enforcement-boundary implementation is not published in this directory.
-
-The original tested boundary source survives independently on both the Windows test host and Raspberry Pi.
-
-The two retained copies are byte-identical and have SHA-256:
-
-```text
-7bd3b443caf4c5b8d88b70db9cbb8b4ec28df6fcdbbe301ba7cb402cfbb2905d
-```
-
-The public provider source has SHA-256:
-
-```text
-97aad386e48813488047503030de277d165a4a9040d758d7679d330a7ba0ebeb
-```
-
-Artifact-level details are recorded in `PROVENANCE.md`.
-
-## Evidence Status
-
-The original interactive terminal transcript from the July 11, 2026 execution is not included in this package.
-
-The surviving evidence includes:
-
-- the original provider implementation;
-- the original boundary implementation retained outside the public package;
-- an independently retained byte-identical copy of the boundary implementation on the Raspberry Pi;
-- contemporaneous laboratory records of the tested conditions and observed results;
-- SHA-256 identification of the surviving source artifacts.
-
-No reconstructed terminal output is presented as original runtime evidence.
-
-## What POC-001 Supports
-
-POC-001 supports the tested behavioral claim that a previously issued, bounded artifact could authorize one matching request during provider unavailability while invalid, expired, mismatched, missing, or replayed artifacts were denied.
-
-The proof demonstrated:
-
-- provider-first validation during normal availability;
-- bounded disconnected acceptance;
-- action binding;
-- context binding;
-- request binding;
-- expiration enforcement;
-- single-use declaration;
-- running-process replay denial;
-- fail-closed behavior without a valid bounded artifact;
-- return to provider-backed operation after provider restoration.
-
-## What POC-001 Does Not Support
-
-POC-001 does not establish exclusive provider cryptographic issuance authority.
-
-Because the provider and Raspberry Pi boundary shared the HMAC secret, the boundary possessed cryptographic material sufficient to generate HMAC-authenticated artifacts.
-
-POC-001 also does not establish:
-
+- exclusive provider cryptographic issuance authority;
 - asymmetric provider authenticity;
-- direct cryptographic verification on the ESP32;
-- persistent spent-state across restart or power loss;
+- endpoint-local cryptographic verification;
+- persistent spent-state across boundary restart or power loss;
 - crash-safe spend persistence;
 - multi-boundary double-spend resistance;
 - exactly-once physical execution;
-- security of the Raspberry Pi after arbitrary privileged compromise.
+- protection against arbitrary privileged compromise of the Raspberry Pi boundary.
 
-Those properties are outside the scope of this proof.
+These properties require separate evidence and are addressed, where applicable, by subsequent NUVL tests.
 
 ## Result
 
-POC-001 established the initial bounded disconnected-authority behavior and exposed the shared-secret trust limitation that was removed in POC-002.
+**PASS**
 
-The proof sequence therefore progresses from bounded behavior to stronger authority separation:
+POC-001 demonstrated bounded, single-use disconnected authorization during temporary provider unavailability while retaining fail-closed behavior when valid bounded authority was absent.
 
-```text
-POC-001
-HMAC bounded disconnected authority
-        |
-        | shared-secret limitation identified
-        v
-POC-002
-Ed25519 provider authenticity
-        |
-        | asymmetric provider/boundary trust separation
-        v
-POC-003
-Ed25519 bounded disconnected single-use authority
-```
+The experiment also identified the shared-secret trust limitation that motivated the asymmetric provider-authenticity architecture evaluated beginning with POC-002.
