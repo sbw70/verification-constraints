@@ -1,118 +1,172 @@
-# NUVL Separate-Provider Validation
+# SP-001 — Separate-Provider Baseline
 
 ## Purpose
 
-This directory contains validation of NUVL with provider authority hosted on infrastructure physically separate from the NUVL verification/enforcement boundary.
+SP-001 evaluates whether the existing NUVL provider-controlled bounded-authority path continues to operate when the provider and its Ed25519 private signing key are moved to a physically separate host from the Raspberry Pi verification/enforcement boundary.
 
-The objective is to determine whether the existing provider-controlled bounded-authority model remains enforceable when the provider and its private signing key execute on a separate host.
+The test changes provider placement without changing the underlying provider-authenticity or bounded-authority model.
+
+**Overall Result: PASS**
+
+## Test Classification
+
+**Category:** NUVL core with deployment variation — no architecture change  
+**Capability:** Separate-provider operation  
+**Primary objective:** Validate remote provider operation, fail-closed provider loss, and restoration without transferring provider signing authority to the boundary.
 
 ## Architecture
 
-The separate-provider configuration places the provider and verification/enforcement boundary on different physical systems:
+The tested topology was:
 
     Separate Provider Host
     Ed25519 private signing key
             |
             | network
             v
-    NUVL Verification / Enforcement Boundary
+    Raspberry Pi NUVL Boundary
     Ed25519 public verification key
             |
             v
-    Bounded execution path
+    Bounded authority / spend path
 
-The provider originates signed authority.
+The provider executed on a separate Linux host.
 
-The NUVL boundary receives and evaluates provider-signed authority using public verification material. Physical separation does not require transfer of the provider private signing key to the boundary.
+The Raspberry Pi boundary retained the corresponding public verification key and did not hold the provider private signing key.
 
 ## Authority Model
 
-The separate-provider configuration preserves the existing NUVL authority split:
+The provider:
 
-**Provider**
-- originates authority within configured scope;
-- retains private signing authority.
+- originates bounded authority;
+- retains private Ed25519 signing authority.
 
-**NUVL boundary**
+The NUVL boundary:
+
+- contacts the provider for new authority;
 - verifies provider signatures;
-- evaluates request and artifact binding;
-- enforces scope, validity, replay, and use restrictions;
-- rejects authority that does not satisfy the configured admission conditions.
+- evaluates artifact and request binding;
+- enforces bounded-use and replay conditions;
+- does not require possession of the provider private signing key.
 
-The boundary is not intended to originate or enlarge provider authority within the tested architecture.
+SP-001 evaluates whether this authority relationship remains intact when provider execution is moved to separate infrastructure.
 
-Separate-provider testing evaluates whether that authority relationship remains intact when the provider is moved to independent infrastructure.
+## Test Sequence
 
-## Validation Set
+SP-001 exercised three principal conditions:
 
-Current validation includes:
+| Phase | Provider Condition | Expected |
+|---|---|---|
+| Baseline | Separate provider online | Verified issuance and bounded spend |
+| Unavailable | Separate provider stopped | New issuance denied |
+| Restoration | Same provider restored | Verified issuance resumes |
 
-- `sp001-baseline/` — physically separate provider baseline, including provider-unavailable fail-closed behavior and restoration;
-- `sp002-provider-substitution/` — unauthorized provider substitution using the expected provider position and artifact representation but a different Ed25519 signing key.
+All expected conditions were observed.
 
-Each test directory contains its own scope, results, provenance, evidence, source artifacts, and integrity manifest.
+Detailed runtime observations are maintained in `RESULTS.md`.
 
-Detailed behavioral claims are maintained within the individual test packages rather than in this parent directory.
+## Separate-Provider Baseline
 
-## Evidence Model
+The separate provider successfully issued Ed25519-signed bounded authority across the network to the Raspberry Pi boundary.
 
-Individual test packages may contain:
+The boundary verified that authority using the configured public trust anchor.
 
-- `README.md` — test purpose, architecture, scope, and claim boundary;
-- `RESULTS.md` — observed test conditions and outcomes;
-- `PROVENANCE.md` — artifact lineage and original/tested-source identity;
-- source and configuration artifacts required for reproduction;
-- captured runtime evidence where retained;
-- `SHA256SUMS.txt` — integrity manifest for the published package.
+A fresh bounded artifact was subsequently accepted through the spend path without contacting the provider for the spend.
 
-Later reproduction or validation evidence is identified separately from original test-time evidence.
+The existing persistent spent-state enforcement remained in use.
 
-No reconstructed output is represented as original runtime evidence.
+## Provider-Unavailable Control
 
-## Test Key Material
+The provider process was stopped while the Raspberry Pi boundary remained operational.
 
-Laboratory Ed25519 key material included in an individual test package is test-only material.
+A new authority request was denied with:
 
-It has no production, operational, account, identity, or external trust relationship.
+    decision: denied
+    provider_verified: false
+    reason: provider_unavailable
 
-Publication of test key material is a reproducibility decision and does not alter the authority model evaluated by the test.
+No new artifact was returned through the tested issuance path.
 
-## Scope
+**Result: PASS**
 
-Separate-provider validation evaluates:
+## Provider Restoration
 
-- physical separation of provider and enforcement infrastructure;
-- retention of provider private signing authority on the provider host;
-- public-key verification at the NUVL boundary;
-- behavior during provider unavailability and restoration;
-- behavior when an unauthorized provider occupies the expected provider position but cannot produce signatures valid under the configured trust anchor.
+The same provider implementation was restarted on the separate host.
 
-A completed test supports only the properties directly exercised by that test.
+The Raspberry Pi boundary was not restarted or reprovisioned.
 
-This validation set does not, by itself, establish:
+Verified provider issuance resumed through the same running boundary.
 
-- security after arbitrary privileged compromise of the NUVL boundary;
+**Result: PASS**
+
+## Evidence Package
+
+This directory contains:
+
+    sp001-baseline/
+    ├── README.md
+    ├── RESULTS.md
+    ├── PROVENANCE.md
+    ├── SHA256SUMS.txt
+    ├── evidence/
+    │   └── sp001_control_evidence.log
+    ├── provider/
+    │   ├── poc003_ed25519_provider_1h.py
+    │   └── poc002_ed25519_private.pem
+    ├── boundary/
+    │   └── sp001_separate_provider_boundary.py
+    └── trust/
+        └── poc002_ed25519_public.pem
+
+`RESULTS.md` records executed conditions and observed outcomes.
+
+`PROVENANCE.md` records source lineage, test-time artifact identity, host correspondence, and evidence provenance.
+
+`evidence/sp001_control_evidence.log` contains the retained provider-availability control record.
+
+`SHA256SUMS.txt` is the integrity manifest for the published package.
+
+## Supported Claim
+
+SP-001 supports the bounded claim that, within the tested configuration:
+
+- provider signing authority operated on a host physically separate from the NUVL verification/enforcement boundary;
+- the boundary verified provider-signed authority using public verification material;
+- bounded authority could be consumed without contacting the provider during the spend operation;
+- loss of the separate provider prevented acquisition of new provider authority through the tested issuance path;
+- restoration of the same provider restored verified issuance without restarting or reprovisioning the boundary.
+
+## Claim Boundary
+
+SP-001 does not establish:
+
+- rejection of an unauthorized substitute provider;
+- protection against a compromised or malicious network intermediary;
+- security after arbitrary privileged compromise of the Raspberry Pi boundary;
+- protection of mutable boundary trust configuration against privileged modification;
 - endpoint-local Ed25519 verification;
-- resistance to every malicious-intermediary condition;
-- production infrastructure security;
 - production key-management security;
-- provider high availability;
-- protection of mutable trust configuration against privileged modification.
+- production provider infrastructure security;
+- provider high availability.
 
-## Relationship to Existing NUVL Evidence
+Unauthorized provider substitution is evaluated separately by SP-002.
 
-Separate-provider validation builds on the provider-authenticity and bounded-authority properties established by earlier NUVL proofs.
+## Relationship to SP-002
 
-The principal variable introduced by SP-001 is physical separation of the provider authority source from the verification/enforcement boundary.
+SP-001 establishes the separate-provider baseline.
 
-SP-002 then evaluates a distinct condition: whether occupying the expected provider network position is sufficient to obtain authority without possession of signing material trusted by the boundary.
+SP-002 then preserves the same verification boundary and legitimate trust anchor while replacing the provider with an unauthorized substitute using an unrelated signing key.
 
-Across both tests, the governing invariant remains:
+The progression is:
 
-    provider originates bounded authority
-                 |
-                 v
-    boundary may verify and enforce
-                 |
-                 v
-    boundary does not receive provider signing authority
+    SP-001
+    physically separate legitimate provider
+            |
+            v
+    verified authority preserved
+
+
+    SP-002
+    unauthorized provider at expected position
+            |
+            v
+    authority rejected
