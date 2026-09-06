@@ -6,299 +6,250 @@ This document records the provenance of surviving artifacts associated with the 
 
 The provenance record distinguishes among:
 
-1. original tested source retained from the July execution;
-2. artifacts independently retained on the Raspberry Pi and Windows test host;
-3. sanitized derivatives prepared for public distribution;
-4. contemporaneously recorded test results;
-5. files intentionally excluded from publication.
+- original tested source retained from the July execution;
+- artifacts independently retained on multiple test systems;
+- post-test publication derivatives;
+- contemporaneous behavioral records;
+- artifacts intentionally excluded from publication.
 
 The original interactive terminal transcript was not retained.
 
 No reconstructed output is represented as original runtime evidence.
 
-No sanitized derivative is represented as byte-identical to an original tested artifact when its SHA-256 digest differs.
+A publication derivative is not represented as byte-identical to an original tested artifact when its contents and SHA-256 digest differ.
 
 ## Original Test Environment
 
 The tested path was:
 
-```text
-ESP32-S3
-    |
-    | Wi-Fi
-    v
-GL.iNet Mango GL-MT300N-V2
-    |
-    v
-Raspberry Pi 5
-NUVL verification boundary
-    |
-    v
-Windows provider
-```
+    ESP32-S3
+        |
+        | Wi-Fi
+        v
+    GL.iNet Mango GL-MT300N-V2
+        |
+        v
+    Raspberry Pi 5
+    NUVL verification boundary
+        |
+        v
+    Windows provider
 
 Trust placement was:
 
-```text
-Windows provider:
-    Ed25519 private signing key
+    Windows provider
+        Ed25519 private signing key
 
-Raspberry Pi:
-    provider public verification key
+    Raspberry Pi
+        provider public verification key
 
-ESP32-S3:
-    no provider private signing key
-```
+    ESP32-S3
+        no provider private signing key
 
-Ed25519 provider-signature verification occurred at the Raspberry Pi boundary.
+Provider-signature verification occurred at the Raspberry Pi boundary.
 
 ## Surviving Raspberry Pi Artifacts
 
-Examination of the original Raspberry Pi test host identified the following surviving POC-002 artifacts:
+The original Raspberry Pi test host retained:
 
-```text
-/home/seth/poc002_ed25519_pi_boundary.py
-/home/seth/poc002_ed25519_public.pem
-/home/seth/poc002_ed25519_public_correct.pem
-/home/seth/poc002_ed25519_public_wrong.pem
-```
+    /home/seth/poc002_ed25519_pi_boundary.py
+    /home/seth/poc002_ed25519_public.pem
+    /home/seth/poc002_ed25519_public_correct.pem
+    /home/seth/poc002_ed25519_public_wrong.pem
 
 Observed filesystem timestamps were:
 
-```text
-2026-07-19 20:59:01  /home/seth/poc002_ed25519_pi_boundary.py
-2026-07-20 13:59:44  /home/seth/poc002_ed25519_public_wrong.pem
-2026-07-20 14:04:14  /home/seth/poc002_ed25519_public_correct.pem
-2026-07-20 14:12:13  /home/seth/poc002_ed25519_public.pem
-```
+    2026-07-19 20:59:01  /home/seth/poc002_ed25519_pi_boundary.py
+    2026-07-20 13:59:44  /home/seth/poc002_ed25519_public_wrong.pem
+    2026-07-20 14:04:14  /home/seth/poc002_ed25519_public_correct.pem
+    2026-07-20 14:12:13  /home/seth/poc002_ed25519_public.pem
 
-These timestamps are retained as provenance metadata. They are not treated as cryptographic evidence.
+These timestamps are retained as supporting filesystem metadata and are not treated as cryptographic evidence.
 
-## Cross-Host SHA-256 Correspondence
+## Original Tested Artifact Identity
 
-### Raspberry Pi Boundary
+The retained Windows test-host artifacts were identified as follows:
 
-Raspberry Pi artifact:
+| Artifact | SHA-256 |
+|---|---|
+| `poc002_ed25519_pi_boundary.py` | `956e83b03b71c693641a8eee30e9dc8e2db6b8a71de008d052447ce5a06fafc9` |
+| `poc002_ed25519_provider.py` | `8d0430ff07fc938090d43e112b7276b481612491044d7d1f3f68bcb1ef1cd3ee` |
+| `poc002_ed25519_public.pem` | `2fd9c44a0579b985bc44722313725c8a6fd532b665b617b3e5082efb14c49f63` |
+| `poc002_esp32_matrix_repeat.py` | `463d9fdf193ed7b37a99c8edf1d7bdc5ceb282622e9990b383196cbd9e44a337` |
+| `poc002_esp32_test.py` | `53c1cd04f9f2a51d83f88dc2231663738f51727d23401f17f40c538b974f6c7e` |
+| `poc002a_esp32_probe.py` | `7d1c97e44c66a0bed6c3d53dde25d22fb7532fb9237b67511e715509760cb242` |
+| `poc002_wrong_trust_anchor_public.pem` | `95eb0d5089b5ceda23e3cadc7cfb3c0f4af3fb787712716cfab46671216311b9` |
 
-```text
-956e83b03b71c693641a8eee30e9dc8e2db6b8a71de008d052447ce5a06fafc9  /home/seth/poc002_ed25519_pi_boundary.py
-```
+These values identify retained original test artifacts.
 
-Windows test-host copy:
+They are historical provenance values and are distinct from current repository-integrity values maintained in `SHA256SUMS.txt`.
 
-```text
-956e83b03b71c693641a8eee30e9dc8e2db6b8a71de008d052447ce5a06fafc9  poc002_ed25519_pi_boundary.py
-```
+## Cross-Host Correspondence
 
-**Result: SHA-256 match.**
+### Boundary Source
 
-The independently retained Raspberry Pi and Windows copies of the original boundary source are byte-identical.
+The Raspberry Pi retained:
+
+    /home/seth/poc002_ed25519_pi_boundary.py
+
+Its SHA-256 matched the independently retained Windows copy:
+
+    956e83b03b71c693641a8eee30e9dc8e2db6b8a71de008d052447ce5a06fafc9
+
+**Result: MATCH**
+
+This establishes byte identity between the surviving Windows and Raspberry Pi copies of the original POC-002 boundary source.
 
 The boundary implementation is not included in the public POC-002 package.
 
-### Correct Provider Public Key
+### Correct Provider Trust Anchor
 
-Raspberry Pi active public key:
+Three independently retained copies of the correct provider public key were identified:
 
-```text
-2fd9c44a0579b985bc44722313725c8a6fd532b665b617b3e5082efb14c49f63  /home/seth/poc002_ed25519_public.pem
-```
+    /home/seth/poc002_ed25519_public.pem
+    /home/seth/poc002_ed25519_public_correct.pem
+    Windows: poc002_ed25519_public.pem
 
-Raspberry Pi preserved correct-key copy:
+All three produced:
 
-```text
-2fd9c44a0579b985bc44722313725c8a6fd532b665b617b3e5082efb14c49f63  /home/seth/poc002_ed25519_public_correct.pem
-```
+    2fd9c44a0579b985bc44722313725c8a6fd532b665b617b3e5082efb14c49f63
 
-Windows test-host copy:
+**Result: MATCH**
 
-```text
-2fd9c44a0579b985bc44722313725c8a6fd532b665b617b3e5082efb14c49f63  poc002_ed25519_public.pem
-```
-
-**Result: SHA-256 match across all three retained copies.**
+This establishes byte identity among the retained copies of the provider public verification key used by the tested trust relationship.
 
 ### Deliberately Incorrect Trust Anchor
 
-Raspberry Pi wrong-key artifact:
+The Raspberry Pi retained the unrelated public key used for the trust-anchor substitution condition.
 
-```text
-95eb0d5089b5ceda23e3cadc7cfb3c0f4af3fb787712716cfab46671216311b9  /home/seth/poc002_ed25519_public_wrong.pem
-```
+The Pi copy and retained publication-source copy produced:
 
-Publication copy:
+    95eb0d5089b5ceda23e3cadc7cfb3c0f4af3fb787712716cfab46671216311b9
 
-```text
-95eb0d5089b5ceda23e3cadc7cfb3c0f4af3fb787712716cfab46671216311b9  poc002_wrong_trust_anchor_public.pem
-```
+**Result: MATCH**
 
-**Result: SHA-256 match.**
+This artifact is cryptographically distinct from the correct provider public key and represents the intentionally incorrect trust anchor used during POC-002A.
 
-The deliberately incorrect trust anchor is cryptographically distinct from the correct provider public key.
+## Publication Derivatives
 
-## Original Windows Test-Host Source Hashes
+Environment-specific public network addressing was removed or replaced in publication copies where required.
 
-The following SHA-256 values identify the retained original test sources before publication sanitization:
+No test logic was intentionally changed as part of that process.
 
-```text
-956E83B03B71C693641A8EEE30E9DC8E2DB6B8A71DE008D052447CE5A06FAFC9  poc002_ed25519_pi_boundary.py
-8D0430FF07FC938090D43E112B7276B481612491044D7D1F3F68BCB1EF1CD3EE  poc002_ed25519_provider.py
-2FD9C44A0579B985BC44722313725C8A6FD532B665B617B3E5082EFB14C49F63  poc002_ed25519_public.pem
-463D9FDF193ED7B37A99C8EDF1D7BDC5CEB282622E9990B383196CBD9E44A337  poc002_esp32_matrix_repeat.py
-53C1CD04F9F2A51D83F88DC2231663738F51727D23401F17F40C538B974F6C7E  poc002_esp32_test.py
-7D1C97E44C66A0BED6C3D53DDE25D22FB7532FB9237B67511E715509760CB242  poc002a_esp32_probe.py
-```
+Files modified for publication are treated as derivatives and retain separate artifact identity from the original tested source.
 
-The deliberately incorrect public verification key is identified by:
+### Provider Derivative
 
-```text
-95EB0D5089B5CEDA23E3CADC7CFB3C0F4AF3FB787712716CFAB46671216311B9  poc002_wrong_trust_anchor_public.pem
-```
+The original provider source was modified for publication sanitation.
 
-## Publication Sanitization
+Original tested artifact:
 
-Environment-specific public network addressing was replaced in publication copies where required.
+    poc002_ed25519_provider.py
+    SHA-256: 8d0430ff07fc938090d43e112b7276b481612491044d7d1f3f68bcb1ef1cd3ee
 
-No test logic was intentionally changed as part of this sanitization.
+Sanitized derivative prepared for publication:
 
-Files modified by sanitization have different SHA-256 digests from their original tested versions and are classified as sanitized publication derivatives.
+    SHA-256: 32c5141e240ee812a1fb8073eda0d96e586829a272fb8f1e613b64ead8e04001
 
-### Provider
+The publication derivative is not represented as byte-identical to the July tested provider source.
 
-Original tested source:
+### Boundary Derivative
 
-```text
-8D0430FF07FC938090D43E112B7276B481612491044D7D1F3F68BCB1EF1CD3EE  poc002_ed25519_provider.py
-```
+A sanitized boundary derivative was also prepared during evidence recovery.
 
-Sanitized publication copy:
+Original tested artifact:
 
-```text
-32C5141E240EE812A1FB8073EDA0D96E586829A272FB8F1E613B64EAD8E04001  poc002_ed25519_provider.py
-```
+    SHA-256: 956e83b03b71c693641a8eee30e9dc8e2db6b8a71de008d052447ce5a06fafc9
 
-The publication copy is therefore not byte-identical to the July tested source.
+Sanitized recovery derivative:
 
-### Boundary
+    SHA-256: b982c8939cfc52b15b54b17d821474ba4beac1c2b829f9b93b8e7edc31461ed0
 
-Original tested source:
+The boundary implementation is not distributed in this POC-002 publication package.
 
-```text
-956E83B03B71C693641A8EEE30E9DC8E2DB6B8A71DE008D052447CE5A06FAFC9  poc002_ed25519_pi_boundary.py
-```
+The derivative digest is retained only to distinguish the recovery copy from the original tested source.
 
-A sanitized derivative prepared during evidence recovery has SHA-256:
+### Unmodified Publication Artifacts
 
-```text
-B982C8939CFC52B15B54B17D821474BA4BEAC1C2B829F9B93B8E7EDC31461ED0  poc002_ed25519_pi_boundary.py
-```
+The following retained artifacts required no content modification during publication preparation:
 
-The boundary implementation is intentionally excluded from the public POC-002 package.
+- `poc002_esp32_test.py`
+- `poc002_esp32_matrix_repeat.py`
+- `poc002a_esp32_probe.py`
+- `poc002_ed25519_public.pem`
+- `poc002_wrong_trust_anchor_public.pem`
 
-The sanitized derivative hash is retained only as part of the recovery record.
+Their original tested identities are recorded in the artifact table above.
 
-### Test Clients
+Current repository-integrity values are maintained in `SHA256SUMS.txt` and are not duplicated here.
 
-The following publication files required no modification and remain byte-identical to the retained original test-host copies:
+## Private Signing Material
 
-```text
-53C1CD04F9F2A51D83F88DC2231663738F51727D23401F17F40C538B974F6C7E  poc002_esp32_test.py
-463D9FDF193ED7B37A99C8EDF1D7BDC5CEB282622E9990B383196CBD9E44A337  poc002_esp32_matrix_repeat.py
-7D1C97E44C66A0BED6C3D53DDE25D22FB7532FB9237B67511E715509760CB242  poc002a_esp32_probe.py
-```
+The original test environment contained the provider Ed25519 private signing key.
 
-### Public-Key Artifacts
+A separate private key existed for the unrelated keypair used during the trust-anchor substitution condition.
 
-The correct provider public key required no publication modification:
+Private signing material is not required to establish the retained public-key correspondence or the observed verification behavior documented in this evidence package.
 
-```text
-2FD9C44A0579B985BC44722313725C8A6FD532B665B617B3E5082EFB14C49F63  poc002_ed25519_public.pem
-```
-
-The deliberately incorrect trust anchor also required no publication modification:
-
-```text
-95EB0D5089B5CEDA23E3CADC7CFB3C0F4AF3FB787712716CFAB46671216311B9  poc002_wrong_trust_anchor_public.pem
-```
-
-Both files contain public verification material only.
-
-## Private-Key Exclusion
-
-The original test environment contained the provider's Ed25519 private signing key.
-
-A separate private key existed for the unrelated keypair used during the trust-anchor substitution test.
-
-Neither private key is included in the public repository.
-
-The public package contains only the corresponding public verification material required to document the tested trust relationships.
-
-Private-key exclusion is intentional and is not treated as missing evidence.
+Publication status of cryptographic test material is a repository-packaging decision and does not alter the original POC-002 test result.
 
 ## Runtime Evidence Status
 
 No original interactive POC-002 terminal transcript was located during evidence recovery.
 
-The Raspberry Pi was examined for POC-002 and POC-002A artifacts and for files associated with the July 19–20 test period.
+The original Raspberry Pi was examined for POC-002 artifacts and retained runtime output associated with the July 19–20 test period.
 
-The surviving Pi-side artifacts identified were:
+Surviving Pi-side artifacts included:
 
-```text
-poc002_ed25519_pi_boundary.py
-poc002_ed25519_public.pem
-poc002_ed25519_public_correct.pem
-poc002_ed25519_public_wrong.pem
-```
+- the original boundary source;
+- the active provider public verification key;
+- a preserved correct-key copy;
+- the deliberately incorrect trust anchor.
 
 No retained POC-002 runtime-output file was identified.
 
-The Raspberry Pi shell history contained extensive later NUVL test activity but did not identify a retained POC-002 terminal log or redirected POC-002 runtime-output file.
+The Raspberry Pi shell history contained later NUVL activity but did not identify a retained POC-002 terminal transcript or redirected runtime-output file.
 
-Accordingly, `RESULTS.md` records the observed results preserved in the contemporaneous laboratory record.
+Behavioral and numerical observations in `RESULTS.md` therefore derive from the contemporaneous laboratory record.
 
-`RESULTS.md` is not a reconstructed terminal transcript and is not represented as raw runtime evidence.
+`RESULTS.md` is not represented as reconstructed raw terminal evidence.
 
 ## Evidence Classification
 
-### Original Tested Source
+**Original tested source**  
+Source retained from the July 19–20 test activity and identified by historical artifact identity.
 
-Source retained from the July 19–20 execution and identified by its original SHA-256 digest.
+**Independently retained artifact**  
+An artifact preserved on more than one test system for which byte identity was established through cryptographic comparison.
 
-### Independently Retained Artifact
+**Publication derivative**  
+A post-test copy modified for publication. A derivative maintains separate artifact identity and is not represented as the original tested source.
 
-An artifact preserved on more than one test system for which byte identity is established through matching SHA-256 digests.
+**Contemporaneous result record**  
+Behavioral and numerical observations recorded during or immediately following the original test activity.
 
-The original Raspberry Pi boundary source and correct provider public key fall into this category.
+**Publication integrity record**  
+Current repository artifact integrity maintained in `SHA256SUMS.txt`.
 
-### Sanitized Publication Derivative
+These evidence classes are intentionally separate.
 
-A post-test copy modified solely for publication sanitation.
+A change to repository representation does not alter the historical identity of the original tested artifacts recorded here.
 
-A sanitized derivative has its own SHA-256 digest and is not represented as the original tested artifact.
+## Provenance Assessment
 
-### Contemporaneous Result Record
+The surviving evidence establishes:
 
-Behavioral and numerical results recorded in the laboratory record during or immediately following the original test activity.
+- identity of retained original POC-002 test source;
+- byte identity between independently retained Windows and Raspberry Pi boundary copies;
+- byte identity among independently retained copies of the correct provider public verification key;
+- identity of the deliberately incorrect trust anchor used during POC-002A;
+- explicit separation between original tested source and later publication derivatives;
+- consistency between retained implementation and the contemporaneous laboratory record.
 
-### Publication Manifest
+SHA-256 correspondence establishes byte identity between retained artifacts.
 
-`SHA256SUMS.txt` identifies the exact files distributed in the public GitHub directory.
-
-The publication manifest is distinct from the original tested-source hashes preserved in this provenance record.
-
-## Provenance Limitations
-
-Matching SHA-256 digests establish byte identity between retained artifacts.
-
-They do not independently establish execution time or prove a behavioral test result.
-
-The POC-002 behavioral record therefore consists of the combined evidence provided by:
-
-- surviving original test source;
-- independently retained artifacts;
-- contemporaneous laboratory results;
-- consistency between the recorded test conditions and surviving test implementation.
+It does not independently establish execution chronology or prove behavioral test outcomes.
 
 The absence of the original interactive terminal transcript remains an explicit evidence limitation.
 
-Any later reproduction of POC-002 constitutes a separate execution and requires its own date, runtime evidence, artifact hashes, and reproduction designation. It does not replace or become the original July 19–20, 2026 test record.
+Any later reproduction of POC-002 or POC-002A constitutes a separate execution and requires its own date, runtime evidence, artifact identity, and reproduction designation. It does not replace the July 19–20, 2026 test record.
