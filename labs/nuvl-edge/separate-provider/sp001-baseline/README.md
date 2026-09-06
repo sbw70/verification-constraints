@@ -1,8 +1,10 @@
 # NUVL Separate-Provider Validation
 
+## Purpose
+
 This directory contains validation of NUVL with provider authority hosted on infrastructure physically separate from the NUVL verification/enforcement boundary.
 
-The objective is to test whether provider-controlled bounded authority remains intact when the provider and its private signing key execute on a separate host.
+The objective is to determine whether the existing provider-controlled bounded-authority model remains enforceable when the provider and its private signing key execute on a separate host.
 
 ## Architecture
 
@@ -21,73 +23,96 @@ The separate-provider configuration places the provider and verification/enforce
 
 The provider originates signed authority.
 
-The NUVL boundary may authenticate, evaluate, and enforce that authority, but does not acquire the provider private signing key merely because the provider is remote.
-
+The NUVL boundary receives and evaluates provider-signed authority using public verification material. Physical separation does not require transfer of the provider private signing key to the boundary.
 
 ## Authority Model
 
-Physical separation of the provider does not change the underlying NUVL authority model.
+The separate-provider configuration preserves the existing NUVL authority split:
 
-The provider may originate authority within its configured scope.
+**Provider**
+- originates authority within configured scope;
+- retains private signing authority.
 
-The NUVL boundary may:
+**NUVL boundary**
+- verifies provider signatures;
+- evaluates request and artifact binding;
+- enforces scope, validity, replay, and use restrictions;
+- rejects authority that does not satisfy the configured admission conditions.
 
-- receive provider authority;
-- verify provider signatures;
-- evaluate request and artifact bindings;
-- enforce existing limits;
-- reject inadmissible authority;
-- enforce replay and use restrictions.
+The boundary is not intended to originate or enlarge provider authority within the tested architecture.
 
-The boundary does not gain authority to originate or enlarge provider authority simply because the provider is located on another system.
+Separate-provider testing evaluates whether that authority relationship remains intact when the provider is moved to independent infrastructure.
+
+## Validation Set
+
+Current validation includes:
+
+- `sp001-baseline/` — physically separate provider baseline, including provider-unavailable fail-closed behavior and restoration;
+- `sp002-provider-substitution/` — unauthorized provider substitution using the expected provider position and artifact representation but a different Ed25519 signing key.
+
+Each test directory contains its own scope, results, provenance, evidence, source artifacts, and integrity manifest.
+
+Detailed behavioral claims are maintained within the individual test packages rather than in this parent directory.
+
+## Evidence Model
+
+Individual test packages may contain:
+
+- `README.md` — test purpose, architecture, scope, and claim boundary;
+- `RESULTS.md` — observed test conditions and outcomes;
+- `PROVENANCE.md` — artifact lineage and original/tested-source identity;
+- source and configuration artifacts required for reproduction;
+- captured runtime evidence where retained;
+- `SHA256SUMS.txt` — integrity manifest for the published package.
+
+Later reproduction or validation evidence is identified separately from original test-time evidence.
+
+No reconstructed output is represented as original runtime evidence.
 
 ## Test Key Material
 
-Laboratory Ed25519 key material may be included in individual test packages for reproducibility.
+Laboratory Ed25519 key material included in an individual test package is test-only material.
 
-Any published key material in this directory is test-only material with no production, operational, account, identity, or external trust relationship.
+It has no production, operational, account, identity, or external trust relationship.
 
-Published test private keys are intentionally non-secret and exist solely to reproduce the laboratory authority relationship.
-
-## Evidence
-
-Individual test directories contain their own:
-
-- test description;
-- results;
-- provenance;
-- source files;
-- test key material where applicable;
-- captured evidence where available;
-- SHA-256 manifests.
-
-Evidence generated during later validation should be identified separately from evidence produced during an original interactive run.
-
-Current validation:
-
-- `sp001-baseline/` — physically separate Ed25519 provider baseline, including provider-unavailable fail-closed behavior and restoration.
+Publication of test key material is a reproducibility decision and does not alter the authority model evaluated by the test.
 
 ## Scope
 
-The separate-provider work evaluates provider placement, trust separation, and the preservation of bounded provider authority across that separation.
+Separate-provider validation evaluates:
 
-A completed test supports only the properties actually exercised by that test.
+- physical separation of provider and enforcement infrastructure;
+- retention of provider private signing authority on the provider host;
+- public-key verification at the NUVL boundary;
+- behavior during provider unavailability and restoration;
+- behavior when an unauthorized provider occupies the expected provider position but cannot produce signatures valid under the configured trust anchor.
 
-This directory does not, by itself, establish:
+A completed test supports only the properties directly exercised by that test.
 
-- resistance to arbitrary compromise of the NUVL boundary;
-- endpoint-side Ed25519 verification;
-- resistance to all malicious intermediaries;
+This validation set does not, by itself, establish:
+
+- security after arbitrary privileged compromise of the NUVL boundary;
+- endpoint-local Ed25519 verification;
+- resistance to every malicious-intermediary condition;
 - production infrastructure security;
 - production key-management security;
-- provider high availability.
-
-Additional conditions may be tested independently without requiring a predetermined numbered test schedule.
+- provider high availability;
+- protection of mutable trust configuration against privileged modification.
 
 ## Relationship to Existing NUVL Evidence
 
-Separate-provider validation builds on the existing NUVL provider-authenticity and bounded-authority evidence.
+Separate-provider validation builds on the provider-authenticity and bounded-authority properties established by earlier NUVL proofs.
 
-The principal architectural variable introduced by SP-001 is physical separation of the provider authority source from the verification/enforcement boundary.
+The principal variable introduced by SP-001 is physical separation of the provider authority source from the verification/enforcement boundary.
 
-The bounded-authority invariant remains unchanged.
+SP-002 then evaluates a distinct condition: whether occupying the expected provider network position is sufficient to obtain authority without possession of signing material trusted by the boundary.
+
+Across both tests, the governing invariant remains:
+
+    provider originates bounded authority
+                 |
+                 v
+    boundary may verify and enforce
+                 |
+                 v
+    boundary does not receive provider signing authority
