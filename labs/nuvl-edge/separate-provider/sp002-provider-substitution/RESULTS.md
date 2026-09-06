@@ -4,89 +4,85 @@
 
 **PASS**
 
-SP-002 demonstrated that occupying the expected provider network/service position was insufficient to originate authority accepted by the NUVL boundary.
+SP-002 evaluated whether occupying the expected provider network and service position was sufficient to originate authority accepted by the NUVL boundary.
 
-An unauthorized substitute provider operated at the provider address and produced a structurally valid Ed25519-signed artifact using the expected provider representation. The Raspberry Pi boundary retained its existing legitimate public trust anchor.
+An unauthorized substitute provider reproduced the expected provider-facing representation and produced a structurally valid Ed25519-signed artifact using an unrelated signing key.
+
+The Raspberry Pi boundary retained the legitimate provider public trust anchor throughout the substitution.
 
 The substitute artifact was rejected because its signature did not verify against that trust anchor.
 
-After the legitimate provider was restored, verified issuance resumed through the same boundary.
-
----
+After restoration of the legitimate provider, verified issuance resumed through the same boundary.
 
 ## Test Sequence
 
 ### 1. Legitimate Provider Baseline
 
-The legitimate provider was running at:
+The legitimate provider was operating at:
 
-`http://192.168.0.240:8091`
+    http://192.168.0.240:8091
 
 A request was submitted through the Raspberry Pi boundary using:
 
-- `device_id: esp32-field-01`
-- `context: field_led_demo`
-- `requested_action: accept`
-- `nonce: sp002-rerun-legitimate`
+    device_id: esp32-field-01
+    context: field_led_demo
+    requested_action: accept
+    nonce: sp002-rerun-legitimate
 
-Result:
+Observed:
 
-- `artifact_id: 984c0e8fff05cf1f4692c38d`
-- `decision: issued`
-- `provider_verified: true`
-- `reason: provider_signed_bounded_artifact`
+    artifact_id: 984c0e8fff05cf1f4692c38d
+    decision: issued
+    provider_verified: true
+    reason: provider_signed_bounded_artifact
 
 The returned artifact identified:
 
-- `alg: Ed25519`
-- `provider_id: laptop-ed25519-provider-01`
-- `decision: accepted`
-- `max_uses: 1`
-- `offline_allowed: true`
+    alg: Ed25519
+    provider_id: laptop-ed25519-provider-01
+    decision: accepted
+    max_uses: 1
+    offline_allowed: true
 
-**Baseline result: PASS**
+**Result: PASS**
 
 The legitimate provider's signed authority was accepted by the unchanged boundary.
-
----
 
 ### 2. Unauthorized Provider Substitution
 
 The legitimate provider was stopped.
 
-An unauthorized substitute provider was then started at the same provider service position.
+An unauthorized substitute provider was then started at the expected provider service position.
 
-The substitute preserved the expected provider-facing representation, including:
+The substitute reproduced relevant provider-facing characteristics, including:
 
-- `provider_id: laptop-ed25519-provider-01`
-- `context: field_led_demo`
-- `alg: Ed25519`
-- `max_uses: 1`
-- `offline_allowed: true`
+    provider_id: laptop-ed25519-provider-01
+    context: field_led_demo
+    alg: Ed25519
+    max_uses: 1
+    offline_allowed: true
 
-The substitute used a different Ed25519 private signing key.
+The substitute used an unrelated Ed25519 private signing key.
 
-The Raspberry Pi boundary's legitimate public trust anchor was not replaced.
+The Raspberry Pi boundary trust anchor was not changed.
 
-A new request was submitted through the boundary using:
+A new request was submitted using:
 
-- `device_id: esp32-field-01`
-- `context: field_led_demo`
-- `requested_action: accept`
-- `nonce: sp002-rerun-unauthorized`
+    device_id: esp32-field-01
+    context: field_led_demo
+    requested_action: accept
+    nonce: sp002-rerun-unauthorized
 
-Result:
+Observed:
 
-- `artifact_id: 0c422920aea5d0a91289a9d0`
-- `decision: denied`
-- `provider_verified: false`
-- `reason: invalid_provider_signature`
+    artifact_id: 0c422920aea5d0a91289a9d0
+    decision: denied
+    provider_verified: false
+    reason: invalid_provider_signature
 
-**Unauthorized substitution result: PASS**
+**Result: PASS**
 
-The substitute provider could produce an artifact with the expected structure and provider representation, but it could not produce authority accepted by the boundary because it did not possess the legitimate provider signing key.
-
----
+The substitute produced an artifact with the expected representation but did not produce authority accepted by the boundary.
 
 ### 3. Legitimate Provider Restoration
 
@@ -96,127 +92,95 @@ The legitimate provider was restarted without changing the Raspberry Pi boundary
 
 A new request was submitted using:
 
-- `device_id: esp32-field-01`
-- `context: field_led_demo`
-- `requested_action: accept`
-- `nonce: sp002-rerun-restored`
+    device_id: esp32-field-01
+    context: field_led_demo
+    requested_action: accept
+    nonce: sp002-rerun-restored
 
-Result:
+Observed:
 
-- `artifact_id: a1dce6c1aa6dc9398eb4330b`
-- `decision: issued`
-- `provider_verified: true`
-- `reason: provider_signed_bounded_artifact`
+    artifact_id: a1dce6c1aa6dc9398eb4330b
+    decision: issued
+    provider_verified: true
+    reason: provider_signed_bounded_artifact
 
-**Restoration result: PASS**
+**Result: PASS**
 
-Verified authority issuance resumed after restoration of the legitimate provider.
-
----
+Verified provider issuance resumed after restoration of the legitimate provider.
 
 ## Observed Matrix
 
 | Condition | Decision | Provider Verified | Reason | Result |
 |---|---|---:|---|---|
-| Legitimate provider | issued | true | provider_signed_bounded_artifact | PASS |
-| Unauthorized substitute provider | denied | false | invalid_provider_signature | PASS |
-| Legitimate provider restored | issued | true | provider_signed_bounded_artifact | PASS |
+| Legitimate provider | issued | true | `provider_signed_bounded_artifact` | PASS |
+| Unauthorized substitute provider | denied | false | `invalid_provider_signature` | PASS |
+| Legitimate provider restored | issued | true | `provider_signed_bounded_artifact` | PASS |
 
-Overall:
+**Overall Result: PASS — 3/3 expected conditions observed.**
 
-`3/3 expected conditions observed — PASS`
+## Trust-State Control
 
----
+The same Raspberry Pi verification boundary and legitimate Ed25519 public trust anchor remained in place during:
 
-## Boundary and Trust State
+1. legitimate-provider baseline;
+2. unauthorized-provider substitution;
+3. legitimate-provider restoration.
 
-The test used the separate-provider boundary derivative:
+The trust anchor was not replaced as part of the substitution condition.
 
-`sp001_separate_provider_boundary.py`
-
-SHA-256:
-
-`f35855d54933ee1f188576d9a8dc0eb9c30f8e7a5de821772f929df9cb801637`
-
-The boundary used the legitimate Ed25519 public trust anchor:
-
-`poc002_ed25519_public.pem`
-
-SHA-256:
-
-`2fd9c44a0579b985bc44722313725c8a6fd532b665b617b3e5082efb14c49f63`
-
-The trust anchor remained unchanged during provider substitution and restoration.
-
----
-
-## Unauthorized Provider Artifacts
-
-Unauthorized provider implementation:
-
-`sp002_unauthorized_provider.py`
-
-SHA-256:
-
-`ad049085e8470b3fc17eb9089d3ade85db03bb05b21764f6d304a0c07d2f1703`
-
-Unauthorized test signing key:
-
-`sp002_unauthorized_private.pem`
-
-SHA-256:
-
-`dfb7da42fa074f8f68916f52780e310c3797e4da2caa674c5b0427324f0ad57d`
-
-The unauthorized signing key is a disposable test key used only to reproduce the provider-substitution condition.
-
----
+This distinguishes SP-002 from a trust-anchor substitution test.
 
 ## Runtime Evidence
 
-Clean rerun evidence:
+The retained runtime record is:
 
-`evidence/sp002_rerun_evidence.log`
+    evidence/sp002_rerun_evidence.log
 
-Size:
+The transcript captures the complete three-phase sequence:
 
-`3527 bytes`
+1. legitimate provider accepted;
+2. unauthorized substitute rejected;
+3. legitimate provider restored and accepted.
 
-SHA-256:
-
-`3420bcd631a0ffeae8d6086467df7c223d9d25c5fd3746b79dfad3ddb07bd148`
-
-The evidence captures the legitimate baseline, unauthorized-provider rejection, and legitimate-provider restoration sequence.
-
----
+Artifact identity and integrity information for the evidence file are maintained in `PROVENANCE.md` and `SHA256SUMS.txt`.
 
 ## Demonstrated Property
 
-SP-002 demonstrates that provider network position and provider representation are not sufficient to establish authority.
+SP-002 demonstrated that, within the tested configuration, provider network position and provider-facing representation were not sufficient to obtain accepted provider authority.
 
-The enforcement boundary accepted authority from the legitimate provider whose signatures verified against the configured trust anchor and rejected authority generated by a substitute provider using a different signing key.
+The legitimate provider produced authority that verified against the configured trust anchor.
 
-In this tested configuration:
+The unauthorized substitute reproduced the expected service position and artifact representation but signed with an unrelated key. The boundary rejected that authority with:
 
-`provider position != provider authority`
+    provider_verified: false
+    reason: invalid_provider_signature
 
-`provider identity representation != cryptographic authority`
+The tested distinction was:
 
-Possession of the expected address, service interface, artifact format, and provider identifier did not allow the substitute provider to originate authority accepted by the boundary.
+    provider position != provider authority
 
----
+    provider representation != cryptographic authority
 
-## Scope and Limitations
+Possession of the expected address, service interface, artifact format, and provider identifier did not substitute for possession of signing material corresponding to the boundary's configured trust anchor.
 
-SP-002 specifically tests unauthorized provider substitution against an unchanged verification boundary and unchanged legitimate public trust anchor.
+## Supported Claim
 
-It does not independently demonstrate:
+SP-002 supports the bounded claim that, within the tested configuration:
+
+- authority from the legitimate provider was accepted;
+- a substitute provider occupying the expected provider position was rejected when its signature did not verify against the unchanged legitimate trust anchor;
+- restoration of the legitimate provider restored verified issuance without changing the boundary trust anchor.
+
+## Claim Boundary
+
+SP-002 does not establish:
 
 - protection of the Raspberry Pi trust-anchor file against privileged modification;
-- resistance to arbitrary compromise of the verification/enforcement boundary itself;
+- security after arbitrary privileged compromise of the verification/enforcement boundary;
 - endpoint-local Ed25519 verification;
-- rejection of every possible replay of a previously legitimate artifact;
+- rejection of every possible replay of previously legitimate authority;
 - transport-layer authentication of the provider connection;
-- protection against denial-of-service by an unauthorized provider occupying the expected network position.
+- resistance to denial-of-service at the provider network position;
+- resistance to every possible malicious intermediary behavior.
 
-Those properties require separate tests or controls.
+Those properties require separate evidence.
