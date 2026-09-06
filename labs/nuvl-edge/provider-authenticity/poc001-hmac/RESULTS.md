@@ -2,15 +2,15 @@
 
 ## Summary
 
-POC-001 tested bounded disconnected authority during provider unavailability using HMAC-SHA256 authenticated artifacts.
+POC-001 evaluated bounded disconnected authority during temporary provider unavailability using HMAC-SHA256 authenticated artifacts.
 
-The test established a provider-first normal path and a bounded fallback path in which a previously issued artifact could authorize one matching request while the provider was unavailable.
+The test exercised a provider-first normal path and a bounded disconnected path in which a previously issued artifact could authorize one matching request while the provider was unavailable.
 
-The original test was performed July 11, 2026.
+The original test was performed on July 11, 2026.
 
 ## Test Sequence
 
-The recorded test sequence exercised:
+The recorded sequence exercised:
 
 1. provider-reachable baseline;
 2. provider unavailable with a valid bounded artifact;
@@ -21,131 +21,12 @@ The recorded test sequence exercised:
 7. expired artifact;
 8. provider restoration.
 
-## Provider-Reachable Baseline
-
-With the provider reachable, the request followed the normal provider-first path.
-
-The configured action and context were evaluated by the provider.
-
-**Observed result: ACCEPT.**
-
-This established the normal provider-backed baseline before testing disconnected behavior.
-
-## Provider Unavailable — Valid Bounded Artifact
-
-A provider-issued artifact was obtained before provider loss.
-
-The artifact contained authenticated constraints including:
-
-```text
-action
-context
-nonce
-issued_at
-expires_at
-max_uses=1
-request_repr
-```
-
-The provider was then made unavailable.
-
-A request matching the artifact's action and context was submitted through the Raspberry Pi boundary while the artifact remained unexpired and unused.
-
-The boundary validated the artifact through the bounded provider-unavailable path.
-
-**Observed result: ACCEPT.**
-
-The accepted bounded-path condition corresponded to:
-
-```text
-decision=accepted
-reason=bounded_artifact_valid_once
-path=provider_unavailable_bounded_window
-```
-
-## Replay
-
-The same bounded artifact was submitted again after its successful use.
-
-The artifact nonce had already been entered into the boundary's used-nonce state.
-
-**Observed result: DENY.**
-
-The replay condition corresponded to:
-
-```text
-reason=artifact_replay
-```
-
-The artifact therefore produced one accepted disconnected use during the running boundary process.
-
-## Missing Artifact
-
-A request was submitted during provider unavailability without a bounded artifact.
-
-**Observed result: DENY.**
-
-The missing-artifact condition corresponded to:
-
-```text
-reason=missing_artifact
-path=provider_unavailable_fail_closed
-```
-
-Provider unavailability alone did not produce acceptance.
-
-## Wrong Context
-
-A bounded artifact was presented against a context outside the context encoded into the artifact.
-
-**Observed result: DENY.**
-
-The context mismatch corresponded to:
-
-```text
-reason=artifact_wrong_context
-```
-
-## Wrong Action
-
-A bounded artifact was presented against an action outside the action encoded into the artifact.
-
-**Observed result: DENY.**
-
-The action mismatch corresponded to:
-
-```text
-reason=artifact_wrong_action
-```
-
-## Expired Artifact
-
-A bounded artifact was presented after its validity window had expired.
-
-**Observed result: DENY.**
-
-The expiration condition corresponded to:
-
-```text
-reason=artifact_expired
-```
-
-## Provider Restoration
-
-Provider service was restored after the provider-unavailable test conditions.
-
-Normal provider-backed validation resumed.
-
-**Observed result: ACCEPT.**
-
-The test therefore returned from the bounded disconnected path to the normal provider-first path after provider availability was restored.
-
-## Consolidated Results
+## Results
 
 | Test condition | Expected | Observed |
 |---|---|---|
 | Provider reachable baseline | ACCEPT | ACCEPT |
-| Provider unavailable + valid unexpired unused artifact | ACCEPT once | ACCEPT |
+| Provider unavailable with valid, unexpired, unused artifact | ACCEPT once | ACCEPT |
 | Replay of consumed artifact | DENY | DENY |
 | Missing artifact | DENY | DENY |
 | Wrong context | DENY | DENY |
@@ -153,174 +34,219 @@ The test therefore returned from the bounded disconnected path to the normal pro
 | Expired artifact | DENY | DENY |
 | Provider restored | ACCEPT | ACCEPT |
 
-**Result: PASS for all recorded POC-001 conditions.**
+**Overall result: PASS**
 
-## Fail-Closed Conditions
+All recorded POC-001 conditions produced the expected behavior.
 
-The surviving boundary implementation contains explicit denial paths for:
+## Provider-Reachable Baseline
 
-```text
-missing_artifact
-artifact_decode_failed
-artifact_signature_invalid
-artifact_wrong_action
-artifact_wrong_context
-artifact_request_binding_invalid
-artifact_expired
-artifact_not_single_use
-artifact_missing_nonce
-artifact_replay
-```
+With the provider reachable, the request followed the normal provider-first path.
 
-Not every implementation-level denial reason above was a separately recorded POC-001 test case.
+The configured action and context were evaluated by the provider.
 
-The recorded behavioral test set specifically established denial for:
+**Observed result: ACCEPT**
 
-- replay;
+This established the provider-backed baseline before disconnected operation was exercised.
+
+## Provider-Unavailable — Valid Bounded Artifact
+
+A bounded artifact was issued before provider loss.
+
+The artifact included authenticated constraints for:
+
+- action;
+- context;
+- nonce;
+- issuance time;
+- expiration time;
+- maximum use count;
+- request representation.
+
+The provider was then made unavailable.
+
+A matching request was submitted while the artifact remained valid and unused.
+
+**Observed result: ACCEPT**
+
+The bounded-path response reported:
+
+    decision=accepted
+    reason=bounded_artifact_valid_once
+    path=provider_unavailable_bounded_window
+
+The artifact was admitted for one matching request during provider unavailability.
+
+## Replay
+
+The same artifact was submitted again after successful use.
+
+**Observed result: DENY**
+
+The response reported:
+
+    reason=artifact_replay
+
+This established single-use behavior during the lifetime of the running boundary process.
+
+## Missing Artifact
+
+A request was submitted during provider unavailability without a bounded artifact.
+
+**Observed result: DENY**
+
+The response reported:
+
+    reason=missing_artifact
+    path=provider_unavailable_fail_closed
+
+Provider unavailability alone did not authorize the request.
+
+## Wrong Context
+
+An artifact was presented for a context different from the context encoded in the artifact.
+
+**Observed result: DENY**
+
+The response reported:
+
+    reason=artifact_wrong_context
+
+## Wrong Action
+
+An artifact was presented for an action different from the action encoded in the artifact.
+
+**Observed result: DENY**
+
+The response reported:
+
+    reason=artifact_wrong_action
+
+## Expired Artifact
+
+An artifact was presented after expiration.
+
+**Observed result: DENY**
+
+The response reported:
+
+    reason=artifact_expired
+
+## Provider Restoration
+
+Provider service was restored after the disconnected-path conditions.
+
+Normal provider-backed validation resumed.
+
+**Observed result: ACCEPT**
+
+The test therefore returned from bounded disconnected operation to the normal provider-first path without introducing a permanent local authorization mode.
+
+## Fail-Closed Assessment
+
+The recorded test directly established denial for:
+
+- replayed artifact;
 - missing artifact;
 - wrong context;
 - wrong action;
 - expired artifact.
 
-The remaining implementation paths are documented as surviving source behavior rather than claimed as independently exercised POC-001 results.
+The surviving boundary implementation contains additional denial paths for malformed or otherwise inadmissible artifacts.
 
-## Single-Use Result
+Those implementation paths are not claimed as separately exercised POC-001 results unless supported by the contemporaneous test record.
 
-The bounded artifact specified:
+## Single-Use Assessment
 
-```text
-max_uses=1
-```
+The tested artifact specified a maximum use count of one.
 
-After successful validation, its nonce was recorded in the boundary's in-memory used-nonce state.
+After successful disconnected acceptance, subsequent use of the same artifact was denied as replay.
 
-A second use was denied.
+This supports single-use enforcement during the running boundary process.
 
-This result supports single-use enforcement during the running boundary process.
+POC-001 does not establish persistence of spent state across boundary restart or power loss.
 
-It does not establish persistent single-use enforcement after boundary restart or power loss.
+## Provider-Unavailable Assessment
 
-## Provider-Unavailable Result
+The provider-unavailable condition did not create general local acceptance authority.
 
-The provider-unavailable condition did not create a general local acceptance mode.
+Observed behavior was:
 
-The boundary accepted only when the previously issued bounded artifact passed the required validation checks.
-
-Without an admissible artifact, the provider-unavailable path denied the request.
-
-The tested behavior was therefore:
-
-```text
-provider reachable
-        |
-        v
-provider-backed validation
-        |
-        v
-ACCEPT
+    provider reachable
+            |
+            v
+    provider-backed validation
+            |
+            v
+    ACCEPT
 
 
-provider unavailable
-        |
-        v
-valid bounded artifact
-        |
-        v
-ACCEPT ONCE
+    provider unavailable
+            |
+            v
+    valid bounded artifact
+            |
+            v
+    ACCEPT ONCE
 
 
-provider unavailable
-        |
-        v
-missing / invalid / expired /
-mismatched / replayed artifact
-        |
-        v
-DENY
-```
+    provider unavailable
+            |
+            v
+    missing / invalid / expired /
+    mismatched / replayed artifact
+            |
+            v
+    DENY
 
-## HMAC Authority Limitation
+Acceptance during provider loss therefore depended on previously issued bounded authority rather than provider unavailability itself.
+
+## HMAC Trust Limitation
 
 POC-001 used a shared HMAC secret.
 
-The provider used that secret to authenticate bounded artifacts.
+The provider used that secret to authenticate bounded artifacts, and the Raspberry Pi boundary possessed the same secret in order to validate them.
 
-The Raspberry Pi boundary possessed the same secret in order to validate them.
+This architecture does not establish exclusive provider cryptographic issuance authority because the boundary possessed cryptographic material capable of generating valid HMAC authentication values.
 
-Consequently, the POC-001 cryptographic arrangement did not restrict artifact origination exclusively to the provider.
+This limitation affects the authority-separation claim, not the observed bounded-disconnected behavior.
 
-The boundary possessed cryptographic material sufficient to calculate valid HMAC authentication values.
-
-This does not invalidate the behavioral result of the bounded disconnected test.
-
-It limits the authority-separation claim that can be made from POC-001.
-
-POC-002 subsequently replaced this shared-secret arrangement with Ed25519 provider signing and public-key verification at the boundary.
+POC-002 subsequently replaced the shared-secret relationship with Ed25519 provider signing and public-key verification at the boundary.
 
 ## Evidence Status
 
-The original interactive terminal transcript from the July 11, 2026 execution is not included in this package.
+The original interactive terminal transcript from the July 11, 2026 execution was not retained.
 
-The behavioral results in this document are preserved from the contemporaneous NUVL hardware laboratory record.
+The behavioral results documented here derive from the contemporaneous NUVL hardware laboratory record.
 
-The surviving implementation artifacts include:
+No reconstructed terminal output is represented as original runtime evidence.
 
-```text
-ddil_provider.py
-ddil_boundary.py
-```
+Artifact identity, cross-host correspondence, and publication status are documented separately in `PROVENANCE.md`.
 
-The provider implementation is included in the public package.
+## Supported Result
 
-The boundary implementation remains outside the public package.
+POC-001 demonstrated, within the tested HMAC architecture:
 
-The original boundary source survives independently on the Windows test host and Raspberry Pi with matching SHA-256:
-
-```text
-7bd3b443caf4c5b8d88b70db9cbb8b4ec28df6fcdbbe301ba7cb402cfbb2905d
-```
-
-The original provider source has SHA-256:
-
-```text
-97aad386e48813488047503030de277d165a4a9040d758d7679d330a7ba0ebeb
-```
-
-See `PROVENANCE.md` for artifact-level provenance.
-
-## Interpretation
-
-POC-001 demonstrated that a previously issued, time-limited, request-bound artifact could provide narrowly bounded authority during temporary provider unavailability.
-
-The recorded test established:
-
-- normal provider-backed acceptance;
-- acceptance of a valid bounded artifact during provider loss;
-- denial of artifact replay;
-- denial without an artifact;
-- denial for wrong context;
-- denial for wrong action;
-- denial after artifact expiration;
-- restoration of normal provider-backed acceptance.
-
-The experiment also identified a material trust-placement limitation: HMAC verification required the boundary to possess the same secret used to authenticate artifacts.
-
-POC-001 therefore established the bounded disconnected behavior but did not establish exclusive provider cryptographic issuance authority.
+- provider-backed acceptance during normal availability;
+- one-time acceptance of valid bounded authority during provider unavailability;
+- replay denial;
+- denial when no artifact was supplied;
+- context binding;
+- action binding;
+- expiration enforcement;
+- fail-closed behavior when valid bounded authority was absent;
+- restoration of provider-backed operation after provider recovery.
 
 ## Claim Boundary
 
-POC-001 supports a bounded disconnected-authority behavioral result under the tested HMAC architecture.
-
-It does not establish:
+POC-001 does not establish:
 
 - exclusive provider signing authority;
 - asymmetric provider authenticity;
-- persistent replay protection across boundary restart;
-- replay protection across power loss;
+- persistent replay protection across restart or power loss;
 - crash-safe spent-state persistence;
 - multi-boundary double-spend resistance;
-- direct cryptographic verification at the ESP32;
+- endpoint-local cryptographic verification;
 - exactly-once physical execution;
-- security after arbitrary privileged compromise of the Raspberry Pi boundary.
+- protection against arbitrary privileged compromise of the Raspberry Pi boundary.
 
 Those properties require separate evidence.
