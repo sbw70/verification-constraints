@@ -1,347 +1,304 @@
-# SP-002 Provenance — Unauthorized Provider Substitution
+# SP-002 — Provenance
 
 ## Purpose
 
-SP-002 evaluates whether control of the expected provider network and service position is sufficient to originate authority accepted by the NUVL verification boundary.
+This document records artifact identity, cryptographic relationships, test-host configuration, and runtime-evidence provenance for the SP-002 unauthorized-provider-substitution test.
 
-The test substitutes an unauthorized Ed25519 provider while preserving the expected provider-facing service, provider identifier, artifact structure, and request semantics. The verification boundary and its legitimate public trust anchor remain unchanged.
+SP-002 replaced the legitimate provider with an unauthorized substitute while preserving the Raspberry Pi verification boundary and its configured legitimate Ed25519 public trust anchor.
 
-The resulting evidence isolates cryptographic signing authority from network position and provider representation.
-
----
+Behavioral test conditions and observed outcomes are documented separately in `RESULTS.md`.
 
 ## Test Architecture
 
-SP-002 used three relevant trust components:
+SP-002 used:
 
-1. a separately hosted provider service;
-2. a Raspberry Pi verification boundary;
-3. an Ed25519 public trust anchor retained by the verification boundary.
+- a separate Linux provider host;
+- a Raspberry Pi NUVL verification boundary;
+- an Ed25519 public trust anchor retained by the boundary.
 
-The provider service was reachable by the boundary at:
+The provider service position was:
 
-`192.168.0.240:8091`
+    192.168.0.240:8091
 
-The verification boundary operated independently on the Raspberry Pi and identified the configured provider as:
+The Raspberry Pi boundary was configured to contact:
 
-`http://192.168.0.240:8091`
+    http://192.168.0.240:8091
 
-During the substitution phase, the service occupying that provider position changed. The boundary verification configuration did not.
+During the substitution condition, the process occupying that provider position changed.
 
----
+The boundary implementation and configured legitimate trust anchor remained unchanged.
 
 ## Provider Host
 
-Provider services executed on a separate Linux host:
+Provider services executed on:
 
 - Hostname: `Xer0trust2`
 - Address: `192.168.0.240`
-- Provider port: `8091`
+- Port: `8091`
 - Python: `3.12.3`
 
 The legitimate and unauthorized providers occupied the same host and service position sequentially.
 
 Only one provider process occupied port `8091` during each test phase.
 
-This arrangement allowed provider implementation and signing authority to change without changing the network destination used by the verification boundary.
+This arrangement allowed provider implementation and signing authority to change while preserving the network destination used by the verification boundary.
 
----
+## Artifact Identity
+
+The principal SP-002 artifacts were identified as follows:
+
+| Artifact | Role | Original/Test SHA-256 |
+|---|---|---|
+| `sp001_separate_provider_boundary.py` | Verification boundary | `f35855d54933ee1f188576d9a8dc0eb9c30f8e7a5de821772f929df9cb801637` |
+| `poc002_ed25519_public.pem` | Legitimate boundary trust anchor | `2fd9c44a0579b985bc44722313725c8a6fd532b665b617b3e5082efb14c49f63` |
+| `poc003_ed25519_provider_1h.py` | Legitimate provider implementation | `e7206aeb42a4b2f903cdf01d21604e2d19a7d0a2a79962e55982524de69c4d62` |
+| `sp002_unauthorized_provider.py` | Unauthorized substitute provider | `ad049085e8470b3fc17eb9089d3ade85db03bb05b21764f6d304a0c07d2f1703` |
+| `sp002_unauthorized_private.pem` | Unauthorized test signing key | `dfb7da42fa074f8f68916f52780e310c3797e4da2caa674c5b0427324f0ad57d` |
+| `sp002_rerun_evidence.log` | Retained three-phase runtime evidence | `3420bcd631a0ffeae8d6086467df7c223d9d25c5fd3746b79dfad3ddb07bd148` |
+
+These values identify the artifacts used or captured during the SP-002 test activity.
+
+They are historical test/provenance values and are distinct from current repository-integrity values maintained in `SHA256SUMS.txt`.
 
 ## Verification Boundary
 
-The Raspberry Pi boundary reported:
+SP-002 reused:
 
-`poc004_persistent_replay_pi`
+    sp001_separate_provider_boundary.py
 
-The SP-002 test used the separate-provider boundary derivative:
+The boundary was configured for the separate provider at:
 
-`sp001_separate_provider_boundary.py`
-
-SHA-256:
-
-`f35855d54933ee1f188576d9a8dc0eb9c30f8e7a5de821772f929df9cb801637`
-
-The boundary was configured to contact:
-
-`http://192.168.0.240:8091`
-
-The same boundary implementation remained in service across the legitimate-provider baseline, unauthorized-provider substitution, and legitimate-provider restoration phases.
+    http://192.168.0.240:8091
 
 No SP-002 modification to the boundary verification logic was required.
 
----
+The same boundary implementation remained in service across:
+
+1. legitimate-provider baseline;
+2. unauthorized-provider substitution;
+3. legitimate-provider restoration.
 
 ## Legitimate Trust Anchor
 
-Provider signatures were evaluated against the Ed25519 public key:
+The Raspberry Pi boundary used:
 
-`poc002_ed25519_public.pem`
+    poc002_ed25519_public.pem
 
-SHA-256:
+This public key represented the legitimate provider trust relationship.
 
-`2fd9c44a0579b985bc44722313725c8a6fd532b665b617b3e5082efb14c49f63`
-
-This public key represented the legitimate provider trust relationship at the verification boundary.
-
-The trust anchor was not replaced during provider substitution.
+The trust anchor was not replaced during the provider-substitution condition.
 
 The unauthorized provider key was not added to the boundary trust configuration.
 
-This distinction is central to SP-002: the provider implementation and signing key changed while the verifier and configured trust relationship remained constant.
-
----
+SP-002 therefore changed the provider-side signing authority while preserving the verifier-side trust relationship.
 
 ## Legitimate Provider
 
-The legitimate provider implementation used for the baseline and restoration phases was:
+The legitimate provider implementation was:
 
-`poc003_ed25519_provider_1h.py`
+    poc003_ed25519_provider_1h.py
 
-SHA-256:
+It used the private Ed25519 signing key corresponding to the public verification key configured at the Raspberry Pi boundary.
 
-`e7206aeb42a4b2f903cdf01d21604e2d19a7d0a2a79962e55982524de69c4d62`
+Relevant provider-facing characteristics included:
 
-The legitimate provider used the private Ed25519 signing key corresponding to the public trust anchor held by the Raspberry Pi boundary.
+    service port: 8091
+    provider_id: laptop-ed25519-provider-01
+    context: field_led_demo
+    algorithm: Ed25519
+    max_uses: 1
+    offline_allowed: true
 
-Relevant provider and artifact characteristics included:
-
-- service port `8091`;
-- provider identifier `laptop-ed25519-provider-01`;
-- context `field_led_demo`;
-- Ed25519 signatures;
-- bounded artifact issuance;
-- `max_uses: 1`;
-- `offline_allowed: true`.
-
-A legitimate provider artifact therefore possessed both the expected representation and a signature verifiable under the configured trust anchor.
-
----
+The same legitimate provider implementation was used for the baseline and restoration phases.
 
 ## Unauthorized Substitute Provider
 
 The substitution condition used:
 
-`sp002_unauthorized_provider.py`
+    sp002_unauthorized_provider.py
 
-SHA-256:
+The substitute reproduced relevant provider-facing characteristics of the legitimate provider, including:
 
-`ad049085e8470b3fc17eb9089d3ade85db03bb05b21764f6d304a0c07d2f1703`
+    service port: 8091
+    provider_id: laptop-ed25519-provider-01
+    context: field_led_demo
+    algorithm: Ed25519
+    max_uses: 1
+    offline_allowed: true
 
-The substitute provider intentionally reproduced the provider-facing characteristics required to make network position and representation insufficient discriminators.
+The substitute signed with:
 
-Relevant configuration included:
+    sp002_unauthorized_private.pem
 
-- host binding `0.0.0.0`;
-- service port `8091`;
-- provider identifier `laptop-ed25519-provider-01`;
-- expected context `field_led_demo`;
-- Ed25519 artifact signatures;
-- `max_uses: 1`;
-- `offline_allowed: true`.
+This private key was created as disposable laboratory test material for the provider-substitution condition.
 
-The substitute could therefore occupy the expected provider service position and generate artifacts conforming to the expected provider representation.
+It does not correspond to the legitimate public trust anchor configured at the Raspberry Pi boundary.
 
-Its signing authority was intentionally different.
+The provider position and representation could therefore remain substantially constant while the underlying signing authority changed.
 
----
+## Cryptographic Relationship
 
-## Unauthorized Signing Key
+The SP-002 trust relationships were:
 
-The substitute provider signed artifacts using:
+    LEGITIMATE PROVIDER
 
-`sp002_unauthorized_private.pem`
+    legitimate private key
+            |
+            | Ed25519
+            v
+    poc002_ed25519_public.pem
+    configured at boundary
 
-SHA-256:
 
-`dfb7da42fa074f8f68916f52780e310c3797e4da2caa674c5b0427324f0ad57d`
+    UNAUTHORIZED PROVIDER
 
-This key is a disposable laboratory key created for the provider-substitution condition.
+    sp002_unauthorized_private.pem
+            |
+            | Ed25519
+            v
+    unrelated public-key relationship
+            |
+            X
+    poc002_ed25519_public.pem
+    configured at boundary
 
-It does not correspond to the legitimate public trust anchor configured at the verification boundary.
+The unauthorized private key was intentionally outside the configured provider trust relationship.
 
-The distinction between the legitimate and substitute providers therefore did not depend on provider address, port, provider identifier, artifact format, or claimed algorithm. It depended on whether the resulting signature established the configured cryptographic trust relationship.
+## Execution Provenance
 
----
+SP-002 was executed as a sequential three-phase control:
 
-## Execution Record
+    legitimate provider
+            |
+            v
+    unauthorized substitute
+            |
+            v
+    legitimate provider restored
 
-SP-002 was executed as a three-phase sequence.
+The same provider service position was used throughout.
 
-### Phase 1 — Legitimate Provider Baseline
+The Raspberry Pi verification boundary and legitimate public trust anchor remained unchanged across the three conditions.
 
-The legitimate provider occupied:
+Detailed requests, artifact identifiers, decisions, verification states, and reason strings are documented in `RESULTS.md`.
 
-`192.168.0.240:8091`
+## Runtime Evidence Provenance
 
-The boundary processed a request containing:
+The retained SP-002 runtime record is:
 
-- `device_id: esp32-field-01`
-- `context: field_led_demo`
-- `requested_action: accept`
-- `nonce: sp002-rerun-legitimate`
+    evidence/sp002_rerun_evidence.log
 
-Observed result:
+Test-time SHA-256:
 
-- `artifact_id: 984c0e8fff05cf1f4692c38d`
-- `decision: issued`
-- `provider_verified: true`
-- `reason: provider_signed_bounded_artifact`
+    3420bcd631a0ffeae8d6086467df7c223d9d25c5fd3746b79dfad3ddb07bd148
 
-The baseline established successful issuance through the configured provider trust relationship.
+The transcript captures the sequential legitimate-provider, unauthorized-substitution, and legitimate-restoration conditions.
 
-### Phase 2 — Unauthorized Provider Substitution
+The recording was closed after completion of the three-phase sequence and subsequently hashed.
 
-The legitimate provider was stopped and replaced by the unauthorized provider at the same provider service position.
-
-The verification boundary and legitimate public trust anchor remained unchanged.
-
-The boundary processed a request containing:
-
-- `device_id: esp32-field-01`
-- `context: field_led_demo`
-- `requested_action: accept`
-- `nonce: sp002-rerun-unauthorized`
-
-The substitute returned an Ed25519-signed artifact using its unauthorized signing key.
-
-Observed boundary result:
-
-- `artifact_id: 0c422920aea5d0a91289a9d0`
-- `decision: denied`
-- `provider_verified: false`
-- `reason: invalid_provider_signature`
-
-The artifact was not admitted as provider-authorized authority.
-
-### Phase 3 — Legitimate Provider Restoration
-
-The unauthorized provider was stopped and the legitimate provider restored at the same provider service position.
-
-No replacement of the legitimate public trust anchor was performed.
-
-The boundary processed a request containing:
-
-- `device_id: esp32-field-01`
-- `context: field_led_demo`
-- `requested_action: accept`
-- `nonce: sp002-rerun-restored`
-
-Observed result:
-
-- `artifact_id: a1dce6c1aa6dc9398eb4330b`
-- `decision: issued`
-- `provider_verified: true`
-- `reason: provider_signed_bounded_artifact`
-
-Verified issuance resumed when the legitimate signing authority returned.
-
----
-
-## Canonical Runtime Evidence
-
-The publication-grade execution record is:
-
-`evidence/sp002_rerun_evidence.log`
-
-File size:
-
-`3527 bytes`
-
-SHA-256:
-
-`3420bcd631a0ffeae8d6086467df7c223d9d25c5fd3746b79dfad3ddb07bd148`
-
-The recording contains the legitimate baseline, unauthorized substitution rejection, and legitimate restoration sequence.
-
-The terminal recording was closed immediately after completion of the three-phase sequence and hashed after capture terminated.
-
-This file is the canonical SP-002 runtime evidence.
-
----
+This file is the retained runtime evidence for the SP-002 test execution documented in `RESULTS.md`.
 
 ## Superseded Evidence Record
 
-An earlier terminal recording named:
+An earlier recording named:
 
-`sp002_substitution_evidence.log`
+    sp002_substitution_evidence.log
 
-was generated during the original SP-002 execution.
+was generated during prior SP-002 activity.
 
-That recording remained active during subsequent evidence-recovery activity. Commands used to inspect the recording were themselves captured into the same recording, producing unrelated content and recursive reproductions of portions of the file.
+That recording remained active during subsequent evidence-recovery work. Commands used to inspect the recording were consequently captured into the same file, introducing unrelated material and recursive reproductions of portions of the recording.
 
-The original recording was therefore unsuitable as a bounded publication artifact.
+That file is not used as the canonical publication evidence for SP-002.
 
-It is superseded for publication purposes by `sp002_rerun_evidence.log`.
+It was superseded by:
 
-No SP-002 result is derived from reconstructed or fabricated terminal output.
+    sp002_rerun_evidence.log
 
----
+The superseded recording is not used to reconstruct or supplement the retained rerun transcript.
 
-## Relationship to Prior Provider-Authenticity Testing
+## Relationship to Prior Trust-Anchor Testing
 
-SP-002 exercises a different trust failure from the earlier wrong-trust-anchor condition.
+SP-002 is distinct from the earlier trust-anchor substitution condition.
 
-The prior trust-anchor substitution condition retained the legitimate provider while replacing the verification key presented to the boundary.
+The earlier condition preserved the legitimate provider while replacing the verification key configured at the boundary.
 
-SP-002 performs the inverse:
+SP-002 preserved the legitimate boundary trust anchor while replacing the provider and its signing key.
 
-- the legitimate verification boundary remains in place;
-- the legitimate public trust anchor remains in place;
-- the provider occupying the expected service position is replaced;
-- the substitute signs with an unauthorized private key.
+The relationship is:
 
-The two conditions independently exercise opposite sides of the provider/verifier trust relationship.
+    PRIOR TRUST-ANCHOR TEST
 
-SP-002 therefore isolates provider substitution from verifier trust-anchor substitution.
+    legitimate provider
+            +
+    incorrect boundary trust anchor
 
----
 
-## Evidence Interpretation
+    SP-002
 
-The observed result establishes that, within the tested architecture, successful provider impersonation at the network and representation layers did not establish provider authority.
+    unauthorized provider
+            +
+    unchanged legitimate boundary trust anchor
 
-The substitute possessed:
+The two tests therefore exercise opposite sides of the provider/verifier trust relationship.
 
-- the expected provider host position;
-- the expected service port;
-- the expected provider identifier;
-- the expected context;
-- the expected artifact structure;
-- the expected Ed25519 algorithm declaration.
+## Evidence Classification
 
-It did not possess the private signing key corresponding to the boundary's configured public trust anchor.
+**Test artifact**  
+Source, configuration, or cryptographic material used during the SP-002 execution and identified by its test-time artifact identity.
 
-The boundary consequently returned:
+**Trust anchor**  
+Public verification material retained by the NUVL boundary to establish the legitimate provider signing relationship.
 
-`decision: denied`
+**Unauthorized test key**  
+Disposable laboratory signing material deliberately excluded from the legitimate provider trust relationship.
 
-`provider_verified: false`
+**Captured runtime evidence**  
+The retained terminal transcript recording the controlled three-phase SP-002 execution.
 
-`reason: invalid_provider_signature`
+**Superseded evidence**  
+An earlier recording excluded from the canonical evidence package because its capture boundary was not cleanly terminated.
 
-Restoration of the legitimate provider restored verified issuance without changing the trust anchor.
+**Publication integrity record**  
+Current repository artifact integrity maintained in `SHA256SUMS.txt`.
 
-The evidence therefore supports the bounded claim that, in the tested configuration, provider position and representation were insufficient to originate accepted authority without the corresponding legitimate signing authority.
+These classifications are intentionally separate.
 
----
+Current publication bytes may differ from historical test-time artifacts if repository preparation modifies a file. Any modified copy must retain separate publication identity rather than being represented as byte-identical to the tested artifact.
 
-## Artifact Provenance
+## Publication Lineage
 
-| Artifact | Role | SHA-256 |
-|---|---|---|
-| `sp001_separate_provider_boundary.py` | Verification boundary | `f35855d54933ee1f188576d9a8dc0eb9c30f8e7a5de821772f929df9cb801637` |
-| `poc002_ed25519_public.pem` | Legitimate boundary trust anchor | `2fd9c44a0579b985bc44722313725c8a6fd532b665b617b3e5082efb14c49f63` |
-| `poc003_ed25519_provider_1h.py` | Legitimate provider | `e7206aeb42a4b2f903cdf01d21604e2d19a7d0a2a79962e55982524de69c4d62` |
-| `sp002_unauthorized_provider.py` | Unauthorized substitute provider | `ad049085e8470b3fc17eb9089d3ade85db03bb05b21764f6d304a0c07d2f1703` |
-| `sp002_unauthorized_private.pem` | Unauthorized test signing key | `dfb7da42fa074f8f68916f52780e310c3797e4da2caa674c5b0427324f0ad57d` |
-| `sp002_rerun_evidence.log` | Canonical runtime evidence | `3420bcd631a0ffeae8d6086467df7c223d9d25c5fd3746b79dfad3ddb07bd148` |
+The SP-002 publication package may contain:
 
----
+    provider/poc003_ed25519_provider_1h.py
+    provider/sp002_unauthorized_provider.py
+    provider/sp002_unauthorized_private.pem
+    boundary/sp001_separate_provider_boundary.py
+    trust/poc002_ed25519_public.pem
+    evidence/sp002_rerun_evidence.log
 
-## Provenance Boundary
+Documentation files are maintained separately within the same package.
 
-SP-002 establishes provenance for the tested provider-substitution condition and its associated artifacts.
+`SHA256SUMS.txt` is the authoritative integrity manifest for the current published bytes.
 
-It does not establish protection against privileged modification of the Raspberry Pi trust-anchor file, arbitrary compromise of the verification boundary, or endpoint-local Ed25519 verification.
+Historical test-time hashes retained in this provenance record establish test-artifact lineage and must not be substituted for current publication hashes when the underlying bytes differ.
 
-Those properties are outside the SP-002 test boundary and require independent evidence.
+## Provenance Assessment
+
+The retained SP-002 evidence establishes:
+
+- identity of the verification boundary used during SP-002;
+- identity of the legitimate public trust anchor;
+- identity of the legitimate provider implementation;
+- identity of the unauthorized substitute implementation;
+- identity of the unauthorized signing key;
+- separation between the legitimate and unauthorized signing relationships;
+- preservation of the boundary and legitimate trust anchor across the substitution sequence;
+- use of the same provider service position by the legitimate and unauthorized providers;
+- identity of the retained three-phase runtime transcript;
+- exclusion of the earlier contaminated recording from the canonical evidence package.
+
+SHA-256 values establish artifact identity and, where independently compared, byte correspondence.
+
+They do not independently prove the behavioral outcome of the provider-substitution test.
+
+Observed decisions and the resulting security claim are documented in `RESULTS.md`.
