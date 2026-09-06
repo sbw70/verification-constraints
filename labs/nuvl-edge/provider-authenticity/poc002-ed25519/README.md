@@ -1,299 +1,267 @@
 # POC-002 — Ed25519 Provider Authenticity
 
-## Overview
+## Purpose
 
-POC-002 tested asymmetric provider authority in the NUVL validation path.
+POC-002 evaluates asymmetric provider authority in the NUVL validation path.
 
-The proof replaced the shared-secret trust model used in the preceding HMAC experiment with an Ed25519 model in which the provider retained the private signing key and the Raspberry Pi NUVL boundary held only the corresponding public verification key.
+The test replaces the shared-secret HMAC relationship used in POC-001 with an Ed25519 trust model in which the provider retains the private signing key and the Raspberry Pi NUVL boundary holds only the corresponding public verification key.
 
-The objective was to determine whether the boundary could recognize valid provider authority while rejecting stale, modified, unsigned, incorrectly scoped, or incorrectly bound provider output without possessing the provider's private signing authority.
+The objective is to determine whether the boundary can recognize valid provider authority while rejecting stale, modified, unsigned, incorrectly scoped, or incorrectly bound provider output without possessing the provider's private signing authority.
 
-POC-002A extended the same configuration to provider-unavailable recovery and deliberate trust-anchor substitution.
+POC-002A extends the same architecture to provider-unavailable recovery and deliberate trust-anchor substitution.
 
 ## Test Classification
 
-**Category:** NUVL core — no architecture change.
+**Category:** NUVL core — no architecture change  
+**Capability:** Provider-authenticated bounded authority  
+**Primary objective:** Validate provider-signed decisions at an intermediary enforcement boundary without transferring provider signing authority to that boundary.
 
-**Capability:** Provider-authenticated bounded authority.
+## Authority Model
 
-**Use case:** A constrained endpoint requests an action through an intermediary boundary while the provider remains the source of authoritative signed decisions.
+The tested trust relationship was:
 
-## Authority Placement
+    Provider
+      |
+      | Ed25519 private signing key
+      |
+      | signed provider decision
+      v
+    Raspberry Pi NUVL boundary
+      |
+      | provider public verification key only
+      | signature validation
+      | expiration validation
+      | request-binding validation
+      |
+      v
+    ESP32-S3 endpoint
 
-The tested authority relationship was:
-
-```text
-Provider
-  |
-  | Ed25519 private signing key retained here
-  |
-  | signed provider decision
-  v
-Raspberry Pi NUVL boundary
-  |
-  | provider public verification key only
-  | signature / expiry / request-binding validation
-  |
-  v
-ESP32-S3 endpoint
-```
-
-The provider private key was not installed on the Raspberry Pi or ESP32 endpoint.
+The provider private signing key was not installed on the Raspberry Pi or ESP32 endpoint.
 
 Ed25519 verification occurred at the Raspberry Pi boundary.
 
-This test did not implement Ed25519 verification directly on the ESP32.
+POC-002 does not implement Ed25519 verification directly on the ESP32.
 
-## Hardware
+## Test Architecture
 
 The July 19–20, 2026 bench consisted of:
 
 - one ESP32-S3 endpoint;
 - GL.iNet Mango GL-MT300N-V2 wireless access point;
 - Raspberry Pi 5 running the NUVL verification boundary;
-- Windows laptop running the provider.
+- Windows host running the provider.
 
-The logical request path was:
+The tested request path was:
 
-```text
-ESP32-S3
-    |
-    | Wi-Fi
-    v
-GL.iNet Mango
-    |
-    v
-Raspberry Pi 5
-NUVL boundary
-    |
-    v
-Windows provider
-```
+    ESP32-S3
+        |
+        | Wi-Fi
+        v
+    GL.iNet Mango
+        |
+        v
+    Raspberry Pi 5
+    NUVL boundary
+        |
+        v
+    Windows provider
 
-POC-002 was a single-endpoint proof. The repeated matrix represents repeated transactions against the test endpoint, not a multi-endpoint fleet test.
+POC-002 was a single-endpoint proof. Repeated matrix execution represents repeated transactions against the same test architecture rather than a multi-endpoint fleet test.
 
 ## POC-002 Test Matrix
 
-The endpoint test client exercised eight provider-authenticity and request-binding conditions.
+The test client exercised eight provider-authenticity and request-binding conditions:
 
-| Case | Condition | Expected result |
+| Case | Condition | Expected Result |
 |---|---|---|
 | 1 | Valid signed acceptance | ACCEPT |
 | 2 | Valid signed denial | DENY |
 | 3 | Validly signed stale provider artifact | DENY |
 | 4 | Provider artifact modified after signing | DENY |
 | 5 | Unsigned provider artifact | DENY |
-| 6 | Request made under an unauthorized/wrong context | DENY |
-| 7 | Signed provider artifact bound to a different context | DENY |
-| 8 | Signed provider artifact bound to a different nonce/request | DENY |
+| 6 | Request under unauthorized context | DENY |
+| 7 | Signed artifact bound to different context | DENY |
+| 8 | Signed artifact bound to different request nonce | DENY |
 
 The initial matrix exercised all eight conditions once.
 
-A separate repeat harness then exercised the complete eight-case matrix ten times.
+A separate repeat harness then executed the complete eight-case matrix ten times.
 
-Detailed observed results are recorded in `RESULTS.md`.
+Detailed observations and aggregate results are maintained in `RESULTS.md`.
 
-## POC-002A — Provider Unavailable / Recovery
+## Provider-Unavailable Control
 
-POC-002A tested whether loss of the provider could cause the boundary to accept an action without a verified provider decision.
+POC-002A evaluated whether provider loss could result in acceptance without a verified provider decision.
 
-The sequence was:
+The tested sequence was:
 
-```text
-Provider available
-    |
-    v
-signed provider decision verified
-    |
-    v
-ACCEPT
+    provider available
+            |
+            v
+    signed decision verified
+            |
+            v
+    ACCEPT
 
-Provider unavailable
-    |
-    v
-no verified provider decision
-    |
-    v
-DENY / provider_unavailable
 
-Provider restored
-    |
-    v
-signed provider decision verified
-    |
-    v
-ACCEPT
-```
+    provider unavailable
+            |
+            v
+    no verified provider decision
+            |
+            v
+    DENY
 
-The recovery portion tested restoration of normal provider-backed acceptance without resetting the Raspberry Pi boundary or ESP32 endpoint.
 
-## Trust-Anchor Substitution
+    provider restored
+            |
+            v
+    signed decision verified
+            |
+            v
+    ACCEPT
 
-The same POC-002 configuration was used to test an intentionally incorrect verification key.
+The recovery condition evaluated restoration of normal provider-backed operation without resetting the Raspberry Pi boundary or ESP32 endpoint.
 
-The configured provider public key on the Raspberry Pi was replaced with an unrelated Ed25519 public key while the provider continued signing with its original private key.
+## Trust-Anchor Substitution Control
 
-The sequence was:
+POC-002A also evaluated behavior when the Raspberry Pi was configured with an unrelated Ed25519 public key while the legitimate provider continued signing with its original private key.
 
-```text
-Correct provider public key
-    |
-    v
-provider signature verifies
-    |
-    v
-ACCEPT
+The tested sequence was:
 
-Unrelated public key substituted
-    |
-    v
-provider signature cannot be verified
-    |
-    v
-DENY / invalid_provider_signature
+    correct provider public key
+            |
+            v
+    provider signature verifies
+            |
+            v
+    ACCEPT
 
-Correct provider public key restored
-    |
-    v
-provider signature verifies
-    |
-    v
-ACCEPT
-```
 
-The alternate public key retained from this test is included as:
+    unrelated public key configured
+            |
+            v
+    provider signature does not verify
+            |
+            v
+    DENY
 
-`poc002_wrong_trust_anchor_public.pem`
 
-The private key associated with that deliberately unrelated test keypair is not published.
+    correct public key restored
+            |
+            v
+    provider signature verifies
+            |
+            v
+    ACCEPT
 
-## Public Files
+This condition evaluates trust-anchor correctness at the verification boundary.
 
-### `poc002_ed25519_provider.py`
+It does not establish protection of the Raspberry Pi trust-anchor file against privileged modification.
 
-Provider implementation used to create Ed25519-signed provider decisions.
+## Security Property Evaluated
 
-The publication copy has environment-specific addressing sanitized where required.
+POC-002 evaluates separation between provider signing authority and boundary verification authority.
 
-### `poc002_ed25519_public.pem`
+Within the tested architecture:
 
-Public verification key corresponding to the provider signing key used for the test.
+- the provider retained the Ed25519 private signing key;
+- the Raspberry Pi boundary received only the corresponding public verification key;
+- provider output was admitted only after successful cryptographic and request-binding validation;
+- invalid provider output was rejected without requiring possession of the provider private key at the boundary.
 
-The provider private key is intentionally excluded.
+The test therefore evaluates whether provider authority can be recognized without transferring provider signing capability to the enforcement boundary.
 
-### `poc002_wrong_trust_anchor_public.pem`
+## Evidence Package
 
-Unrelated public verification key used during the deliberate trust-anchor substitution test.
+This directory contains the provider, test clients, verification material, results, provenance record, and integrity manifest associated with POC-002 and POC-002A.
 
-Its corresponding private key is intentionally excluded.
+Key published artifacts include:
 
-### `poc002_esp32_test.py`
+- `poc002_ed25519_provider.py`
+- `poc002_ed25519_public.pem`
+- `poc002_wrong_trust_anchor_public.pem`
+- `poc002_esp32_test.py`
+- `poc002_esp32_matrix_repeat.py`
+- `poc002a_esp32_probe.py`
+- `RESULTS.md`
+- `PROVENANCE.md`
+- `SHA256SUMS.txt`
 
-ESP32-side eight-case POC-002 matrix client.
+Artifact lineage, original tested-source identity, publication derivatives, and retained cross-host correspondence are documented in `PROVENANCE.md`.
 
-### `poc002_esp32_matrix_repeat.py`
-
-Repeat harness that executes the eight-case matrix ten times.
-
-### `poc002a_esp32_probe.py`
-
-Endpoint probe used while externally changing provider availability and the configured Pi trust anchor.
-
-### `RESULTS.md`
-
-Recorded POC-002 and POC-002A results and evidence limitations.
-
-### `PROVENANCE.md`
-
-Artifact provenance, original tested-source hashes, publication-copy distinctions, and independently retained Raspberry Pi artifact hashes.
-
-### `SHA256SUMS.txt`
-
-SHA-256 manifest for the files actually published in this directory.
-
-## Publication Boundary
-
-The Raspberry Pi enforcement-boundary implementation is not published in this directory.
-
-Its original tested source was independently retained on both the Windows test host and Raspberry Pi. Matching SHA-256 digests are recorded in `PROVENANCE.md`.
-
-This allows the surviving tested artifact to be identified without publishing the boundary implementation.
-
-Private Ed25519 signing keys are also excluded.
-
-Publication copies of files containing environment-specific public addressing were sanitized before publication.
-
-A sanitized derivative must not be represented as byte-identical to the original tested source when its SHA-256 digest differs.
+Current repository integrity values are maintained in `SHA256SUMS.txt`.
 
 ## Evidence Status
 
 The original interactive terminal transcript from the July 19–20, 2026 execution was not retained.
 
-No replacement or reconstructed terminal log is presented as original evidence.
+No reconstructed terminal output is presented as original runtime evidence.
 
 The surviving evidence includes:
 
-- original test source retained from the July execution;
-- the test matrix and repeat harness;
-- contemporaneous laboratory records of the observed results;
-- the original Raspberry Pi boundary source independently retained on the Pi and Windows test host;
-- the original provider public verification key independently retained on both systems;
-- the deliberately incorrect public trust anchor retained on the Raspberry Pi;
-- SHA-256 correspondence between independently retained artifacts.
+- retained test source;
+- the eight-case matrix client;
+- the repeated-matrix harness;
+- contemporaneous laboratory records;
+- independently retained verification material;
+- retained Raspberry Pi boundary source;
+- deliberate wrong-trust-anchor material.
 
-See `RESULTS.md` and `PROVENANCE.md` for the evidence record.
+Detailed evidence status and artifact provenance are documented separately in `PROVENANCE.md`.
 
-## What POC-002 Supports
+## Supported Claims
 
-POC-002 supports the narrower claim that a NUVL boundary configured with the provider's public verification key can validate provider-signed decisions without possessing the provider's private signing key.
+POC-002 supports the bounded claim that, within the tested configuration:
 
-The test also demonstrates rejection of:
+- the provider retained the Ed25519 private signing key;
+- the Raspberry Pi boundary verified provider decisions using the corresponding public key;
+- the boundary did not require the provider private key to validate signed provider output;
+- stale signed provider output was rejected;
+- provider output modified after signing was rejected;
+- unsigned provider output was rejected;
+- unauthorized request context was rejected;
+- signed output bound to a different context was rejected;
+- signed output bound to a different request nonce was rejected;
+- provider signatures that could not be validated against the configured trust anchor were rejected.
 
-- stale signed provider output;
-- provider output modified after signing;
-- unsigned provider output;
-- unauthorized request context;
-- signed output bound to a different context;
-- signed output bound to a different request nonce;
-- signatures that cannot be validated against the configured provider trust anchor.
+POC-002A additionally supports:
 
-POC-002A additionally demonstrates fail-closed behavior when the provider is unavailable and restoration of provider-backed acceptance after provider service recovery.
+- fail-closed behavior when the provider was unavailable;
+- restoration of provider-backed acceptance after provider recovery;
+- rejection of legitimate provider signatures when an unrelated verification key was configured;
+- restoration of valid verification after the correct trust anchor was restored.
 
-## What POC-002 Does Not Support
+## Claim Boundary
 
-POC-002 does not demonstrate that a Raspberry Pi remains trustworthy after arbitrary privileged compromise.
+POC-002 does not establish that the Raspberry Pi remains trustworthy after arbitrary privileged compromise.
 
-Possession of only a public verification key prevents that key from being used to generate a valid provider signature. It does not, by itself, prevent privileged malicious software on the enforcement boundary from bypassing the verification procedure entirely.
+Possession of only a public verification key prevents that key from being used to create a legitimate provider signature, but it does not prevent compromised boundary software from bypassing the verification procedure itself.
 
-The trust-anchor substitution test demonstrates rejection when the configured public key does not correspond to the provider signing key.
+POC-002 also does not establish:
 
-It does not demonstrate protection of the mutable Raspberry Pi trust-anchor file against privileged replacement.
-
-POC-002 also does not demonstrate:
-
+- protection of the Raspberry Pi trust-anchor file against privileged replacement;
 - direct Ed25519 verification by the ESP32;
 - multi-endpoint or fleet behavior;
 - persistent single-use disconnected authority;
 - crash-safe spent-state persistence;
 - exactly-once physical execution.
 
-Those properties require separate tests.
+Those properties require separate evidence.
 
 ## Relationship to Subsequent Work
 
-POC-002 established the asymmetric trust relationship used by subsequent NUVL experiments:
+POC-002 establishes the asymmetric trust relationship used by subsequent NUVL experiments:
 
-```text
-provider retains signing authority
-             |
-             v
-boundary receives verification authority
-             |
-             v
-boundary may recognize provider authority
-but does not receive the provider private key
-```
+    provider retains signing authority
+                 |
+                 v
+    boundary receives verification authority
+                 |
+                 v
+    boundary may recognize provider authority
+    without receiving the provider private key
 
-The subsequent POC-003 work combined this asymmetric provider-authenticity model with bounded disconnected single-use authority.
+POC-003 subsequently combines this asymmetric provider-authenticity model with bounded disconnected single-use authority.
 
-Later persistence and race tests address properties outside the scope of POC-002.
+Later persistence, race, crash-window, and actuator tests evaluate properties outside the scope of POC-002.
