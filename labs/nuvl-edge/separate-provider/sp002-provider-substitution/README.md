@@ -112,6 +112,7 @@ This directory contains:
     │   └── sp002_rerun_evidence.log
     ├── provider/
     │   ├── poc003_ed25519_provider_1h.py
+    │   ├── poc002_ed25519_private.pem
     │   ├── sp002_unauthorized_provider.py
     │   └── sp002_unauthorized_private.pem
     ├── boundary/
