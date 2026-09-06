@@ -4,157 +4,119 @@
 
 This document records the provenance of surviving artifacts associated with the July 11, 2026 POC-001 HMAC bounded-disconnected-authority test.
 
-The provenance record distinguishes among:
+The provenance record establishes:
 
-1. original tested source retained from the July execution;
-2. artifacts independently retained on the Raspberry Pi and Windows test host;
-3. contemporaneously recorded test results;
-4. files included in the public repository;
-5. files intentionally excluded from publication.
+- identity of surviving original test source;
+- cross-host correspondence of retained source artifacts;
+- publication status of surviving artifacts;
+- relationship between retained source and the contemporaneous test record;
+- known evidence limitations.
 
-The original interactive terminal transcript is not included in this package.
-
-No reconstructed output is represented as original runtime evidence.
+The original interactive terminal transcript is not included in this package. No reconstructed output is represented as original runtime evidence.
 
 ## Original Test Environment
 
 The tested path was:
 
-```text
-ESP32-S3
-    |
-    | Wi-Fi
-    v
-GL.iNet Mango GL-MT300N-V2
-    |
-    v
-Raspberry Pi 5
-NUVL boundary
-    |
-    v
-Windows provider
-```
+    ESP32-S3
+        |
+        | Wi-Fi
+        v
+    GL.iNet Mango GL-MT300N-V2
+        |
+        v
+    Raspberry Pi 5
+    NUVL boundary
+        |
+        v
+    Windows provider
 
 POC-001 used HMAC-SHA256 authentication for bounded provider-issued artifacts.
 
 Trust placement was:
 
-```text
-Windows provider:
-    shared HMAC secret
-    artifact issuance
-    normal provider validation
+    Windows provider
+        shared HMAC secret
+        artifact issuance
+        normal provider validation
 
-Raspberry Pi:
-    same shared HMAC secret
-    bounded-artifact validation
-    in-memory used-nonce state
+    Raspberry Pi
+        shared HMAC secret
+        bounded-artifact validation
+        in-memory used-nonce state
 
-ESP32-S3:
-    request endpoint
-```
+    ESP32-S3
+        request endpoint
 
-Because HMAC uses shared secret material, the provider and boundary both possessed cryptographic material capable of calculating valid artifact authentication values.
+Because HMAC uses shared secret material, both the provider and boundary possessed cryptographic material capable of generating valid artifact authentication values.
 
-This trust-placement limitation is part of the original POC-001 architecture and is preserved in the evidence record.
+This limitation is intrinsic to the tested POC-001 architecture.
 
-## Surviving Windows Test-Host Artifacts
+## Surviving Original Source
 
-The following original POC-001 source files were recovered from the Windows test host:
+Two original POC-001 source files were recovered from the Windows test host:
 
-```text
-ddil_provider.py
-ddil_boundary.py
-```
+    ddil_provider.py
+    ddil_boundary.py
 
-Observed Windows filesystem timestamps were:
+Observed filesystem timestamps were:
 
-```text
-2026-07-11 19:54:47  ddil_provider.py
-2026-07-11 19:56:10  ddil_boundary.py
-```
+    2026-07-11 19:54:47  ddil_provider.py
+    2026-07-11 19:56:10  ddil_boundary.py
 
-These timestamps are retained as provenance metadata. They are not treated as cryptographic evidence.
+These timestamps are retained as supporting filesystem metadata and are not treated as cryptographic evidence.
 
-## Original Source SHA-256
+The retained source was identified as follows:
 
-The retained Windows test-host files have the following SHA-256 digests:
+| Artifact | SHA-256 |
+|---|---|
+| `ddil_provider.py` | `97aad386e48813488047503030de277d165a4a9040d758d7679d330a7ba0ebeb` |
+| `ddil_boundary.py` | `7bd3b443caf4c5b8d88b70db9cbb8b4ec28df6fcdbbe301ba7cb402cfbb2905d` |
 
-```text
-97aad386e48813488047503030de277d165a4a9040d758d7679d330a7ba0ebeb  ddil_provider.py
-7bd3b443caf4c5b8d88b70db9cbb8b4ec28df6fcdbbe301ba7cb402cfbb2905d  ddil_boundary.py
-```
+These values identify the surviving original POC-001 source and are retained as historical provenance values. They are distinct from the publication-integrity manifest maintained in `SHA256SUMS.txt`.
 
-These hashes identify the surviving original POC-001 implementation.
+## Cross-Host Source Correspondence
 
-## Independently Retained Raspberry Pi Artifact
+The Raspberry Pi test host independently retained a boundary implementation at:
 
-The original Raspberry Pi test host retained a POC-001 boundary implementation at:
+    /home/seth/nuvl_ddil_poc/ddil_boundary.py
 
-```text
-/home/seth/nuvl_ddil_poc/ddil_boundary.py
-```
+SHA-256 comparison of the independently retained Raspberry Pi and Windows boundary copies produced the same digest:
 
-Its SHA-256 digest is:
+    7bd3b443caf4c5b8d88b70db9cbb8b4ec28df6fcdbbe301ba7cb402cfbb2905d
 
-```text
-7bd3b443caf4c5b8d88b70db9cbb8b4ec28df6fcdbbe301ba7cb402cfbb2905d  /home/seth/nuvl_ddil_poc/ddil_boundary.py
-```
+**Result: MATCH**
 
-The independently retained Windows copy has:
+The matching digest establishes byte identity between the surviving Windows and Raspberry Pi copies of the POC-001 boundary source.
 
-```text
-7bd3b443caf4c5b8d88b70db9cbb8b4ec28df6fcdbbe301ba7cb402cfbb2905d  ddil_boundary.py
-```
+It does not independently establish execution time or behavioral test results.
 
-**Result: SHA-256 match.**
+## Source Characteristics
 
-The surviving Windows and Raspberry Pi copies of the POC-001 boundary implementation are byte-identical.
+### Provider
 
-This cross-host correspondence establishes independent preservation of the same boundary source on the two systems.
-
-## Provider Source
-
-The surviving original provider implementation has SHA-256:
-
-```text
-97aad386e48813488047503030de277d165a4a9040d758d7679d330a7ba0ebeb  ddil_provider.py
-```
-
-The source implements:
+The retained provider implementation includes:
 
 - HMAC-SHA256 artifact authentication;
 - bounded-artifact issuance;
-- action binding;
-- context binding;
-- unique nonce generation;
-- issuance time;
-- expiration time;
-- `max_uses=1`;
-- request representation;
+- action and context restrictions;
+- nonce generation;
+- issuance and expiration times;
+- single-use artifact declaration;
+- request binding;
 - normal provider validation.
 
-The retained provider source contains the laboratory default:
+The source contains the laboratory fallback value:
 
-```text
-dev_ddil_lab_secret_change_me
-```
+    dev_ddil_lab_secret_change_me
 
-This value is explicitly defined in the source as the fallback value used when the `DDIL_SECRET` environment variable is absent.
+This value is defined as the default used when the `DDIL_SECRET` environment variable is absent.
 
-It is retained because the public provider file is published as the surviving original source rather than as a sanitized derivative.
+It is retained because the provider file represents surviving original laboratory source rather than a sanitized derivative. It is not an operational credential.
 
-No production credential is represented by this value.
+### Boundary
 
-## Boundary Source
-
-The surviving boundary implementation has SHA-256:
-
-```text
-7bd3b443caf4c5b8d88b70db9cbb8b4ec28df6fcdbbe301ba7cb402cfbb2905d  ddil_boundary.py
-```
-
-The implementation contains:
+The retained boundary implementation includes:
 
 - provider-first validation;
 - provider-unavailable bounded-artifact validation;
@@ -163,155 +125,106 @@ The implementation contains:
 - context binding;
 - request-representation binding;
 - expiration enforcement;
-- `max_uses=1` enforcement;
+- single-use enforcement;
 - nonce validation;
 - in-memory replay tracking;
-- fail-closed denial when no valid bounded artifact is available.
+- fail-closed denial when valid bounded authority is absent.
 
-The boundary source is intentionally excluded from the public POC-001 package.
-
-Its SHA-256 digest and cross-host correspondence are retained here as provenance for the tested implementation.
+The boundary implementation is not distributed in the public POC-001 package.
 
 ## Publication Status
 
-### Published Original Artifact
+The public package includes:
 
-The public POC-001 package includes:
+    ddil_provider.py
 
-```text
-ddil_provider.py
-```
+The Raspberry Pi boundary implementation:
 
-Published SHA-256:
+    ddil_boundary.py
 
-```text
-97aad386e48813488047503030de277d165a4a9040d758d7679d330a7ba0ebeb  ddil_provider.py
-```
+is intentionally excluded from this publication package.
 
-The publication copy is byte-identical to the surviving original Windows test-host source represented by that digest.
+The original boundary remains represented in this provenance record because independently retained Windows and Raspberry Pi copies were established as byte-identical.
 
-No publication sanitation changed this file.
+Current integrity values for files distributed through the repository are maintained exclusively in:
 
-### Unpublished Original Artifact
+    SHA256SUMS.txt
 
-The public POC-001 package does not include:
+Publication-integrity values are not duplicated in this document.
 
-```text
-ddil_boundary.py
-```
+## HMAC Trust Placement
 
-The tested boundary implementation is identified by:
+Both retained implementations use the same `DDIL_SECRET` configuration mechanism.
 
-```text
-7bd3b443caf4c5b8d88b70db9cbb8b4ec28df6fcdbbe301ba7cb402cfbb2905d  ddil_boundary.py
-```
+The provider uses the shared secret to generate artifact authentication values. The boundary uses the shared secret to validate them.
 
-The same digest was independently reproduced from the copy retained on the Raspberry Pi.
+The resulting relationship is:
 
-Exclusion from the public repository is intentional and does not indicate loss of the artifact.
+    provider
+        |
+        | shared HMAC secret
+        |
+        +-----------------------+
+                                |
+                                v
+                         NUVL boundary
 
-## HMAC Trust-Placement Record
+Possession of the verification material therefore also provides the cryptographic material required to generate valid HMAC authentication values.
 
-Both surviving implementations reference the same `DDIL_SECRET` configuration mechanism.
+POC-001 does not support a claim of exclusive provider cryptographic issuance authority.
 
-The provider uses the secret to generate artifact authentication values.
-
-The boundary uses the secret to validate artifact authentication values.
-
-The resulting cryptographic relationship is:
-
-```text
-provider
-    |
-    | shared HMAC secret
-    |
-    +-----------------------+
-                            |
-                            v
-                     NUVL boundary
-```
-
-This arrangement means that possession of the verification material also provides the material necessary to calculate valid HMAC authentication values.
-
-POC-001 therefore cannot support a claim that cryptographic artifact origination was exclusively retained by the provider.
-
-This limitation is intrinsic to the tested HMAC design rather than a publication artifact or evidence-recovery limitation.
-
-POC-002 subsequently replaced this shared-secret relationship with an Ed25519 private-key/public-key split.
+POC-002 addresses this limitation by replacing the shared-secret relationship with an Ed25519 private-signing-key/public-verification-key separation.
 
 ## Runtime Evidence Status
 
-No original interactive POC-001 terminal transcript is included in the recovered artifact set.
+The original interactive POC-001 terminal transcript was not retained.
 
-The behavioral results recorded in `RESULTS.md` derive from the contemporaneous NUVL hardware laboratory record.
+Behavioral results documented in `RESULTS.md` derive from the contemporaneous NUVL hardware laboratory record and are not represented as reconstructed raw terminal output.
 
-They are not represented as reconstructed raw terminal output.
-
-The surviving source is consistent with the recorded POC-001 conditions, including:
+The surviving implementation is consistent with the recorded test conditions, including:
 
 - provider-first validation;
-- valid bounded disconnected acceptance;
+- bounded disconnected acceptance;
 - replay denial;
 - missing-artifact denial;
-- wrong-context denial;
-- wrong-action denial;
-- expiration denial;
-- fail-closed provider-unavailable behavior.
+- action and context binding;
+- expiration enforcement;
+- fail-closed behavior during provider unavailability.
 
-Source consistency does not independently prove that each path executed during the original test.
+Source consistency does not independently establish execution of those conditions.
 
-The behavioral execution record remains the contemporaneous laboratory record.
+Behavioral claims therefore remain grounded in the contemporaneous laboratory record rather than inferred solely from source inspection.
 
 ## Evidence Classification
 
-### Original Tested Source
+The POC-001 evidence package distinguishes four evidence classes:
 
-Source retained from the July 11 execution and identified by its SHA-256 digest.
+**Original tested source**  
+Source retained from the July 11 test activity and identified by historical SHA-256 values.
 
-The surviving POC-001 provider and boundary implementations fall into this category.
+**Independently retained source**  
+Source retained on multiple test systems for which byte identity was established through SHA-256 comparison.
 
-### Independently Retained Artifact
+**Contemporaneous result record**  
+Behavioral observations recorded during or immediately following the original test activity and documented in `RESULTS.md`.
 
-An artifact preserved on more than one test system for which byte identity is established through matching SHA-256 digests.
+**Publication integrity record**  
+Current repository artifact integrity maintained in `SHA256SUMS.txt`.
 
-The POC-001 boundary implementation falls into this category.
+These evidence classes are intentionally separate. A publication hash change does not alter the identity of an original tested artifact recorded in this provenance document.
 
-### Contemporaneous Result Record
+## Provenance Assessment
 
-Behavioral results recorded during or immediately following the original test activity.
+The surviving evidence establishes:
 
-The POC-001 behavioral results documented in `RESULTS.md` fall into this category.
+- retention of the original provider source;
+- retention of the original boundary source;
+- byte identity between independently retained Windows and Raspberry Pi boundary copies;
+- consistency between retained implementation and the contemporaneous laboratory record;
+- explicit identification of the shared-secret trust limitation.
 
-### Publication Manifest
+The evidence does not independently establish execution chronology from cryptographic data alone.
 
-`SHA256SUMS.txt` identifies the exact files distributed in the public POC-001 directory.
+The absence of the original interactive terminal transcript remains an explicit limitation.
 
-The publication manifest is distinct from the original tested-source hashes preserved in this provenance record.
-
-## Provenance Summary
-
-| Artifact | Status | SHA-256 |
-|---|---|---|
-| `ddil_provider.py` | Original tested source; public | `97aad386e48813488047503030de277d165a4a9040d758d7679d330a7ba0ebeb` |
-| `ddil_boundary.py` | Original tested source; unpublished | `7bd3b443caf4c5b8d88b70db9cbb8b4ec28df6fcdbbe301ba7cb402cfbb2905d` |
-| Pi `ddil_boundary.py` | Independently retained original | `7bd3b443caf4c5b8d88b70db9cbb8b4ec28df6fcdbbe301ba7cb402cfbb2905d` |
-
-The boundary cross-host hash match establishes byte identity between the independently retained Windows and Raspberry Pi copies.
-
-## Provenance Limitations
-
-Matching SHA-256 digests establish byte identity between retained artifacts.
-
-They do not independently establish when an artifact executed or prove a behavioral test result.
-
-The POC-001 evidence record therefore consists of the combined support provided by:
-
-- surviving original provider source;
-- surviving original boundary source;
-- independent cross-host preservation of the boundary source;
-- contemporaneous laboratory results;
-- consistency between the recorded test conditions and surviving implementation.
-
-The absence of an original interactive terminal transcript remains an explicit evidence limitation.
-
-Any later reproduction of POC-001 constitutes a separate execution and requires its own date, runtime evidence, artifact hashes, and reproduction designation. It does not replace or become the original July 11, 2026 test record.
+Any later reproduction of POC-001 constitutes a separate execution and requires its own date, runtime evidence, artifact identity, and reproduction designation. It does not replace the July 11, 2026 test record.
