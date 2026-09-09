@@ -1,1 +1,125 @@
+ESP-LOCAL-002 — CURATED EVIDENCE RECORD
 
+TEST OBJECTIVE
+Demonstrate endpoint-local bounded-authority admissibility recognition using an externally generated one-time bearer capability, with independent observation of physical command issuance.
+
+TEST CLASSIFICATION
+NUVL core placement/capability integration; no fundamental architecture change.
+
+TOPOLOGY
+External provider/source utility
+    -> HTTP request carrying bounded tuple + bearer capability
+    -> XIAO ESP32-S3 endpoint-local recognition
+    -> servo PWM command
+
+Independent ESP32-S3 DevKit witness monitored the servo PWM signal.
+
+ENDPOINT
+device_id: esp32-xiao-servo-01
+context: esp_local_002
+authorized action: move_servo
+endpoint IP: 192.168.0.81
+HTTP port: 8088
+
+CAPABILITY MODEL
+The external provider/source generated a random 256-bit bearer capability.
+
+Capability:
+8b20574c6ba2330e4a4b94e91e1a1669c585b7d86c95e5592bd018ff42337e3e
+
+The endpoint stored only the SHA-256 commitment:
+
+700775b2bd9fd36b8f0c5f6e5072297a6e6df30bbfb24b49fbf9e88960ad18ae
+
+The endpoint required exact recognition of:
+- device_id
+- context
+- action
+- capability
+
+The endpoint compared SHA-256(capability) against the stored commitment.
+
+The capability was marked spent in RAM before physical command issuance.
+
+SEMANTIC RESULTS
+
+Invalid capability:
+decision=denied
+reason=capability_invalid
+
+Valid capability, first spend:
+decision=accepted
+reason=authority_admissible
+device_id=esp32-xiao-servo-01
+
+Exact capability replay:
+decision=denied
+reason=capability_spent
+
+Same capability with wrong device:
+decision=denied
+reason=wrong_device
+
+Same capability with wrong context:
+decision=denied
+reason=wrong_context
+
+Same capability with unauthorized action:
+decision=denied
+reason=action_not_authorized
+
+INDEPENDENT PHYSICAL-COMMAND WITNESS
+
+Before accepted spend, witness reported IDLE.
+
+Accepted spend witness:
+
+ESP_LOCAL_001_WITNESS_BURST_START ticks_ms=236837
+ESP_LOCAL_001_WITNESS_BURST_END pulses=50 duration_ms=980 pulse_min_us=1792 pulse_max_us=2001
+
+The witness returned to IDLE after the burst.
+
+Exact replay of the same capability returned:
+
+{"reason": "capability_spent", "decision": "denied"}
+
+No additional PWM burst was observed following the replay denial.
+
+Witness remained IDLE through at least:
+
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=355095 state=IDLE
+
+OBSERVED RESULT
+A valid externally generated bearer capability satisfying the endpoint-local admissibility predicate produced one accepted result and one independently witnessed physical command burst.
+
+Replay of the consumed capability was denied and produced no additional witnessed physical command.
+
+Other tested violations of the local device, context, action, and capability requirements were denied.
+
+CLAIM SUPPORTED
+A resource-constrained physical endpoint can locally recognize possession of an externally generated one-time capability, independently constrain its admissibility to a specific local device/context/action predicate, consume that capability before physical command issuance, and deny reuse without relying on a separate recognition boundary.
+
+CLAIM BOUNDARIES / LIMITATIONS
+This test does not establish cryptographic identity of the request sender. The capability is a bearer value; possession permits presentation.
+
+The device/context/action tuple is enforced by endpoint-local constants and is not cryptographically bound into the capability commitment itself.
+
+The spent state is RAM-only and is cleared by endpoint reset. Persistent replay resistance is not claimed by ESP-LOCAL-002.
+
+The test does not establish secure boot, endpoint-compromise resistance, protected trust-anchor storage, tamper resistance, production key custody, or exactly-once mechanical execution.
+
+The independent witness establishes electrical PWM command issuance, not mechanical servo movement.
+
+ARTIFACTS
+
+esp_local_002_provider.py
+SHA256:
+175F571A938991B70A8C4ADF9D58864D179FA91CB70F4477F0717CB2C173C723
+
+esp_local_002_main.py
+SHA256:
+15938CBB3842BD6BFFF21F54CFD6FEEBE8BFC0E98BE1A24A236ECBBAE87D4874
+
+esp_local_002_witness.py
+SHA256:
+AF380567C2FA6E961C1A029073BDD15FB7C39CE0034A80C554DC6709DD0F8AC4
