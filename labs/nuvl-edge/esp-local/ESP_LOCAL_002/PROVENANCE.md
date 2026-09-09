@@ -43,10 +43,16 @@ The external capability-generation utility was:
 esp_local_002_provider.py
 ```
 
-SHA-256:
+Tested-source SHA-256:
 
 ```text
 175F571A938991B70A8C4ADF9D58864D179FA91CB70F4477F0717CB2C173C723
+```
+
+Published-copy SHA-256:
+
+```text
+d4ed191d8be8d9ba0bfaf23bae7359d5df4327f42aabad48323857643cc5ab1b
 ```
 
 The utility generated a random 256-bit bearer capability:
@@ -71,10 +77,16 @@ The endpoint firmware used for the final test state was:
 esp_local_002_main.py
 ```
 
-SHA-256:
+Tested-source SHA-256:
 
 ```text
 15938CBB3842BD6BFFF21F54CFD6FEEBE8BFC0E98BE1A24A236ECBBAE87D4874
+```
+
+Published-copy SHA-256:
+
+```text
+35ae53417de32cac375b414d7582c9cb9c379d9203cb6e4c23cd2316904b40d1
 ```
 
 The endpoint required the exact request key set:
@@ -102,19 +114,27 @@ For an accepted request, the implementation marked the capability spent before p
 
 ## Witness Firmware
 
-The independent witness firmware was:
+The independent witness firmware used during the test was:
 
 ```text
 esp_local_002_witness.py
 ```
 
-SHA-256:
+Tested-source SHA-256:
 
 ```text
 AF380567C2FA6E961C1A029073BDD15FB7C39CE0034A80C554DC6709DD0F8AC4
 ```
 
-This source is identical to the witness implementation used for ESP-LOCAL-001.
+Published-copy SHA-256:
+
+```text
+4cd13da81a5b7313fb0647c0ec9ba87709effbcb4ce7a8eecc30cfc4d88e13af
+```
+
+The tested witness implementation was the same witness implementation used for ESP-LOCAL-001.
+
+The published witness copy is not represented as byte-identical to the tested-source artifact because its published-copy digest differs from the tested-source digest.
 
 The witness monitored the endpoint servo PWM signal and independently recorded command bursts.
 
@@ -179,16 +199,22 @@ action_not_authorized
 
 ## Evidence Record
 
-The curated evidence record is:
+The curated bench evidence record is:
 
 ```text
 ESP_LOCAL_002_EVIDENCE.log
 ```
 
-SHA-256:
+Tested-source SHA-256:
 
 ```text
 8B66231145627977D47127992B9380287A31CFF8DC5378CB7DEB33474842187A
+```
+
+Published-copy SHA-256:
+
+```text
+08dbdd0e43223306168d2cfa7b62b644d29e6eed04f1e77fb8622a23054357b1
 ```
 
 The evidence record contains:
@@ -206,15 +232,21 @@ The evidence record is a curated record assembled from observed terminal and wit
 
 ## Artifact Relationship
 
-The published artifacts represent the final tested ESP-LOCAL-002 implementation and its corresponding external capability utility, independent witness, and curated evidence record.
+The tested-source digests identify the bench-side artifacts associated with the completed ESP-LOCAL-002 test.
 
-The provider utility hash identifies the external capability-generation implementation used for the test.
+The published-copy digests identify the corresponding files as stored in the public repository.
 
-The endpoint firmware hash identifies the implementation that performed endpoint-local recognition and RAM-based single-use consumption.
+Where tested-source and published-copy digests differ, the publication copy is not represented as byte-identical to the bench-side artifact. The separate digests preserve the distinction between test provenance and publication integrity.
 
-The witness firmware hash identifies the independent electrical observation implementation used to record PWM command issuance.
+The provider tested-source digest identifies the external capability-generation implementation associated with the test.
 
-The evidence-record hash identifies the curated record of the observed test results.
+The endpoint tested-source digest identifies the implementation that performed endpoint-local recognition and RAM-based single-use consumption during the test.
+
+The witness tested-source digest identifies the independent electrical observation implementation used during the test.
+
+The evidence tested-source digest identifies the curated bench evidence record associated with the result.
+
+The corresponding published-copy digests identify the repository artifacts covered by the publication manifest.
 
 ## Claim Boundary
 
@@ -248,4 +280,6 @@ The published ESP-LOCAL-002 artifacts are covered by the accompanying:
 SHA256SUMS.txt
 ```
 
-The manifest verified all four covered artifacts successfully.
+`SHA256SUMS.txt` records the published-copy digests and paths used for repository integrity verification.
+
+The publication manifest verified all four covered artifacts successfully.
