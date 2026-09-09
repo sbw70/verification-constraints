@@ -1,1 +1,311 @@
+ESP-LOCAL-001
+Endpoint-Local NUVL Placement and Physical Execution Gating
+CURATED EVIDENCE RECORD
 
+Record type:
+Curated record assembled from observed test outputs.
+This file is not represented as a continuous raw terminal capture.
+
+======================================================================
+OBJECTIVE
+======================================================================
+
+Determine whether authority-admissibility recognition can execute
+directly on a resource-constrained physical endpoint and gate local
+physical command issuance without relying on the Raspberry Pi as the
+recognition boundary.
+
+======================================================================
+ACTIVE TEST TOPOLOGY
+======================================================================
+
+External request source
+    |
+    v
+XIAO ESP32-S3
+    device_id: esp32-xiao-servo-01
+    serial: COM3
+    test address: 192.168.0.81:8088
+    |
+    +-- local authority-admissibility recognition
+    |
+    +-- servo PWM output
+            |
+            +-- servo actuator
+            |
+            +-- independent ESP32-S3 DevKit witness
+
+Independent witness:
+    device_id: esp32-s3-03
+    serial: COM8
+    observed signal: GPIO5
+    expected PWM frequency: 50 Hz
+
+A second XIAO ESP32-S3 remained outside the active test path as a
+control/reference endpoint.
+
+======================================================================
+FINAL ARTIFACT IDENTITIES
+======================================================================
+
+esp_local_001_main.py
+SHA256:
+0F84521FA85A6EA439DFA6B464C69D9DA53E788365C737318ECA5F7140822FDD
+
+esp_local_001_witness.py
+SHA256:
+AF380567C2FA6E961C1A029073BDD15FB7C39CE0034A80C554DC6709DD0F8AC4
+
+======================================================================
+LOCAL ADMISSIBILITY BOUNDS
+======================================================================
+
+Expected device_id:
+esp32-xiao-servo-01
+
+Expected context:
+esp_local_demo
+
+Authorized action:
+move_servo
+
+Final implementation rejects fields outside the defined request
+representation.
+
+======================================================================
+SEMANTIC TEST RESULTS
+======================================================================
+
+CASE: Valid request
+
+Request:
+{"device_id":"esp32-xiao-servo-01","context":"esp_local_demo","action":"move_servo"}
+
+Observed result:
+decision: accepted
+reason: authority_admissible
+device_id: esp32-xiao-servo-01
+
+RESULT: PASS
+
+
+CASE: Unauthorized action
+
+Observed result:
+decision: denied
+reason: action_not_authorized
+
+RESULT: PASS
+
+
+CASE: Wrong device
+
+Request used during matrix:
+{"device_id":"esp32-xiao-servo-02","context":"esp_local_demo","action":"move_servo"}
+
+Observed result:
+decision: denied
+reason: wrong_device
+
+RESULT: PASS
+
+
+CASE: Wrong context
+
+Observed result:
+decision: denied
+reason: wrong_context
+
+RESULT: PASS
+
+
+CASE: Missing context
+
+Observed result:
+decision: denied
+reason: wrong_context
+
+RESULT: PASS
+
+
+CASE: Missing device
+
+Observed result:
+decision: denied
+reason: wrong_device
+
+RESULT: PASS
+
+
+CASE: Missing action
+
+Observed result:
+decision: denied
+reason: action_not_authorized
+
+RESULT: PASS
+
+======================================================================
+REPRESENTATION-AMBIGUITY FINDING
+======================================================================
+
+During testing, the initial implementation accepted an otherwise valid
+request containing an additional unrecognized field:
+
+{"device_id":"esp32-xiao-servo-01","context":"esp_local_demo","action":"move_servo","extra":"ignored"}
+
+Observed initial result:
+accepted
+
+The behavior was treated as a representation-ambiguity defect. The
+recognition component was accepting information outside the
+representation it interpreted.
+
+The recognition logic was changed to reject fields outside:
+
+device_id
+context
+action
+
+The same extra-field request was then tested again.
+
+Observed corrected result:
+decision: denied
+reason: unexpected_field
+
+The valid request was subsequently retested.
+
+Observed regression-check result:
+decision: accepted
+reason: authority_admissible
+device_id: esp32-xiao-servo-01
+
+RESULT:
+Defect identified and corrected.
+Unexpected-field denial: PASS
+Valid-path regression check: PASS
+
+======================================================================
+INDEPENDENT PHYSICAL-COMMAND WITNESS — ACCEPTED PATH
+======================================================================
+
+Valid request result:
+
+decision: accepted
+reason: authority_admissible
+device_id: esp32-xiao-servo-01
+
+Independent witness output:
+
+ESP_LOCAL_001_WITNESS_BURST_START ticks_ms=74859
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=75082 state=ACTIVE
+ESP_LOCAL_001_WITNESS_BURST_END pulses=50 duration_ms=978 pulse_min_us=857 pulse_max_us=2006
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=80084 state=IDLE
+
+Observed electrical command:
+
+pulse count: 50
+burst duration: 978 ms
+minimum observed pulse width: 857 us
+maximum observed pulse width: 2006 us
+
+RESULT: PASS
+
+The accepted decision corresponded to independently observed actuator
+PWM command activity.
+
+======================================================================
+INDEPENDENT PHYSICAL-COMMAND WITNESS — DENIED PATH
+======================================================================
+
+Request:
+
+{"device_id":"esp32-xiao-servo-02","context":"esp_local_demo","action":"move_servo"}
+
+Observed request result:
+
+decision: denied
+reason: wrong_device
+
+After the previously accepted PWM burst completed, the independent
+witness continued reporting IDLE.
+
+Observed witness interval included:
+
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=80084 state=IDLE
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=85084 state=IDLE
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=90084 state=IDLE
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=95084 state=IDLE
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=100085 state=IDLE
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=105085 state=IDLE
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=110085 state=IDLE
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=115085 state=IDLE
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=120085 state=IDLE
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=125085 state=IDLE
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=130086 state=IDLE
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=135086 state=IDLE
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=140086 state=IDLE
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=145086 state=IDLE
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=150086 state=IDLE
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=155086 state=IDLE
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=160087 state=IDLE
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=165087 state=IDLE
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=170087 state=IDLE
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=175087 state=IDLE
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=180087 state=IDLE
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=185088 state=IDLE
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=190088 state=IDLE
+ESP_LOCAL_001_WITNESS_HEARTBEAT ticks_ms=195088 state=IDLE
+
+No subsequent ESP_LOCAL_001_WITNESS_BURST_START or
+ESP_LOCAL_001_WITNESS_BURST_END event was observed during this
+interval.
+
+RESULT: PASS
+
+The tested wrong-device denial produced no independently observed
+actuator-command burst.
+
+======================================================================
+OVERALL RESULT
+======================================================================
+
+PASS
+
+ESP-LOCAL-001 demonstrated that authority-admissibility recognition can
+execute directly on a resource-constrained XIAO ESP32-S3 and gate local
+physical command issuance.
+
+The tested endpoint retained local actuator capability while the local
+recognition function distinguished admissible requests from tested
+requests outside the defined bounds.
+
+The accepted path produced independently witnessed electrical actuator
+command activity.
+
+The witnessed denied path produced no observed actuator-command burst.
+
+======================================================================
+CLAIM BOUNDARY
+======================================================================
+
+ESP-LOCAL-001 is a placement and execution-gating proof.
+
+The incoming request representation in this test was not
+cryptographically authenticated as authority issued by an external
+provider. The endpoint evaluated a locally defined admissibility
+predicate over the received representation.
+
+This test therefore does not, by itself, demonstrate:
+
+- cryptographic attribution to an external provider;
+- resistance to forged provider authority;
+- replay resistance;
+- freshness or expiration enforcement;
+- protected endpoint trust-anchor storage;
+- secure boot or firmware integrity;
+- resistance to endpoint compromise;
+- exactly-once physical execution; or
+- independent verification of mechanical actuator state.
+
+Those properties require separate evidence.
