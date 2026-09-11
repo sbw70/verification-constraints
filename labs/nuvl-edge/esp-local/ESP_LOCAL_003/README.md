@@ -151,6 +151,8 @@ ESP_LOCAL_003_WITNESS_LOG.txt
 
 The witness establishes electrical PWM command issuance. It does not establish guaranteed mechanical movement or exactly-once mechanical execution.
 
+The witness implementation is unchanged from ESP-LOCAL-001 and is intentionally published under its original filename to preserve artifact lineage.
+
 ## Result
 
 **ESP-LOCAL-003: PASS**
