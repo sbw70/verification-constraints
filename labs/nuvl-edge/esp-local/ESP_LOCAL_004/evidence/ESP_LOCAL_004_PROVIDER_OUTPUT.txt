@@ -1,0 +1,21 @@
+PS C:\Users\holiw> python C:\Users\holiw\esp32-main\ESP_LOCAL_004\provider\esp_local_004_provider.py
+ESP_LOCAL_004_PROVIDER
+
+AUTHORITY_OBJECT
+{"device_id":"esp32-xiao-servo-01","context":"esp_local_004","action":"move_servo","nonce":"0d66fb58f65ea7ed6f26afe393add3c1","max_uses":1}
+
+CANONICAL
+{"action":"move_servo","context":"esp_local_004","device_id":"esp32-xiao-servo-01","max_uses":1,"nonce":"0d66fb58f65ea7ed6f26afe393add3c1"}
+
+SIGNATURE_BASE64
+GVv8Fvwxigoogi4vsO6At+fu54hV9wAfMKyDX2Ycjot3cKFZ4ImsXMCesCw2HJh2fLGo6XZzBuewxjvdSg65BQ==
+
+PUBLIC_KEY_HEX
+48852270ce16654edeef2a1c3d0930af4b990e1bf5060fb3221996434f63e5b1
+
+PUBLIC_KEY_LENGTH
+32
+
+SIGNATURE_LENGTH
+64
+PS C:\Users\holiw>
