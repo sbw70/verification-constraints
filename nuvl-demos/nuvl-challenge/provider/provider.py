@@ -295,7 +295,7 @@ class Provider(BaseHTTPRequestHandler):
                 self.end_headers()
                 return
 
-            if now > exp:
+            if now >= exp:
                 bump_denial("expired")
                 self.send_response(403)
                 self.end_headers()
