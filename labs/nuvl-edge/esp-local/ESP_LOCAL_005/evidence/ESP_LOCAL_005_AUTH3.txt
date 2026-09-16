@@ -1,0 +1,5 @@
+ESP-LOCAL-005 Authority #3 - independent witness closure
+nonce=8e15b84274184bc9ff6e8617e6574435
+canonical={"action":"move_servo","context":"esp_local_005","device_id":"esp32-xiao-servo-02","max_uses":1,"nonce":"8e15b84274184bc9ff6e8617e6574435"}
+authority_id=82accbc8b1099249dbf8c0cd438bee5be1d9f77533e5481889dff918a3e69c8d
+signature_b64=IDs8D0XYrCjPp3cevte2kATy+5n6aP0yWmMLQQwXFH6DGjsKGMSh21mzLMQfDEgEuinmeRotQM849Cw/6GRACA==
