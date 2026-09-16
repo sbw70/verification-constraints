@@ -1,0 +1,6 @@
+ESP-LOCAL-005 Authority #4 - post-commit/pre-PWM crash
+nonce=69bd5872bc3976545d246d966248c5ca
+canonical={"action":"move_servo","context":"esp_local_005","device_id":"esp32-xiao-servo-02","max_uses":1,"nonce":"69bd5872bc3976545d246d966248c5ca"}
+authority_id=8da20bacde390ef6fbf278dc84490529faaad24109f9ef53741bfb5f8ef0e86f
+signature_b64=BV1T7scFN4Ncy4fjiWxzQEugIAM3/BAGU6T/7B17pIxv6xPMxc8fwf51qNgeEcO3U8o0RyMsOSnjJnPetp+XDQ==
+fault_point=after durable SPENT reread; before physical execution
