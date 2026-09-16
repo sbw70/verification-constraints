@@ -1,0 +1,6 @@
+ESP-LOCAL-005 Authority #5 - pre-commit crash
+nonce=b585661eb114a3762234f636ea8a49f3
+canonical={"action":"move_servo","context":"esp_local_005","device_id":"esp32-xiao-servo-02","max_uses":1,"nonce":"b585661eb114a3762234f636ea8a49f3"}
+authority_id=b0726ba4fd440577313bc91c966f20e384fa1daaa75b0a3e21b688d6039500b3
+signature_b64=EFQOex8/4iO5pvJzbFbU/zQhU6Y1oHR6HMh6nYUM/91gM0OrCeOJ1nU2FAk7aMrdREf89YzYN6z1Lc6IGK9YDA==
+fault_point=after nvs_set_blob; before nvs_commit; before PWM
