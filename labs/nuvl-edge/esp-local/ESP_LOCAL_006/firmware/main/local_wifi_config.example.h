@@ -1,0 +1,4 @@
+#pragma once
+
+#define ESP_LOCAL_006_WIFI_SSID     "<TEST_WIFI_SSID>"
+#define ESP_LOCAL_006_WIFI_PASSWORD "<TEST_WIFI_PASSWORD>"
