@@ -4,6 +4,23 @@ This is a live endurance challenge for a provider-isolated verification boundary
 
 The challenge is not to prove that invalid traffic can be rejected once. The challenge is to test whether the denial path stays closed while the admissible provider control path remains intact under continuous hostile or invalid traffic.
 
+## Evaluation Permissions
+
+The marked `provider/provider.py`, `client/client.py`, `mint_token.py`, and
+`attacker/attacker.py` files permit local, noncommercial evaluation and modification
+under [Challenge Demonstration Evaluation](../../module-license-notice/README.md#challenge-demonstration-evaluation).
+No separate research license is required for that permitted local evaluation.
+Production use, commercial deployment, redistribution, and other uses require a
+separate written agreement.
+
+The nested `nuvl-core/nuvl.py` has its own Apache 2.0 header and remains licensed
+under Apache 2.0. These evaluation terms do not change that license or grant rights
+to other proprietary modules.
+
+The current `attacker/attacker.py` targets the public challenge by default. Local
+evaluation requires adapting its target to your local environment. The local
+evaluation grant does not replace any separately agreed live-challenge permissions.
+
 ## What You're Looking At
 
 ### `nuvl.py`
