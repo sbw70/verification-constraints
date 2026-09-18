@@ -1,23 +1,10 @@
 # ESP-LOCAL-006 Provenance
 
-## Purpose
+This document records the lineage, tested identities, publication relationships, and evidence classifications for ESP-LOCAL-006.
 
-This document records the origin, lineage, and relationship of the artifacts published for ESP-LOCAL-006.
+ESP-LOCAL-006 evaluates hostile-relay / compromised-forwarder behavior while retaining provider-controlled authority and endpoint-local recognition and enforcement.
 
-It distinguishes:
-
-- original tested artifacts,
-- provider-generated authority material,
-- hostile-relay artifacts,
-- independent witness material,
-- direct persistent-state captures,
-- curated terminal transcripts,
-- publication copies,
-- tested implementation material intentionally excluded from publication.
-
-Observed behavior is documented in `RESULTS.md`.
-
-Published artifact integrity is documented in `SHA256SUMS.txt`.
+The completed publication includes the tested endpoint implementation, provisioner implementation, preserved tested application binaries, provider artifacts, hostile-relay implementation, independent witness implementation, persistent-state captures, relay evidence, curated terminal evidence, and build-support material required to inspect the tested authority path.
 
 ## Test Lineage
 
@@ -25,18 +12,20 @@ ESP-LOCAL-006 extends the endpoint-local bounded-authority model exercised in ES
 
 ESP-LOCAL-004 established endpoint-local Ed25519 recognition of provider-issued authority.
 
-ESP-LOCAL-005 added persistent endpoint-local single-use consumption before the observed physical command path.
+ESP-LOCAL-005 added persistent endpoint-local single-use authority consumption before the observed physical command path and characterized persistence behavior across restart, power-loss, malformed-state, and crash conditions.
 
-ESP-LOCAL-006 retained that endpoint-local enforcement model and introduced a hostile application-layer intermediary between the requester/provider side and the endpoint.
+ESP-LOCAL-006 retained that authority model and introduced a hostile application-layer intermediary between the requester/provider side and the endpoint.
 
-The tested path was:
+Tested path:
 
 ```text
 requester / provider
         ↓
 Raspberry Pi 3 hostile relay
         ↓
-ESP32-S3 endpoint-local enforcement
+ESP32-S3 endpoint-local recognition
+        ↓
+persistent single-use authority enforcement
         ↓
 servo PWM command path
         ↓
@@ -45,11 +34,30 @@ independent ESP32-S3 witness
 
 ESP-LOCAL-006 did not transfer provider authority-generation capability to the relay.
 
-The relay could inspect, modify, substitute, forward, and replay requests but did not possess the trusted provider private key.
+The relay could inspect, modify, substitute, forward, delay, and replay requests but did not possess the trusted provider private key.
+
+## Architectural Classification
+
+ESP-LOCAL-006 is classified as:
+
+```text
+NUVL core
+architecture change: no
+```
+
+The test adds a hostile intermediary condition to the existing bounded-authority architecture.
+
+It does not introduce a new authority source or transfer authority-generation capability to the relay or endpoint.
+
+The supported claim is limited to the tested architecture:
+
+> Intermediary control over the request path did not become the ability to originate, enlarge, substitute, regenerate, or reuse executable provider authority.
+
+The test also demonstrated that rejected invalid submissions did not consume or poison legitimate unused authority subsequently accepted under its original provider-established bounds.
 
 ## Trusted Provider Key Lineage
 
-ESP-LOCAL-006 reused the Ed25519 provider identity previously used in ESP-LOCAL-004 and ESP-LOCAL-005.
+ESP-LOCAL-006 reused the Ed25519 provider identity previously used in the ESP-LOCAL series.
 
 Original trusted private-key source:
 
@@ -69,73 +77,210 @@ Corresponding raw Ed25519 public key:
 48852270ce16654edeef2a1c3d0930af4b990e1bf5060fb3221996434f63e5b1
 ```
 
-The trusted provider private key was used on the requester/provider side to generate the signed Auth1 and Auth2 control artifacts.
+The trusted private key was used on the provider/requester side to generate the signed Authority #1 and Authority #2 trusted requests.
 
 It was not present on the Raspberry Pi 3 hostile relay.
 
-It is not published in the ESP-LOCAL-006 directory.
+It was not embedded in the endpoint runtime.
+
+It is not published in the ESP-LOCAL-006 tree.
+
+## Endpoint Identity
+
+Tested endpoint:
+
+```text
+identity:          esp32-xiao-servo-02
+hardware:          Seeed XIAO ESP32-S3
+MAC:               1c:db:d4:45:10:a4
+serial interface:  COM15
+TCP port:          19061
+framework:         ESP-IDF v6.1
+```
+
+Observed physical-command path:
+
+```text
+endpoint GPIO5
+      ↓
+witness GPIO4
+```
 
 ## Endpoint Runtime Lineage
 
-The tested endpoint runtime was developed locally under:
+Original project root:
 
 ```text
 C:\Users\holiw\esp32-main\ESP_LOCAL_006\
 ```
 
-Primary tested runtime source:
+Original tested runtime source:
 
 ```text
 main\ESP_LOCAL_006.c
 ```
 
-Original tested source SHA-256:
+Published source:
+
+```text
+firmware/main/ESP_LOCAL_006.c
+```
+
+Tested source SHA-256:
 
 ```text
 4BD962535C61C17AD093973DBB720A99CD709D626D3E9EEFF1AD51B6E6E6AAFF
 ```
 
-The final runtime binary used for the scored ESP-LOCAL-006 matrix had SHA-256:
+Recovered preserved tested application binary:
+
+```text
+build\ESP_LOCAL_006.bin
+```
+
+Published as:
+
+```text
+evidence/ESP_LOCAL_006_RUNTIME.bin
+```
+
+Tested binary SHA-256:
 
 ```text
 21376CDD12D63D2F0E8362C969C7268BE56A701ECB3C78BAC712564D5FBE5E75
 ```
 
-That runtime was flashed to the endpoint identified as:
+The recovered binary matched the previously recorded SHA-256 for the runtime used during the scored ESP-LOCAL-006 matrix.
+
+The publication therefore contains the preserved tested application image rather than a later rebuild represented as the tested binary.
+
+## Runtime Authority Path
+
+The published runtime performs the following authority-processing sequence:
 
 ```text
-identity: esp32-xiao-servo-02
-hardware: Seeed XIAO ESP32-S3
-MAC: 1c:db:d4:45:10:a4
-serial interface: COM15
+receive relay envelope
+        ↓
+strict envelope decoding
+        ↓
+Ed25519 verification against trusted provider public key
+        ↓
+semantic admissibility
+        ↓
+SHA-256 received canonical authority
+        ↓
+persistent-state validation
+        ↓
+exact authority-id match
+        ↓
+require UNSPENT
+        ↓
+transition to SPENT
+        ↓
+nvs_set_blob
+        ↓
+nvs_commit
+        ↓
+nvs_close
+        ↓
+nvs_flash_deinit_partition
+        ↓
+nvs_flash_init_partition
+        ↓
+fresh persistent-state reread
+        ↓
+require same authority-id + SPENT
+        ↓
+PWM command
 ```
 
-The final tested runtime connected to the ESP-LOCAL-006 network and listened for endpoint requests on TCP port `19061`.
+The runtime does not contain provider private signing material.
 
-The endpoint runtime source and binary are intentionally not published in this package because they expose implementation detail inside the persistent-authority enforcement boundary.
+No later runtime failure path restores consumed authority.
 
-Their hashes are retained here to identify the tested implementation without distributing that implementation.
+Missing, malformed, corrupt, mismatched, or already-spent authority state is not converted into fresh authority.
 
-## Persistent-State Implementation Publication Boundary
+## Authority-State Record
 
-ESP-LOCAL-006 reused the endpoint-local persistent-state model established during ESP-LOCAL-005.
+ESP-LOCAL-006 uses a dedicated NVS partition.
 
-The public ESP-LOCAL-006 package preserves state captures and observed behavior but does not publish the persistence-boundary implementation.
+Partition definition:
 
-The following tested implementation classes remain outside the ESP-LOCAL-006 publication tree:
+```text
+nuvl_state,data,nvs,,24K,
+```
 
-- endpoint persistence implementation source,
-- authority provisioner source,
-- authority provisioner binaries,
-- implementation-specific state-write logic.
+Resolved tested parameters:
 
-This is a publication boundary, not an absence of tested implementation.
+```text
+label:   nuvl_state
+offset:  0x110000
+size:    0x6000
+length:  24576 bytes
+```
 
-The resulting raw state captures are published separately as evidence.
+The authority record is 44 bytes and contains:
+
+```text
+magic
+version
+state
+reserved
+authority_id[32]
+crc32
+```
+
+Recognized authority-state values:
+
+```text
+UNSPENT = 1
+SPENT   = 2
+```
+
+Namespace:
+
+```text
+nuvl_auth
+```
+
+Key:
+
+```text
+state
+```
+
+The stored `authority_id` is matched against the SHA-256 identifier of the received canonical authority.
+
+## Persistence Interpretation
+
+The runtime records accepted authority as `SPENT` before PWM command issuance.
+
+After `nvs_commit()`, the tested runtime:
+
+```text
+closes the NVS handle
+deinitializes the authority partition
+reinitializes the authority partition
+performs a fresh read
+requires the same authority identifier
+requires SPENT state
+```
+
+The runtime emits:
+
+```text
+006_DURABLE_SPENT_REREAD_PASS
+```
+
+only after that post-commit sequence succeeds.
+
+This is stronger than a same-handle cached reread.
+
+It does not independently establish persistence across every possible immediate power-loss boundary and does not resolve the exact ESP-IDF/NVS physical persistence point characterized separately in ESP-LOCAL-005.
 
 ## Authority #1 Lineage
 
-Authority #1 was generated locally using the trusted provider Ed25519 private key.
+Authority #1 was generated using the trusted provider Ed25519 private key.
 
 Published metadata:
 
@@ -143,19 +288,25 @@ Published metadata:
 provider/ESP_LOCAL_006_AUTH1.txt
 ```
 
-Published request envelope:
+Original SHA-256:
+
+```text
+BEF521A5A13F6707271731A8D5E46F8713F976F653B5ABEB8DE71F5FE05C456D
+```
+
+Published signed request:
 
 ```text
 provider/ESP_LOCAL_006_AUTH1_REQUEST.json
 ```
 
-Authority #1 identifier:
+Original SHA-256:
 
 ```text
-f72ade66cea3c93c2cb57944e03d69e185a061a59f83c3705a8e6977dfddc7d6
+8DF2EAA48A572494EE32F815AFF05B4E7533221C9AAA04C859836983D7DB27DD
 ```
 
-Authority #1 canonical semantics:
+Canonical semantics:
 
 ```json
 {
@@ -167,68 +318,100 @@ Authority #1 canonical semantics:
 }
 ```
 
-Known original artifact hashes:
+Authority identifier:
 
 ```text
-ESP_LOCAL_006_AUTH1.txt
-BEF521A5A13F6707271731A8D5E46F8713F976F653B5ABEB8DE71F5FE05C456D
+f72ade66cea3c93c2cb57944e03d69e185a061a59f83c3705a8e6977dfddc7d6
+```
 
-ESP_LOCAL_006_AUTH1_REQUEST.json
-8DF2EAA48A572494EE32F815AFF05B4E7533221C9AAA04C859836983D7DB27DD
+Provider signature:
+
+```text
+6bsiP6Tqky4FfRvy0qSEXs+gZxbKT/5tz8AAbPMVnLYdHKN3hl8mQ9WsIGk5bgUmS5+/ja8CfgrygAkiRiHuAA==
 ```
 
 Authority #1 was used for:
 
-- `action` mutation,
-- `context` mutation,
-- `device_id` mutation,
-- `max_uses` enlargement,
-- untouched positive control,
-- spent-authority replay.
+```text
+action mutation
+context mutation
+device_id mutation
+max_uses enlargement
+untouched trusted positive control
+spent-authority replay
+```
 
-## Authority #1 Provisioning Lineage
+## Authority #1 Provisioner Lineage
 
-Authority #1 was provisioned into the dedicated endpoint persistent-state partition before the scored relay matrix.
+Original source:
 
-The generated Authority #1 provisioner source had SHA-256:
+```text
+main\ESP_LOCAL_006_PROVISIONER.c
+```
+
+Published source:
+
+```text
+firmware/main/ESP_LOCAL_006_PROVISIONER.c
+```
+
+Source SHA-256:
 
 ```text
 4F461509B5A17F333F43A58F536313CD2647A630AAB5A873CA7C7E116A8F04BB
 ```
 
-The associated provisioner binary had SHA-256:
+Recovered tested provisioner application binary:
+
+```text
+build-provisioner\ESP_LOCAL_006.bin
+```
+
+Published as:
+
+```text
+evidence/ESP_LOCAL_006_PROVISIONER.bin
+```
+
+Tested binary SHA-256:
 
 ```text
 DE134F4C8B69E5B8627B952098D601D769FCC4DE2F27F9D4CC517F12837675FC
 ```
 
-Those provisioner artifacts are not included in the public ESP-LOCAL-006 package.
+The provisioner constructs the exact Authority #1 identifier as `UNSPENT`.
 
-An intermediate raw state capture was created during provisioning diagnostics after the first successful provisioning run and before the provisioning sequence was fully understood.
+It refuses provisioning when an existing authority-state record is already present.
 
-That troubleshooting artifact was retained locally as:
+After writing and committing the record, it closes and reinitializes the authority-state partition and performs a fresh reread requiring a valid `UNSPENT` record before reporting provisioning success.
 
-```text
-ESP_LOCAL_006_PREPROVISION_UNEXPECTED_STATE.bin
-```
+## Authority #1 Final State
 
-It is intentionally excluded from the curated publication package because it is not part of the scored ESP-LOCAL-006 matrix.
-
-The final post-Auth1 state capture is published as:
+Final raw state capture:
 
 ```text
 evidence/ESP_LOCAL_006_AUTH1_SPENT_FINAL.bin
 ```
 
-Publication-stage SHA-256:
+SHA-256:
 
 ```text
-6cd54795b1a346e8c4c87a0ecd044bc64025e49ba55d2f170e9b03ff74306c9f
+6CD54795B1A346E8C4C87A0ECD044BC64025E49BA55D2F170E9B03FF74306C9F
 ```
+
+The parsed record identified Authority #1 and showed:
+
+```text
+state: SPENT
+```
+
+The raw partition capture is evidence of the final authority-state image.
+
+Its hash identifies the complete partition image and is not, by itself, interpreted as proof that only the state byte changed.
 
 ## Authority #2 Lineage
 
-Authority #2 was generated locally as a fresh provider-issued authority for the different-provider-key control.
+Authority #2 was generated as a fresh trusted-provider authority for the different-provider-key control.
 
 Published metadata:
 
@@ -236,10 +419,10 @@ Published metadata:
 provider/ESP_LOCAL_006_AUTH2.txt
 ```
 
-Authority #2 identifier:
+SHA-256:
 
 ```text
-196a973cfe65d81c415618f2874874e65d88e006223783bc0726a4c84acf87fc
+7BD190C4E51BF16260996D1A1745099BA4D0E58A47448385E0D29E9234A9A2BB
 ```
 
 Canonical semantics:
@@ -254,17 +437,15 @@ Canonical semantics:
 }
 ```
 
-Known original metadata SHA-256:
+Authority identifier:
 
 ```text
-7BD190C4E51BF16260996D1A1745099BA4D0E58A47448385E0D29E9234A9A2BB
+196a973cfe65d81c415618f2874874e65d88e006223783bc0726a4c84acf87fc
 ```
 
 ## Wrong-Provider Key Lineage
 
-A separate Ed25519 keypair was generated locally specifically for the Authority #2 negative control.
-
-The keypair was independent of the trusted provider key.
+A separate Ed25519 keypair was generated specifically for the Authority #2 negative control.
 
 Wrong-provider raw public key:
 
@@ -272,21 +453,19 @@ Wrong-provider raw public key:
 4c0baa6a6df7637dbb78aec1262c142be80f66d68eac3fd91f7ee41ee003a2de
 ```
 
-Published public key:
+Published public-key file:
 
 ```text
 provider/ESP_LOCAL_006_WRONG_PROVIDER_PUBLIC.pem
 ```
 
-Known original public-key file SHA-256:
+Original public-key file SHA-256:
 
 ```text
 34AD95543CA665E834B8DFD955C5212052F1D2548061EF657966B896942DCF40
 ```
 
-The corresponding wrong-provider private key was generated only for the negative-control signing operation.
-
-Its local file SHA-256 was:
+Local wrong-provider private-key SHA-256:
 
 ```text
 124669887CB947107821229A821C65F0011CFD6FC76EDB909EB84928CBB0942E
@@ -298,15 +477,13 @@ The endpoint had no configured trust relationship with the wrong-provider public
 
 ## Authority #2 Request Relationship
 
-Two request envelopes were generated over the same canonical Authority #2 bytes.
-
 Trusted-provider request:
 
 ```text
 provider/ESP_LOCAL_006_AUTH2_TRUSTED_REQUEST.json
 ```
 
-Known original SHA-256:
+SHA-256:
 
 ```text
 4BA2BEB9B3C2A405DDCA5530BA693C406975BC4B7C514788582D75E9F333933A
@@ -318,13 +495,13 @@ Wrong-provider request:
 provider/ESP_LOCAL_006_AUTH2_WRONG_PROVIDER_REQUEST.json
 ```
 
-Known original SHA-256:
+SHA-256:
 
 ```text
 A178FDEC65502AECC90DB8065B5EF88A64D70FA5F574D5C9C0D5AAE46B63AAE5
 ```
 
-Artifact verification confirmed:
+Verification established:
 
 ```text
 authority_bytes_equal: True
@@ -335,18 +512,28 @@ authority_sha256:
 signatures_equal: False
 ```
 
-The two request envelopes therefore differ in signature while preserving identical canonical Authority #2 content.
+The two requests therefore preserve identical canonical Authority #2 bytes while differing in signature identity.
 
-This relationship is central to the different-provider-key control.
+This isolates provider-key trust from authority-content differences.
 
-## Authority #2 Provisioning Lineage
+The wrong-provider version was rejected.
 
-Authority #2 used a dedicated generated provisioner.
+The trusted-provider version over the same canonical authority bytes was subsequently accepted.
 
-Original provisioner source:
+The wrong-provider rejection did not consume Authority #2.
+
+## Authority #2 Provisioner Lineage
+
+Original source:
 
 ```text
 main\ESP_LOCAL_006_AUTH2_PROVISIONER.c
+```
+
+Published source:
+
+```text
+firmware/main/ESP_LOCAL_006_AUTH2_PROVISIONER.c
 ```
 
 Source SHA-256:
@@ -355,17 +542,31 @@ Source SHA-256:
 EFF601F71E71DB9AED8FC6E6849A4CD6DB238CB2F3FAED75F14E4BE52B2E3F2C
 ```
 
-Compiled provisioner binary SHA-256:
+Recovered tested application binary:
+
+```text
+build-auth2-provisioner\ESP_LOCAL_006.bin
+```
+
+Published as:
+
+```text
+evidence/ESP_LOCAL_006_AUTH2_PROVISIONER.bin
+```
+
+Tested binary SHA-256:
 
 ```text
 D465219F6460DEE4A69381221F93EDE09BD2D82C67025425B2B5E9515864C0D8
 ```
 
-Those artifacts are not included in the public ESP-LOCAL-006 package.
+The provisioner establishes the exact Authority #2 identifier as `UNSPENT`.
 
-After provisioning, the persistent-state partition was read directly before the wrong-provider / trusted-provider sequence.
+It refuses provisioning if an authority-state record already exists.
 
-Published pre-test capture:
+## Authority #2 Persistent-State Captures
+
+Pre-test capture:
 
 ```text
 evidence/ESP_LOCAL_006_AUTH2_UNSPENT.bin
@@ -377,11 +578,19 @@ SHA-256:
 7529911EE67A9702F2769BB5AFDCAF40481BF3C8E601F0E508BAA62478F4D80C
 ```
 
-The parsed state showed Authority #2 as `UNSPENT`.
+Parsed record:
 
-After trusted execution and replay testing, the partition was read directly again.
+```text
+authority_id:
+196a973cfe65d81c415618f2874874e65d88e006223783bc0726a4c84acf87fc
 
-Published post-test capture:
+state:
+UNSPENT
+```
+
+The NVS page CRC validated.
+
+Final post-test capture:
 
 ```text
 evidence/ESP_LOCAL_006_AUTH2_SPENT_FINAL.bin
@@ -393,22 +602,25 @@ SHA-256:
 F807BC6493E7D2F2CE33EB72A550E5F9ECA2597C3DD83EE9AB0D60E721EA528C
 ```
 
-The parsed state showed the same Authority #2 identifier as `SPENT`.
+Parsed record:
+
+```text
+authority_id:
+196a973cfe65d81c415618f2874874e65d88e006223783bc0726a4c84acf87fc
+
+state:
+SPENT
+```
+
+The NVS page CRC validated.
+
+The pre-test and final images have different complete-partition hashes.
+
+The specific `UNSPENT` to `SPENT` interpretation comes from parsing the authority record and validating the record structure and CRC rather than from the hash difference alone.
 
 ## Persistent-State Capture Lineage
 
-The published persistent-state images are direct raw reads of the dedicated endpoint NVS partition.
-
-Partition parameters:
-
-```text
-label:  nuvl_state
-offset: 0x110000
-length: 0x6000
-size:   24576 bytes
-```
-
-Published captures:
+Published raw state images:
 
 ```text
 evidence/ESP_LOCAL_006_AUTH1_SPENT_FINAL.bin
@@ -416,21 +628,17 @@ evidence/ESP_LOCAL_006_AUTH2_UNSPENT.bin
 evidence/ESP_LOCAL_006_AUTH2_SPENT_FINAL.bin
 ```
 
-These files are raw binary partition images.
+Each image is a direct raw read of the dedicated endpoint `nuvl_state` partition.
 
-They are not text transcripts.
+These files are binary partition captures.
 
-The Auth2 pre-test and post-test images have different SHA-256 values.
-
-The hash difference establishes that the binary images differ.
-
-The specific `UNSPENT` to `SPENT` interpretation comes from parsing the state records, preserving the authority identifier, and validating the NVS page CRC rather than from the partition hashes alone.
+They are not reconstructed text evidence.
 
 ## Hostile Relay Lineage
 
 The hostile relay was developed and executed on a Raspberry Pi 3.
 
-Original relay path on the Pi:
+Original path:
 
 ```text
 /home/seth/ESP_LOCAL_006/relay/esp_local_006_hostile_relay.py
@@ -442,29 +650,32 @@ Published copy:
 relay/esp_local_006_hostile_relay.py
 ```
 
-Original tested SHA-256:
+Tested source SHA-256:
 
 ```text
 61684936844297A11895218EB78630196BA2EC74BE1E5399F6F629AF012E66F4
 ```
 
-The publication copy was transferred from the Pi and verified against the original tested hash before publication staging.
+The relay implementation supports:
 
-The relay implemented:
+```text
+pass
+mutate-action
+mutate-context
+mutate-device
+mutate-max-uses
+replay
+```
 
-- pass-through,
-- `action` mutation,
-- `context` mutation,
-- `device_id` mutation,
-- `max_uses` mutation,
-- replay capability,
-- per-transaction JSONL logging.
+The relay retained the original provider signature after mutation.
 
-The relay retained the original provider signature after mutation and did not possess the trusted provider private key.
+It did not possess the trusted provider private key.
 
-## Relay Host Baseline Lineage
+It did not have trusted-provider signing capability.
 
-The Raspberry Pi 3 baseline was preserved as:
+## Relay Host Baseline
+
+Published baseline:
 
 ```text
 evidence/ESP_LOCAL_006_PI3_BASELINE.txt
@@ -476,47 +687,54 @@ Original path:
 /home/seth/ESP_LOCAL_006/evidence/ESP_LOCAL_006_PI3_BASELINE.txt
 ```
 
-Original SHA-256:
+SHA-256:
 
 ```text
 14A18FC971B79CB479751E88AD39BDE3391C0D40BDAB49D7D40BECD40B9E49D5
 ```
 
-The publication copy was transferred from the Pi and verified against that hash before staging.
+Test topology included:
+
+```text
+Pi hostname: nuvl-relay
+
+eth0:
+192.168.0.141/24
+test-path interface
+
+wlan0:
+192.168.1.154/24
+management interface
+
+IP forwarding:
+disabled
+```
 
 ## Relay Evidence Lineage
 
-The Authority #1 relay sequence was frozen on the Pi as:
-
-```text
-/home/seth/ESP_LOCAL_006/evidence/ESP_LOCAL_006_RELAY_AUTH1.jsonl
-```
-
-Published as:
+Authority #1 relay evidence:
 
 ```text
 evidence/ESP_LOCAL_006_RELAY_AUTH1.jsonl
 ```
 
-Record count:
+Frozen record count:
 
 ```text
 8
 ```
 
-Original frozen SHA-256:
+Frozen SHA-256:
 
 ```text
 CCAC98462DA0708A463ECC1328A5C01CD0B77F0566E1260F9E70237B0F43B659
 ```
 
-The Authority #2 relay sequence was frozen separately as:
+The file contains scored transactions plus non-authority connectivity/probe records.
 
-```text
-/home/seth/ESP_LOCAL_006/evidence/ESP_LOCAL_006_RELAY_AUTH2.jsonl
-```
+Empty probes are not classified as scored authority attempts.
 
-Published as:
+Authority #2 relay evidence:
 
 ```text
 evidence/ESP_LOCAL_006_RELAY_AUTH2.jsonl
@@ -528,29 +746,75 @@ Record count:
 3
 ```
 
-Original frozen SHA-256:
+Frozen SHA-256:
 
 ```text
 27A63A71289A49E9B44DF57ACCE8A065D4F1CBA2A5B697E4314B4CBF2982A0DA
 ```
 
-Both publication copies were transferred from the Pi and verified against the frozen test-time hashes before staging.
+For pass-through transactions, relay evidence preserved byte equality between ingress and egress.
+
+Known Authority #2 envelope hashes:
+
+```text
+wrong-provider envelope:
+03bc27c96c99225f84a64fd74621293826f0a0561f67fbea2484b9041ba0137b
+
+trusted-provider envelope:
+13ce223290a908b855eccf05047a636cdee6de6207639dae2a3e8076a2d898a4
+```
+
+## Transport Anomaly Lineage
+
+The first `max_uses` mutation attempts experienced multisecond Pi-to-endpoint transport delay and timed out before reaching the endpoint.
+
+Those attempts were not classified as authorization denials.
+
+The relay source was inspected and no corresponding mutation defect was identified.
+
+The case was rerun with a longer relay/requester timeout.
+
+The rerun reached the endpoint and was rejected by the endpoint validation path.
+
+Only the completed endpoint-reaching attempt was scored.
+
+This preserves the distinction between:
+
+```text
+transport failure
+```
+
+and:
+
+```text
+authorization denial
+```
 
 ## Independent Witness Lineage
 
 The independent witness was a separate ESP32-S3 DevKit running MicroPython.
 
-The tested physical mapping was:
+Witness MAC:
 
 ```text
-Servo #2 / endpoint GPIO5
-        ↓
-Witness GPIO4
+44:1b:f6:ff:36:a8
 ```
 
-The witness was connected through COM8.
+Serial interface:
 
-Published witness implementation:
+```text
+COM8
+```
+
+Physical mapping:
+
+```text
+endpoint GPIO5
+      ↓
+witness GPIO4
+```
+
+Published implementation:
 
 ```text
 witness/ESP_LOCAL_006_WITNESS_GPIO4.py
@@ -562,25 +826,31 @@ Publication-stage SHA-256:
 CEF567D1778F648904C6C3410381B96FFA0938E7D86E483D286FDABE0EE3CAA3
 ```
 
-The witness implementation measures positive pulse width using MicroPython `time_pulse_us()` and reports observations as:
+The witness uses MicroPython pulse-width measurement and reports:
 
 ```text
 PWM_HIGH_US <width>
 ```
 
-The witness is external to the endpoint authorization decision.
+The witness does not:
 
-It does not generate, validate, consume, or modify provider authority.
+```text
+generate provider authority
+verify provider signatures
+consume authority
+modify authority state
+participate in authorization
+```
 
-It observes the electrical PWM command line only.
+It observes the electrical PWM command path only.
 
 ## Endpoint Transcript Lineage
 
-The live COM15 endpoint session was observed interactively during ESP-LOCAL-006.
+The COM15 endpoint session was observed interactively during the original scored run.
 
-The serial-monitor output was not redirected to a raw log file during the original run.
+The serial session was not redirected into a raw capture file.
 
-Selected terminal lines preserved from the live session were later assembled into:
+Selected preserved terminal output was later assembled into:
 
 ```text
 evidence/ESP_LOCAL_006_ENDPOINT_COM15_CURATED.txt
@@ -592,19 +862,17 @@ Publication-stage SHA-256:
 17D7C4F5C1C8AFF3BD5BEAC42116D92ED7B7C431D4BC78FAC10BB12B909524CA
 ```
 
-This file is a curated derivative.
+This artifact is explicitly classified as a curated derivative.
 
-It is not represented as an original raw serial log.
+It is not represented as an original raw serial capture.
 
-Its hash identifies the curated publication artifact itself and does not represent the unavailable original terminal stream.
+Its SHA-256 identifies the curated publication artifact itself.
 
 ## Witness Transcript Lineage
 
-The live COM8 witness output was observed interactively during ESP-LOCAL-006.
+The COM8 witness session was also observed interactively rather than redirected into an original raw capture file.
 
-The witness output was not redirected to a raw log file during the original run.
-
-Preserved terminal output was later assembled into:
+Preserved output was later assembled into:
 
 ```text
 evidence/ESP_LOCAL_006_WITNESS_COM8_CURATED.txt
@@ -616,80 +884,345 @@ Publication-stage SHA-256:
 5B768366307449D2C6694A15A50C271B2CCC217FA7C0AEE0BA9F451EE209C378
 ```
 
-This file is a curated derivative.
+This artifact is a curated derivative.
 
-It retains:
+It preserves:
 
-- the two observed `1 µs` Auth1 transients,
-- the Auth1 servo-valid pulse sequence,
-- the Auth2 servo-valid pulse sequence,
-- the absence-of-second-burst observations associated with replay controls.
+```text
+two isolated 1 µs Auth1 transients
+Auth1 servo-valid PWM sequence
+Auth2 servo-valid PWM sequence
+absence of a second replay-associated servo-valid burst
+```
 
-It is not represented as an original raw redirected serial log.
+The isolated `1 µs` observations are retained rather than omitted.
 
-Its hash identifies the curated publication artifact.
+They are not classified as servo-valid PWM pulses.
+
+## Witnessed Authority #1 Command
+
+The accepted Authority #1 execution produced:
+
+```text
+49 servo-valid observed pulses
+pulse widths: 1998–2001 µs
+```
+
+Two isolated `1 µs` transients were also preserved before the valid burst.
+
+The replay control did not produce a second servo-valid burst.
+
+## Witnessed Authority #2 Command
+
+The wrong-provider Authority #2 request produced no servo-valid PWM command.
+
+The subsequent trusted-provider request over the same canonical Authority #2 bytes produced:
+
+```text
+49 servo-valid observed pulses
+pulse widths: 1999–2001 µs
+```
+
+The subsequent replay produced no second servo-valid burst.
+
+## Build Configuration Lineage
+
+Published project-level build file:
+
+```text
+firmware/CMakeLists.txt
+```
+
+Original SHA-256:
+
+```text
+74756F785534E7C037C1873F6902BE2F5D041F823EF190B1DD6C628924D58565
+```
+
+Published partition definition:
+
+```text
+firmware/partitions.csv
+```
+
+Original SHA-256:
+
+```text
+2C19BE352D37A87EFF1910984DA4094CC3F76658E0E2F80B630D4C35E4398337
+```
+
+Published ESP-IDF configuration:
+
+```text
+firmware/sdkconfig
+```
+
+Original SHA-256:
+
+```text
+9C6A5C99E2F1FE700886778ED4569614A62D36C7BCDE0B5C8090C88B40B09FAB
+```
+
+The original project-local Wi-Fi configuration file is not published because it contained local network credentials.
+
+## Main CMake Selector Lineage
+
+The local project reused:
+
+```text
+main/CMakeLists.txt
+```
+
+as a source selector during the different application builds.
+
+The final retained local form selected the Authority #2 provisioner:
+
+```cmake
+idf_component_register(
+    SRCS
+        "ESP_LOCAL_006_AUTH2_PROVISIONER.c"
+    INCLUDE_DIRS
+        "."
+    PRIV_REQUIRES
+        nvs_flash
+)
+```
+
+Original SHA-256:
+
+```text
+9665E6F9CDEBFCC0C640B0E1B6ADBBCAD67E5662F94EE6D3FE92B31D785B98FC
+```
+
+That exact final retained file is published as:
+
+```text
+firmware/main/CMakeLists.AUTH2_TESTED.txt
+```
+
+It is identified as the final retained Authority #2 build selector and is not represented as the universal build selector for the runtime or Authority #1 provisioner.
+
+## Wi-Fi Configuration Publication Derivative
+
+Original local file:
+
+```text
+main/local_wifi_config.h
+```
+
+Original SHA-256:
+
+```text
+AC311CA125F7DC1AC30346D7ABF5DB3361737261AFEA4E14863DEE6F87182629
+```
+
+The original contained the test network SSID and Wi-Fi password.
+
+It is not published.
+
+A sanitized derivative is published as:
+
+```text
+firmware/main/local_wifi_config.example.h
+```
+
+with placeholder values:
+
+```c
+#pragma once
+
+#define ESP_LOCAL_006_WIFI_SSID     "<TEST_WIFI_SSID>"
+#define ESP_LOCAL_006_WIFI_PASSWORD "<TEST_WIFI_PASSWORD>"
+```
+
+The sanitized derivative has its own publication identity.
+
+The original credential-bearing file hash is not assigned to the modified publication copy.
+
+## Monocypher Component Lineage
+
+Published component path:
+
+```text
+firmware/components/monocypher/
+```
+
+Published component build file:
+
+```text
+firmware/components/monocypher/CMakeLists.txt
+```
+
+Original SHA-256:
+
+```text
+4E020DC17F045BE8578EB707260D94059C2D5D4C9175DC8481D7AB254305A7B6
+```
+
+Published sources:
+
+```text
+firmware/components/monocypher/monocypher.c
+firmware/components/monocypher/monocypher.h
+firmware/components/monocypher/monocypher-ed25519.c
+firmware/components/monocypher/monocypher-ed25519.h
+```
+
+Original source SHA-256 values:
+
+```text
+monocypher.c
+F1F838CDD483BDEBE0DF0FF5C5ED60535E496F769C6A2F933AC4C0B114207123
+
+monocypher.h
+FCAF6ED771358BB4F40FBA016F6518AE86EC02B1B877D2CC35AD92D3A26FD7B3
+
+monocypher-ed25519.c
+CE0D2F8E32CA8F66398BA5B3456CC74327C3EFF14E7B950CE7D57BE9025CC453
+
+monocypher-ed25519.h
+3A3035181F991A158D0E1C7567258F0BAE8BA0F1F23C5512B4A1DB1B3C9730CE
+```
+
+These identities are consistent with the Monocypher component used in the preceding ESP-LOCAL work.
+
+## Published Tested Application Binaries
+
+The completed publication contains the three preserved application binaries used during the ESP-LOCAL-006 sequence:
+
+```text
+evidence/ESP_LOCAL_006_RUNTIME.bin
+evidence/ESP_LOCAL_006_PROVISIONER.bin
+evidence/ESP_LOCAL_006_AUTH2_PROVISIONER.bin
+```
+
+Recorded tested SHA-256 values:
+
+```text
+ESP_LOCAL_006_RUNTIME.bin
+21376CDD12D63D2F0E8362C969C7268BE56A701ECB3C78BAC712564D5FBE5E75
+
+ESP_LOCAL_006_PROVISIONER.bin
+DE134F4C8B69E5B8627B952098D601D769FCC4DE2F27F9D4CC517F12837675FC
+
+ESP_LOCAL_006_AUTH2_PROVISIONER.bin
+D465219F6460DEE4A69381221F93EDE09BD2D82C67025425B2B5E9515864C0D8
+```
+
+A later rebuilt binary is a reproduction artifact unless its SHA-256 exactly matches the corresponding preserved tested binary.
+
+## Publication Tree
+
+The implementation publication is organized as:
+
+```text
+firmware/
+├── README.md
+├── CMakeLists.txt
+├── partitions.csv
+├── sdkconfig
+├── main/
+│   ├── CMakeLists.AUTH2_TESTED.txt
+│   ├── ESP_LOCAL_006.c
+│   ├── ESP_LOCAL_006_PROVISIONER.c
+│   ├── ESP_LOCAL_006_AUTH2_PROVISIONER.c
+│   └── local_wifi_config.example.h
+└── components/
+    └── monocypher/
+        ├── CMakeLists.txt
+        ├── monocypher.c
+        ├── monocypher.h
+        ├── monocypher-ed25519.c
+        └── monocypher-ed25519.h
+```
+
+Preserved tested binaries are placed under:
+
+```text
+evidence/
+```
+
+rather than duplicated under `firmware/`.
 
 ## Artifact Classification
 
-The published ESP-LOCAL-006 package contains several distinct artifact classes.
-
-| Artifact class | Provenance classification | Purpose |
+| Artifact class | Classification | Purpose |
 |---|---|---|
+| `firmware/main/*.c` | Original tested source / byte-preserved publication copy | Endpoint and provisioner implementation |
+| `firmware/CMakeLists.txt` | Original project build material | ESP-IDF project definition |
+| `firmware/partitions.csv` | Original tested build material | Partition layout |
+| `firmware/sdkconfig` | Original tested ESP-IDF configuration | Tested build configuration |
+| `firmware/main/CMakeLists.AUTH2_TESTED.txt` | Original final retained main build selector | Authority #2 provisioner build state |
+| `firmware/main/local_wifi_config.example.h` | Sanitized publication derivative | Reproduction template without local credentials |
+| `firmware/components/monocypher/*` | Original dependency source / publication copy | Ed25519 cryptographic dependency |
+| `evidence/*PROVISIONER.bin` | Preserved tested binary | Provisioning application image |
+| `evidence/ESP_LOCAL_006_RUNTIME.bin` | Preserved tested binary | Scored endpoint runtime |
 | `relay/*.py` | Original tested source / publication copy | Hostile intermediary implementation |
 | `witness/*.py` | Tested witness implementation / publication copy | Independent PWM observation |
 | `provider/*.txt` | Provider-generated test artifact | Frozen authority metadata |
 | `provider/*.json` | Provider-generated test artifact | Signed request envelopes |
 | `provider/*.pem` | Test public-key material | Wrong-provider verification material |
 | `evidence/*.jsonl` | Original test-time evidence | Relay transaction sequence |
-| `evidence/*_STATE*.bin` / authority `.bin` captures | Original binary evidence | Raw persistent-state partition state |
+| `evidence/*SPENT*.bin` / `*UNSPENT*.bin` | Original binary evidence | Raw persistent-state partition capture |
 | `evidence/*_CURATED.txt` | Curated derivative | Preserved terminal observations |
 | `evidence/ESP_LOCAL_006_PI3_BASELINE.txt` | Original environment record | Relay-host baseline |
 
-Curated derivatives are explicitly identified and do not inherit hashes from the source terminal sessions.
+## Intentionally Unpublished Material
 
-## Tested but Unpublished Artifacts
+The completed ESP-LOCAL-006 publication no longer withholds the endpoint runtime, authority provisioner source, or preserved tested application binaries.
 
-Several implementation artifacts were required for the test but are intentionally not included in the public package.
-
-These include:
+The principal intentionally unpublished test material is:
 
 ```text
-main/ESP_LOCAL_006.c
-main/ESP_LOCAL_006_PROVISIONER.c
-main/ESP_LOCAL_006_AUTH2_PROVISIONER.c
-build*/ESP_LOCAL_006.bin
-provider/ESP_LOCAL_006_WRONG_PROVIDER_PRIVATE.pem
+trusted provider private key
+wrong-provider private key
+original credential-bearing local_wifi_config.h
 ```
 
-The wrong-provider private key is omitted because the signed negative-control request and corresponding public key preserve the tested relationship without requiring publication of private signing material.
-
-Persistence-boundary implementation source and binaries are omitted under the established NUVL publication boundary.
-
-Their omission does not change the provenance of the published test evidence.
+The omission of those files does not prevent inspection of the tested trust relationships because the corresponding public keys, signed test requests, source code, persistent-state captures, and tested application binaries are published.
 
 ## Excluded Troubleshooting Artifact
 
-The following local artifact was retained during setup diagnostics but intentionally excluded from the curated publication package:
+A provisioning diagnostic artifact was retained locally:
 
 ```text
 ESP_LOCAL_006_PREPROVISION_UNEXPECTED_STATE.bin
 ```
 
-It resulted from an intermediate provisioning diagnostic condition and was not part of the scored ESP-LOCAL-006 test matrix.
+It resulted from an intermediate setup/provisioning diagnostic condition.
 
-It is therefore retained locally rather than represented as scored evidence.
+It was not part of the scored ESP-LOCAL-006 matrix.
+
+It is therefore intentionally excluded from the curated publication package.
 
 ## Publication Relationship
 
-The ESP-LOCAL-006 publication package distinguishes between byte-preserved tested artifacts and publication-created derivatives.
+The ESP-LOCAL-006 publication distinguishes between:
 
-For byte-preserved tested artifacts, the publication copy is expected to match the frozen local/test-time SHA-256 where such a hash was established.
+```text
+original tested artifacts
+byte-preserved publication copies
+preserved tested binaries
+sanitized derivatives
+curated derivatives
+excluded diagnostic material
+```
 
-For curated terminal transcripts, the published file is a derivative artifact with its own publication-stage SHA-256.
+A hash established for an original artifact is not assigned to a modified or reconstructed derivative.
 
-A hash from an original artifact is not assigned to a modified, renamed-with-content-change, reconstructed, or curated derivative.
+The sanitized Wi-Fi header has its own publication identity.
 
-`SHA256SUMS.txt` records the hashes of the files actually published in the ESP-LOCAL-006 tree.
+The curated terminal transcripts have their own publication identities.
+
+The preserved tested application binaries retain the recorded SHA-256 identities of the binaries used in the test sequence.
+
+## Manifest Relationship
+
+`SHA256SUMS.txt` records SHA-256 values for the files actually present in the final published ESP-LOCAL-006 tree.
+
+The manifest is generated only after the publication tree and documentation are finalized.
+
+Any earlier manifest created before the final firmware-source and binary publication is superseded by the final regenerated manifest.
 
 ## Evidence Relationship
 
@@ -702,48 +1235,64 @@ hostile relay transaction evidence
         ↓
 endpoint decision observation
         ↓
-persistent-state capture
+persistent authority state
         ↓
 independent PWM observation
 ```
 
-These artifacts are preserved separately so that no single observation source is treated as the sole evidence for the complete result.
-
-The provider artifacts establish the authority and signature material presented.
+The provider artifacts establish the canonical authority and signature material presented.
 
 The relay JSONL files establish intermediary handling.
 
-The endpoint curated transcript preserves the observed endpoint decision sequence.
+The endpoint curated transcript preserves observed endpoint decisions.
 
-The raw partition images preserve persistent-state conditions.
+The raw partition images preserve persistent authority-state conditions.
 
-The independent witness transcript preserves observed PWM behavior.
+The witness transcript preserves independent electrical PWM observations.
 
-## Reproduction and Interpretation
+The source and preserved tested binaries expose the implementation corresponding to those observed behaviors.
 
-Reproduction should preserve the distinction between:
+No single evidence layer is treated as sufficient by itself to establish the complete result.
 
-- trusted provider authority generation,
-- hostile relay behavior,
-- endpoint-local recognition and enforcement,
-- persistent single-use state,
-- independent physical-command observation.
+## Interpretation Boundaries
 
-A relay timeout or transport failure should not be classified as an endpoint authorization denial unless the request reaches the endpoint and exercises the validation path.
+A relay timeout or dropped request is not classified as an endpoint authorization denial unless the request reached the endpoint and exercised the validation path.
 
-A persistent-state partition hash difference should not, by itself, be interpreted as proof of a specific field transition.
+A difference between complete persistent-state partition hashes is not, by itself, proof of a specific field transition.
 
-A curated terminal transcript should not be represented as a raw capture.
+A curated terminal transcript is not represented as a raw redirected serial capture.
 
-A physical PWM witness should not be represented as proof of guaranteed mechanical servo movement.
+An electrical PWM witness is not represented as proof of guaranteed mechanical movement.
 
-Observed outcomes are documented in:
+Post-commit partition deinitialization, reinitialization, and fresh reread establish a stronger runtime verification boundary than a same-handle read but do not independently resolve every immediate-power-loss persistence point.
+
+ESP-LOCAL-006 does not establish resistance to:
+
+```text
+trusted provider private-key theft
+complete endpoint compromise
+denial of service
+hostile routing
+rollback of persistent storage
+physical storage tampering
+absence of trusted time
+```
+
+Those limitations do not alter the tested result that a hostile intermediary lacking trusted provider signing material did not obtain greater executable authority in the scored configuration.
+
+Observed outcomes are recorded in:
 
 ```text
 RESULTS.md
 ```
 
-Published artifact integrity is documented in:
+Firmware implementation and reproduction notes are recorded in:
+
+```text
+firmware/README.md
+```
+
+Published-file integrity is recorded in:
 
 ```text
 SHA256SUMS.txt
