@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # NUVL Challenge Demonstration - Limited Evaluation Permission
 #
 # Permission to run and modify this file for local, noncommercial evaluation
@@ -5,7 +6,6 @@
 # module-license-notice/README.md at the repository root.
 # Uses outside that permission require a separate written agreement.
 # This file is not licensed under Apache 2.0.
-#!/usr/bin/env python3
 import argparse
 import json
 import os
