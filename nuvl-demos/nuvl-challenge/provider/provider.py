@@ -151,7 +151,7 @@ def save_stats():
     if now - _last_save < SAVE_INTERVAL:
         return
     _last_save = now
-    with open("/root/stats.json", "w", encoding="utf-8") as f:
+    with open("stats.json", "w", encoding="utf-8") as f:
         json.dump(stats, f)
 
     rps = compute_rps()
@@ -162,7 +162,7 @@ def save_stats():
     update_system_stats()
     compute_rates()
 
-    with open("/root/stats.json", "w", encoding="utf-8") as f:
+    with open("stats.json", "w", encoding="utf-8") as f:
         json.dump(stats, f, indent=2)
 
 
