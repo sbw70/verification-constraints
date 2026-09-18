@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # NUVL Challenge Demonstration - Limited Evaluation Permission
 #
 # Permission to run and modify this file for local, noncommercial evaluation
