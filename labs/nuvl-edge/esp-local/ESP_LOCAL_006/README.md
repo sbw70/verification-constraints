@@ -1,10 +1,69 @@
 # ESP-LOCAL-006 — Hostile Relay / Compromised Forwarder
 
-ESP-LOCAL-006 evaluates whether an intermediary positioned between the requester/provider side and an endpoint-local enforcement boundary can convert transport or content-control capability into greater executable authority.
+ESP-LOCAL-006 evaluates whether an intermediary positioned between provider-issued authority and an endpoint-local enforcement boundary can convert control of transport or request content into greater executable authority.
 
-The test retains provider-controlled authority while introducing a hostile application-layer relay capable of observing, modifying, substituting, forwarding, and replaying authority-bearing requests.
+The test introduced a hostile application-layer relay capable of observing, modifying, substituting, forwarding, delaying, and replaying authority-bearing requests while retaining endpoint-local recognition and enforcement.
 
-The central requirement is that compromise of the path must not become compromise of provider authority.
+The requirement under test was:
+
+> Intermediary control over the request path must not become the ability to originate, enlarge, substitute, regenerate, or reuse provider authority.
+
+ESP-LOCAL-006 is a NUVL core test and does not introduce an architecture change.
+
+## Tested Architecture
+
+```text
+requester / provider
+        ↓
+Raspberry Pi 3 hostile relay
+        ↓
+ESP32-S3 endpoint-local recognition
+        ↓
+persistent single-use authority enforcement
+        ↓
+servo PWM command path
+        ↓
+independent ESP32-S3 witness
+```
+
+The relay was hostile with respect to transport and request content.
+
+It did not possess the trusted provider private key and did not have trusted-provider signing capability.
+
+The endpoint retained the provider public trust anchor and remained responsible for deciding whether a presented request represented executable provider-established authority.
+
+## Supported Result
+
+Within the tested configuration, the hostile intermediary could transport, observe, mutate, substitute, and replay requests but could not turn those capabilities into greater executable provider authority.
+
+The completed matrix demonstrated that:
+
+- signed-field mutation was rejected,
+- attempted enlargement of `max_uses` was rejected,
+- a correctly structured request signed by an untrusted provider key was rejected,
+- an untouched trusted request remained usable after preceding invalid submissions,
+- valid authority was consumed once,
+- replay after consumption was rejected,
+- rejected hostile submissions did not consume or poison the legitimate unused authority,
+- accepted authority was recorded as `SPENT` before PWM command issuance,
+- independent GPIO observation recorded one servo-valid PWM burst for each accepted fresh authority and no second burst for the scored replay controls.
+
+The strongest provider-key control used identical canonical Authority #2 bytes with different signatures:
+
+```text
+authority_bytes_equal: True
+signatures_equal: False
+```
+
+The wrong-provider signature was rejected.
+
+The trusted-provider signature over the same canonical authority bytes was accepted.
+
+Detailed observed results are recorded in:
+
+```text
+RESULTS.md
+```
 
 ## Scope
 
@@ -13,47 +72,22 @@ ESP-LOCAL-006 exercises:
 - provider-issued Ed25519-signed bounded authority,
 - endpoint-local signature verification,
 - endpoint-local semantic admissibility,
-- persistent single-use authority state,
-- a hostile intermediary with request-content control,
-- signed-field mutation,
-- attempted enlargement of `max_uses`,
+- SHA-256 binding of received canonical authority to persistent authority state,
+- persistent single-use authority consumption,
+- hostile intermediary request-content control,
+- `action` mutation,
+- `context` mutation,
+- `device_id` mutation,
+- `max_uses` enlargement,
 - byte-preserving pass-through controls,
 - wrong-provider signature substitution,
-- replay after legitimate execution,
-- independent electrical observation of the PWM command path,
-- direct pre-test and post-test persistent-state capture.
+- replay after legitimate consumption,
+- direct persistent-state capture,
+- independent electrical observation of the PWM command path.
 
-The relay was hostile with respect to transport and request content.
+ESP-LOCAL-006 tests compromised-forwarder behavior.
 
-It did not possess the trusted provider private key and did not have trusted-provider signing capability.
-
-ESP-LOCAL-006 therefore tests compromised-forwarder behavior, not trusted-provider key compromise.
-
-## Architectural Model
-
-The tested path was:
-
-```text
-requester / provider
-        ↓
-Raspberry Pi 3 hostile relay
-        ↓
-ESP32-S3 endpoint-local enforcement
-        ↓
-persistent single-use authority state
-        ↓
-servo PWM command path
-        ↓
-independent ESP32-S3 witness
-```
-
-The relay could observe and manipulate requests.
-
-The endpoint remained responsible for determining whether a presented request represented executable provider authority.
-
-The endpoint could recognize and consume provider-established authority.
-
-The relay could not independently originate trusted provider authority.
+It does not test compromise of the trusted provider signing key.
 
 ## Test Endpoint
 
@@ -67,17 +101,21 @@ Actuator:   servo PWM
 Port:       19061
 ```
 
-The endpoint used endpoint-local Ed25519 verification and persistent single-use authority state.
+The endpoint used endpoint-local Ed25519 recognition and persistent single-use authority state.
 
-A separate ESP32-S3 DevKit was used as an independent witness of the electrical PWM command path.
+A separate ESP32-S3 DevKit independently monitored the electrical PWM command path:
 
-The witness monitored endpoint GPIO5 through witness GPIO4.
+```text
+endpoint GPIO5
+      ↓
+witness GPIO4
+```
+
+The witness was observational only and did not participate in authorization.
 
 ## Hostile Relay
 
 The hostile relay ran on a Raspberry Pi 3.
-
-Default relay path:
 
 ```text
 requester
@@ -87,7 +125,7 @@ hostile relay
 endpoint
 ```
 
-The relay implementation supports:
+The tested relay implementation supports:
 
 - pass-through,
 - `action` mutation,
@@ -97,11 +135,11 @@ The relay implementation supports:
 - replay,
 - per-transaction JSONL logging.
 
-For mutation cases, the relay modifies the canonical authority content while retaining the original provider signature.
+For mutation cases, the relay modifies authority-bearing content while retaining the original provider signature.
 
-It does not generate a replacement trusted-provider signature.
+It does not create a replacement trusted-provider signature.
 
-At startup the relay reports:
+The tested relay reports:
 
 ```text
 provider_private_key=ABSENT
@@ -110,7 +148,7 @@ signing_capability=ABSENT
 
 ## Provider Authority
 
-The tested authority representation was:
+The runtime recognizes authority in the canonical form:
 
 ```json
 {
@@ -118,11 +156,15 @@ The tested authority representation was:
   "context": "esp_local_006",
   "device_id": "esp32-xiao-servo-02",
   "max_uses": 1,
-  "nonce": "<authority-specific nonce>"
+  "nonce": "<32 lowercase hexadecimal characters>"
 }
 ```
 
-The trusted provider raw Ed25519 public key was:
+The nonce may vary for a fresh provider-issued authority.
+
+The remaining authority-bearing fields are constrained by the endpoint-local admissibility rule used in this test.
+
+Trusted provider raw Ed25519 public key:
 
 ```text
 48852270ce16654edeef2a1c3d0930af4b990e1bf5060fb3221996434f63e5b1
@@ -132,36 +174,76 @@ Two fresh authority instances were used.
 
 ### Authority #1
 
+Authority identifier:
+
+```text
+f72ade66cea3c93c2cb57944e03d69e185a061a59f83c3705a8e6977dfddc7d6
+```
+
 Authority #1 was used for:
 
 - `action` mutation,
 - `context` mutation,
 - `device_id` mutation,
 - `max_uses` enlargement,
-- untouched positive control,
+- untouched trusted positive control,
 - replay after legitimate consumption.
-
-Authority #1 identifier:
-
-```text
-f72ade66cea3c93c2cb57944e03d69e185a061a59f83c3705a8e6977dfddc7d6
-```
 
 ### Authority #2
 
-Authority #2 was used for the different-provider-key control.
-
-Authority #2 identifier:
+Authority identifier:
 
 ```text
 196a973cfe65d81c415618f2874874e65d88e006223783bc0726a4c84acf87fc
 ```
 
-The trusted-provider and wrong-provider Auth2 request envelopes contain identical canonical authority bytes and different Ed25519 signatures.
+Authority #2 was used to isolate provider-key trust.
 
-The wrong-provider public key is published for inspection.
+The trusted-provider and wrong-provider requests preserve identical canonical authority bytes while carrying different Ed25519 signatures.
 
-The corresponding wrong-provider private key is not included in the publication package.
+The endpoint had no trust relationship with the wrong-provider key.
+
+## Endpoint Evaluation Order
+
+The published endpoint runtime implements the following decision path:
+
+```text
+receive relay envelope
+        ↓
+strict envelope decoding
+        ↓
+provider Ed25519 verification
+        ↓
+semantic admissibility
+        ↓
+SHA-256 received authority
+        ↓
+persistent-state validation
+        ↓
+exact authority-id match
+        ↓
+require UNSPENT
+        ↓
+record SPENT
+        ↓
+commit
+        ↓
+close NVS handle
+        ↓
+deinitialize authority partition
+        ↓
+reinitialize authority partition
+        ↓
+fresh state reread
+        ↓
+require same authority-id + SPENT
+        ↓
+PWM command
+```
+
+No later failure path restores consumed authority.
+
+Missing, malformed, corrupt, mismatched, or already-spent authority state is not treated as fresh authority.
 
 ## Persistent Authority State
 
@@ -174,70 +256,152 @@ size:    0x6000
 length:  24576 bytes
 ```
 
-Recognized authority states include:
+The persisted authority record contains:
 
 ```text
-UNSPENT
-SPENT
+magic
+version
+state
+reserved
+authority_id[32]
+crc32
 ```
 
-The endpoint requires a valid matching persistent authority record before execution.
+Total record size:
 
-Accepted authority is recorded as spent before PWM command issuance.
+```text
+44 bytes
+```
 
-Persistence characteristics underlying that state transition were characterized separately in ESP-LOCAL-005.
+Recognized state values:
 
-ESP-LOCAL-006 does not extend those persistence claims beyond the limitations already documented there.
+```text
+UNSPENT = 1
+SPENT   = 2
+```
+
+The endpoint requires a structurally valid persistent record whose stored authority identifier exactly matches the SHA-256 identifier of the received canonical authority.
+
+Accepted authority is transitioned to `SPENT` before physical command issuance.
+
+The runtime then closes the NVS handle, deinitializes and reinitializes the authority partition, and performs a fresh reread requiring the same authority identifier and `SPENT` state before PWM.
+
+This post-commit reread is stronger than a same-handle cached read.
+
+It does not independently establish persistence across an immediate power-loss boundary or resolve the exact physical ESP-IDF/NVS persistence point characterized separately in ESP-LOCAL-005.
 
 ## Test Matrix
 
-The completed ESP-LOCAL-006 matrix includes:
+The scored matrix was:
 
 ```text
-Auth1 action mutation
-Auth1 context mutation
-Auth1 device_id mutation
-Auth1 max_uses enlargement
-Auth1 untouched positive control
-Auth1 replay
-Auth2 wrong-provider signature control
-Auth2 trusted-provider positive control
-Auth2 trusted replay
+1. Auth1 action mutation
+2. Auth1 context mutation
+3. Auth1 device_id mutation
+4. Auth1 max_uses enlargement
+5. Auth1 untouched trusted positive control
+6. Auth1 replay
+7. Auth2 wrong-provider signature control
+8. Auth2 trusted-provider positive control
+9. Auth2 trusted replay
 ```
 
-Detailed observed outcomes are intentionally separated from this README.
+A transport failure was not counted as an authorization denial.
 
-See:
+The initial `max_uses` mutation attempts that failed to reach the endpoint because of relay-to-endpoint transport delay were not scored.
 
-```text
-RESULTS.md
-```
+The case was rerun with a longer transport timeout and was scored only after the mutated request reached the endpoint and exercised the endpoint validation path.
 
 ## Independent Witness
 
-The independent witness runs separately from the enforcing endpoint.
-
-Its role is observation only.
-
-The witness:
+The independent witness:
 
 - does not hold provider signing material,
-- does not verify authority,
+- does not verify provider authority,
 - does not consume authority,
-- does not alter endpoint state,
-- does not make authorization decisions.
+- does not modify persistent state,
+- does not participate in the endpoint decision.
 
-It measures positive pulse widths observed on the endpoint PWM line.
-
-Observed output is emitted as:
+It records positive pulse widths observed on the endpoint PWM line as:
 
 ```text
 PWM_HIGH_US <width>
 ```
 
-The witness establishes observed electrical PWM command issuance.
+The witness supports a claim of observed electrical PWM command issuance.
 
 It does not independently establish guaranteed mechanical servo motion or exactly-once mechanical actuation.
+
+## Evidence Model
+
+The publication preserves separate evidence layers:
+
+```text
+provider authority artifact
+        ↓
+relay transaction record
+        ↓
+endpoint decision observation
+        ↓
+persistent-state capture
+        ↓
+independent PWM observation
+```
+
+No single artifact is treated as sufficient by itself to establish the complete result.
+
+Persistent-state partition hashes establish binary-image identity and change.
+
+The specific `UNSPENT` or `SPENT` interpretation depends on parsing the authority record, preserving the authority identifier, validating the NVS record structure and CRC, and correlating the result with endpoint and replay observations.
+
+The COM15 endpoint and COM8 witness transcripts are curated derivatives reconstructed from preserved interactive terminal output.
+
+They are explicitly not represented as original redirected raw serial logs.
+
+## Published Firmware
+
+Unlike the initial publication boundary used during test development, the completed ESP-LOCAL-006 package includes the endpoint implementation and preserved tested application binaries.
+
+Published firmware material includes:
+
+```text
+firmware/
+├── README.md
+├── CMakeLists.txt
+├── partitions.csv
+├── sdkconfig
+├── main/
+│   ├── CMakeLists.AUTH2_TESTED.txt
+│   ├── ESP_LOCAL_006.c
+│   ├── ESP_LOCAL_006_PROVISIONER.c
+│   ├── ESP_LOCAL_006_AUTH2_PROVISIONER.c
+│   └── local_wifi_config.example.h
+└── components/
+    └── monocypher/
+        ├── CMakeLists.txt
+        ├── monocypher.c
+        ├── monocypher.h
+        ├── monocypher-ed25519.c
+        └── monocypher-ed25519.h
+```
+
+The original credential-bearing `local_wifi_config.h` is not published.
+
+A sanitized publication derivative is provided as:
+
+```text
+firmware/main/local_wifi_config.example.h
+```
+
+The final retained `main/CMakeLists.txt` corresponded to the Authority #2 provisioner build and is preserved as:
+
+```text
+firmware/main/CMakeLists.AUTH2_TESTED.txt
+```
+
+It is not represented as a universal build selector for all three applications.
+
+The exact preserved tested application binaries are published under `evidence/`.
 
 ## Directory Contents
 
@@ -248,6 +412,7 @@ ESP_LOCAL_006/
 ├── PROVENANCE.md
 ├── SHA256SUMS.txt
 ├── evidence/
+├── firmware/
 ├── provider/
 ├── relay/
 └── witness/
@@ -255,16 +420,21 @@ ESP_LOCAL_006/
 
 ### `evidence/`
 
-Contains preserved test evidence, including:
+Contains test evidence including:
 
-- Raspberry Pi relay-host baseline,
+- Raspberry Pi 3 relay-host baseline,
 - Auth1 relay JSONL records,
 - Auth2 relay JSONL records,
 - curated COM15 endpoint transcript,
 - curated COM8 witness transcript,
-- raw persistent-state partition captures.
+- raw authority-state partition captures,
+- preserved tested runtime binary,
+- preserved Authority #1 provisioner binary,
+- preserved Authority #2 provisioner binary.
 
-The terminal transcripts are explicitly marked as curated derivatives and are not represented as raw redirected serial logs.
+### `firmware/`
+
+Contains the published endpoint runtime, provisioner sources, build configuration, partition definition, cryptographic component source, sanitized Wi-Fi configuration template, and firmware-specific documentation.
 
 ### `provider/`
 
@@ -277,11 +447,11 @@ Contains:
 - Authority #2 wrong-provider request,
 - wrong-provider public key.
 
-The trusted provider private key and wrong-provider private key are not published in this directory.
+The trusted provider private key and wrong-provider private key are not published.
 
 ### `relay/`
 
-Contains the hostile relay implementation and relay-specific documentation.
+Contains the tested hostile relay implementation and relay-specific documentation.
 
 ### `witness/`
 
@@ -289,88 +459,46 @@ Contains the independent GPIO witness implementation and witness-specific docume
 
 ### `RESULTS.md`
 
-Records the observed behavior of the completed test matrix.
+Records the observed behavior of the completed scored matrix and test limitations.
 
 ### `PROVENANCE.md`
 
-Records artifact origin, authority relationships, relay lineage, persistent-state capture lineage, curated-evidence lineage, and the tested-but-unpublished implementation boundary.
+Records tested artifact identities, authority relationships, build lineage, relay lineage, persistent-state capture lineage, curated-evidence lineage, and publication relationships.
 
 ### `SHA256SUMS.txt`
 
-Provides SHA-256 verification for the files actually published in the ESP-LOCAL-006 package.
+Records SHA-256 values for the files actually published in the completed ESP-LOCAL-006 tree.
 
-## Reproduction Model
+The manifest is regenerated after publication contents are finalized.
 
-Reproduction should preserve separation between:
+## Reproduction Requirements
+
+A meaningful reproduction must preserve separation between:
 
 1. trusted provider authority generation,
 2. hostile relay operation,
 3. endpoint-local signature verification,
 4. endpoint-local semantic admissibility,
-5. persistent single-use state,
-6. physical command issuance,
-7. independent witness observation.
+5. exact authority-to-state binding,
+6. persistent single-use consumption,
+7. physical command issuance,
+8. independent witness observation.
 
-A mutation case should not be scored as an authorization result unless the modified request reaches the endpoint and exercises the endpoint validation path.
+A mutation case is not an authorization result unless the modified request reaches the endpoint and exercises the endpoint validation path.
 
 A timeout, dropped request, or transport failure is not equivalent to endpoint denial.
 
-For wrong-provider controls, trusted and untrusted requests should preserve identical canonical authority bytes so that provider-key trust is isolated from authority-content differences.
+For a different-provider-key control, trusted and untrusted requests should preserve identical canonical authority bytes so that provider trust is isolated from authority-content differences.
 
-A fresh `UNSPENT` authority should be used when a test requires an unused authority instance.
+A test requiring unused authority should begin with a fresh `UNSPENT` authority instance.
 
-Previously consumed authority should remain consumed rather than being reset and reused as though it were fresh authority.
+Previously consumed authority should remain consumed rather than being reset and reused as though it were fresh.
 
-## Evidence Interpretation
-
-The evidence package preserves several independent observation layers:
-
-```text
-provider authority artifact
-        ↓
-relay transaction record
-        ↓
-endpoint decision observation
-        ↓
-persistent-state capture
-        ↓
-independent PWM witness
-```
-
-No single artifact is treated as sufficient by itself to establish the full execution result.
-
-A difference between pre-test and post-test persistent-state partition hashes establishes that the binary images differ.
-
-The specific state transition must be established from the parsed authority record, preserved authority identifier, valid NVS CRC, endpoint observations, and replay behavior.
-
-Curated terminal transcripts identify the published derivative artifacts themselves and do not claim to be original raw serial captures.
-
-## Publication Boundary
-
-The ESP-LOCAL-006 public package does not include implementation material that exposes the persistent-authority enforcement boundary.
-
-Excluded implementation classes include:
-
-- endpoint runtime source exposing persistence mechanics,
-- authority provisioner source,
-- authority provisioner binaries,
-- implementation-specific state-write logic.
-
-The publication instead preserves:
-
-- provider authority artifacts,
-- relay source,
-- witness source,
-- relay evidence,
-- endpoint observations,
-- witness observations,
-- persistent-state captures,
-- artifact lineage,
-- published hashes.
+A rebuilt binary is a reproduction build unless its SHA-256 exactly matches the corresponding preserved tested binary.
 
 ## Boundaries
 
-ESP-LOCAL-006 is not intended to establish:
+ESP-LOCAL-006 does not establish:
 
 - resistance to trusted provider private-key theft,
 - resistance to complete endpoint compromise,
@@ -380,14 +508,20 @@ ESP-LOCAL-006 is not intended to establish:
 - trusted time or expiration enforcement,
 - tamper-resistant persistent storage,
 - anti-rollback protection,
+- persistence across every possible immediate power-loss point,
+- the exact physical ESP-IDF/NVS persistence boundary,
 - exactly-once mechanical actuation,
 - guaranteed mechanical servo movement.
 
-The relay's network position could still be used to interfere with communication by delaying or preventing delivery.
+The hostile relay can still interfere with availability by delaying, dropping, or preventing delivery.
 
-The property under test is narrower:
+The demonstrated property is narrower:
 
-intermediary control over the request path must not become greater provider authority.
+> Control of the intermediary request path did not become greater executable provider authority in the tested architecture.
+
+The additional negative-path result is also material:
+
+> Rejected invalid submissions did not consume the legitimate unused authority later accepted under the original provider-established bounds.
 
 Observed outcomes are documented in:
 
@@ -399,6 +533,12 @@ Artifact lineage is documented in:
 
 ```text
 PROVENANCE.md
+```
+
+Firmware and build material are documented in:
+
+```text
+firmware/README.md
 ```
 
 Published file integrity is documented in:
