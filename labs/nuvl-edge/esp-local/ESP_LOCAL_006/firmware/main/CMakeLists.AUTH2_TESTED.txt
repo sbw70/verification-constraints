@@ -1,0 +1,8 @@
+﻿idf_component_register(
+    SRCS
+        "ESP_LOCAL_006_AUTH2_PROVISIONER.c"
+    INCLUDE_DIRS
+        "."
+    PRIV_REQUIRES
+        nvs_flash
+)
