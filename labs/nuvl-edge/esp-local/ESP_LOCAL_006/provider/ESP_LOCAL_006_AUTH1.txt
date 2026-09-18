@@ -1,0 +1,7 @@
+ESP-LOCAL-006 AUTHORITY #1
+
+nonce=99337255d93cee60019493a813c42f23
+canonical={"action":"move_servo","context":"esp_local_006","device_id":"esp32-xiao-servo-02","max_uses":1,"nonce":"99337255d93cee60019493a813c42f23"}
+authority_id_sha256=f72ade66cea3c93c2cb57944e03d69e185a061a59f83c3705a8e6977dfddc7d6
+signature_b64=6bsiP6Tqky4FfRvy0qSEXs+gZxbKT/5tz8AAbPMVnLYdHKN3hl8mQ9WsIGk5bgUmS5+/ja8CfgrygAkiRiHuAA==
+provider_public_key_raw=48852270ce16654edeef2a1c3d0930af4b990e1bf5060fb3221996434f63e5b1
