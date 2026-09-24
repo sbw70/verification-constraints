@@ -1,0 +1,116 @@
+{
+  "test_id": "ESP_LOCAL_007",
+  "run_id": "R003",
+  "live": true,
+  "authority_id": "066fd59f04ba90f1476ea388a84e125a349a54435552205c0aaa6d5adfa14545",
+  "endpoint": {
+    "host": "192.168.0.186",
+    "port": 19061
+  },
+  "witness": {
+    "host": "192.168.0.216",
+    "port": 19072
+  },
+  "witness_status_before": {
+    "type": "status_reply",
+    "ip": "192.168.0.216",
+    "connected": true,
+    "control_port": 19072,
+    "gpio": 4,
+    "capture_engine": "rmt_rx",
+    "capture_ready": true,
+    "capture_queue_depth": 0,
+    "capture_overflows": 0,
+    "capture_truncations": 0,
+    "capture_errors": 0,
+    "rx_buffer_symbols": 256,
+    "capture_filter_min_ns": 1250,
+    "pulse_seq": 0,
+    "burst_seq": 0,
+    "session_file": "S_f6ff36a8_B0019.jl",
+    "device_id": "esp32-witness-007",
+    "session": "esp32-witness-007-f6ff36a8-B0019",
+    "run": "NONE"
+  },
+  "witness_start_reply": {
+    "type": "start_reply",
+    "ok": true,
+    "detail": "R_R003.jl",
+    "device_id": "esp32-witness-007",
+    "session": "esp32-witness-007-f6ff36a8-B0019",
+    "run": "R003"
+  },
+  "witness_stop_reply": {
+    "type": "stop_reply",
+    "ok": true,
+    "detail": "cad594e3fc18a0baa90f6a11bc789124c21241340329f83be23f50341ba10705",
+    "device_id": "esp32-witness-007",
+    "session": "esp32-witness-007-f6ff36a8-B0019",
+    "run": "NONE"
+  },
+  "witness_status_after": {
+    "type": "status_reply",
+    "ip": "192.168.0.216",
+    "connected": true,
+    "control_port": 19072,
+    "gpio": 4,
+    "capture_engine": "rmt_rx",
+    "capture_ready": true,
+    "capture_queue_depth": 0,
+    "capture_overflows": 0,
+    "capture_truncations": 0,
+    "capture_errors": 0,
+    "rx_buffer_symbols": 256,
+    "capture_filter_min_ns": 1250,
+    "pulse_seq": 2,
+    "burst_seq": 1,
+    "session_file": "S_f6ff36a8_B0019.jl",
+    "device_id": "esp32-witness-007",
+    "session": "esp32-witness-007-f6ff36a8-B0019",
+    "run": "NONE"
+  },
+  "requesters": [
+    {
+      "index": 0,
+      "error": null,
+      "t_connect_start": 1790184144.5226738,
+      "t_connect_done": 1790184144.5344865,
+      "t_ready_recv": 1790184144.5425296,
+      "ready_line": "{\"ready\":true,\"test\":\"ESP_LOCAL_007\"}",
+      "t_release_pre_send": 745657908131400,
+      "t_release_post_send": 745657908246400,
+      "t_response_recv": 1790184144.636702,
+      "response_line": "{\"status\":\"denied\",\"reason\":\"state_invalid\"}",
+      "parsed_response": {
+        "status": "denied",
+        "reason": "state_invalid"
+      }
+    },
+    {
+      "index": 1,
+      "error": null,
+      "t_connect_start": 1790184144.5228498,
+      "t_connect_done": 1790184144.5345352,
+      "t_ready_recv": 1790184144.5484583,
+      "ready_line": "{\"ready\":true,\"test\":\"ESP_LOCAL_007\"}",
+      "t_release_pre_send": 745657908088700,
+      "t_release_post_send": 745657908165600,
+      "t_response_recv": 1790184145.6482415,
+      "response_line": "{\"status\":\"accepted\",\"reason\":\"executed\"}",
+      "parsed_response": {
+        "status": "accepted",
+        "reason": "executed"
+      }
+    }
+  ],
+  "summary": {
+    "accepted_count": 1,
+    "denied_count": 1,
+    "error_count": 0,
+    "denied_reasons": [
+      "state_invalid"
+    ],
+    "release_send_skew_ns": 42700
+  },
+  "recorded_at_utc": "2026-09-23T17:22:26.062757+00:00"
+}
