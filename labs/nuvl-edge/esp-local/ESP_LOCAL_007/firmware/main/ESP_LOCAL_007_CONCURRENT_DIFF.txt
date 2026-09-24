@@ -1,0 +1,313 @@
+--- ESP_LOCAL_006.c
++++ ESP_LOCAL_007_CONCURRENT.c
+@@ -30,7 +30,7 @@
+ 
+ #include "local_wifi_config.h"
+ 
+-static const char *TAG = "ESP_LOCAL_006";
++static const char *TAG = "ESP_LOCAL_007";
+ 
+ /* --------------------------------------------------------------------------
+  * ESP-LOCAL-006
+@@ -76,7 +76,10 @@
+  * -------------------------------------------------------------------------- */
+ 
+ #define RELAY_LISTEN_PORT       19061
+-#define LISTEN_BACKLOG          4
++#define LISTEN_BACKLOG          16
++
++#define CLIENT_TASK_STACK_BYTES 12288
++#define CLIENT_TASK_PRIORITY    5
+ 
+ #define MAX_REQUEST_LINE        2048
+ #define MAX_AUTHORITY_B64       1024
+@@ -1402,8 +1405,154 @@
+ 
+ 
+ /* --------------------------------------------------------------------------
+- * Application-layer listener
+- * -------------------------------------------------------------------------- */
++ * ESP-LOCAL-007 concurrent application-layer listener
++ *
++ * Test-only dispatch change derived from ESP-LOCAL-006.
++ *
++ * Each accepted TCP connection receives its own FreeRTOS task. The task
++ * reports READY before reading the authority request. The requester
++ * coordinator waits until every intended requester has received READY,
++ * then releases identical provider-issued request bytes concurrently.
++ *
++ * No synchronization is added around process_request(), persistent state,
++ * durable_consume(), provider verification, or physical execution. Those
++ * paths remain the enforcement path under test.
++ * -------------------------------------------------------------------------- */
++
++static bool send_client_ready(int client_sock)
++{
++    static const char ready[] =
++        "{\"ready\":true,\"test\":\"ESP_LOCAL_007\"}\n";
++
++    size_t sent_total = 0U;
++    const size_t ready_length = sizeof(ready) - 1U;
++
++    while (sent_total < ready_length) {
++        ssize_t sent = send(
++            client_sock,
++            ready + sent_total,
++            ready_length - sent_total,
++            0
++        );
++
++        if (sent <= 0) {
++            return false;
++        }
++
++        sent_total += (size_t)sent;
++    }
++
++    return true;
++}
++
++
++static void client_request_task(void *arg)
++{
++    int client_sock = (int)(intptr_t)arg;
++
++    struct timeval timeout = {
++        .tv_sec = 15,
++        .tv_usec = 0
++    };
++
++    (void)setsockopt(
++        client_sock,
++        SOL_SOCKET,
++        SO_RCVTIMEO,
++        &timeout,
++        sizeof(timeout)
++    );
++
++    (void)setsockopt(
++        client_sock,
++        SOL_SOCKET,
++        SO_SNDTIMEO,
++        &timeout,
++        sizeof(timeout)
++    );
++
++    if (!send_client_ready(client_sock)) {
++        ESP_LOGW(
++            TAG,
++            "007_CLIENT_READY_SEND_FAILED fd=%d errno=%d",
++            client_sock,
++            errno
++        );
++
++        close(client_sock);
++        vTaskDelete(NULL);
++        return;
++    }
++
++    ESP_LOGI(
++        TAG,
++        "007_CLIENT_READY fd=%d",
++        client_sock
++    );
++
++    char line[MAX_REQUEST_LINE];
++
++    if (!recv_request_line(
++            client_sock,
++            line,
++            sizeof(line)
++        )) {
++        ESP_LOGW(
++            TAG,
++            "007_DENY_REQUEST_READ fd=%d",
++            client_sock
++        );
++
++        send_response(
++            client_sock,
++            false,
++            "request_read_failed"
++        );
++
++        close(client_sock);
++        vTaskDelete(NULL);
++        return;
++    }
++
++    ESP_LOGI(
++        TAG,
++        "007_CLIENT_REQUEST_RECEIVED fd=%d",
++        client_sock
++    );
++
++    /*
++     * Intentionally call the unchanged ESP-LOCAL-006 enforcement path
++     * concurrently. No contention lock is inserted here.
++     */
++    const char *denial_reason = process_request(line);
++
++    if (denial_reason == NULL) {
++        send_response(
++            client_sock,
++            true,
++            NULL
++        );
++    } else {
++        send_response(
++            client_sock,
++            false,
++            denial_reason
++        );
++    }
++
++    ESP_LOGI(
++        TAG,
++        "007_CLIENT_COMPLETE fd=%d result=%s",
++        client_sock,
++        denial_reason == NULL
++            ? "accepted"
++            : denial_reason
++    );
++
++    close(client_sock);
++    vTaskDelete(NULL);
++}
++
+ 
+ static void relay_listener_loop(void)
+ {
+@@ -1420,6 +1569,7 @@
+                 "Unable to create listener socket: errno=%d",
+                 errno
+             );
++
+             vTaskDelay(pdMS_TO_TICKS(1000));
+             continue;
+         }
+@@ -1450,6 +1600,7 @@
+                 "Listener bind failed: errno=%d",
+                 errno
+             );
++
+             close(server_sock);
+             vTaskDelay(pdMS_TO_TICKS(1000));
+             continue;
+@@ -1461,6 +1612,7 @@
+                 "Listener listen failed: errno=%d",
+                 errno
+             );
++
+             close(server_sock);
+             vTaskDelay(pdMS_TO_TICKS(1000));
+             continue;
+@@ -1468,8 +1620,9 @@
+ 
+         ESP_LOGI(
+             TAG,
+-            "006_ENDPOINT_LISTENING port=%d",
+-            RELAY_LISTEN_PORT
++            "007_ENDPOINT_LISTENING port=%d backlog=%d",
++            RELAY_LISTEN_PORT,
++            LISTEN_BACKLOG
+         );
+ 
+         while (true) {
+@@ -1501,73 +1654,48 @@
+ 
+             ESP_LOGI(
+                 TAG,
+-                "006_REQUEST_FROM %s:%u",
++                "007_CLIENT_ACCEPTED %s:%u fd=%d",
+                 source_ip,
+-                (unsigned)ntohs(source_address.sin_port)
++                (unsigned)ntohs(source_address.sin_port),
++                client_sock
+             );
+ 
+-            struct timeval timeout = {
+-                .tv_sec = 5,
+-                .tv_usec = 0
+-            };
+-
+-            (void)setsockopt(
+-                client_sock,
+-                SOL_SOCKET,
+-                SO_RCVTIMEO,
+-                &timeout,
+-                sizeof(timeout)
++            BaseType_t created = xTaskCreate(
++                client_request_task,
++                "007_client",
++                CLIENT_TASK_STACK_BYTES,
++                (void *)(intptr_t)client_sock,
++                CLIENT_TASK_PRIORITY,
++                NULL
+             );
+ 
+-            (void)setsockopt(
+-                client_sock,
+-                SOL_SOCKET,
+-                SO_SNDTIMEO,
+-                &timeout,
+-                sizeof(timeout)
+-            );
+-
+-            char line[MAX_REQUEST_LINE];
+-
+-            if (!recv_request_line(
+-                    client_sock,
+-                    line,
+-                    sizeof(line)
+-                )) {
+-                ESP_LOGW(TAG, "006_DENY_REQUEST_READ");
++            if (created != pdPASS) {
++                ESP_LOGE(
++                    TAG,
++                    "007_CLIENT_TASK_CREATE_FAILED fd=%d",
++                    client_sock
++                );
++
+                 send_response(
+                     client_sock,
+                     false,
+-                    "request_read_failed"
++                    "server_busy"
+                 );
++
+                 close(client_sock);
+                 continue;
+             }
+ 
+-            const char *denial_reason = process_request(line);
+-
+-            if (denial_reason == NULL) {
+-                send_response(
+-                    client_sock,
+-                    true,
+-                    NULL
+-                );
+-            } else {
+-                send_response(
+-                    client_sock,
+-                    false,
+-                    denial_reason
+-                );
+-            }
+-
+-            close(client_sock);
++            /*
++             * Immediately return to accept(). The client task owns
++             * client_sock from this point forward.
++             */
+         }
+ 
+         close(server_sock);
+         vTaskDelay(pdMS_TO_TICKS(1000));
+     }
+ }
+-
+ 
+ /* --------------------------------------------------------------------------
+  * app_main
