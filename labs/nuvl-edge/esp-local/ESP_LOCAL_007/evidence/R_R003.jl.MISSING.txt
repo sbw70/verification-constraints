@@ -1,3 +1,0 @@
-R_R003.jl is not yet included — it still lives on the witness device's SPIFFS flash.
-Pull it off the witness, then place it here as R_R003.jl (+ R_R003.jl.sha).
-Expected SHA-256: cad594e3fc18a0baa90f6a11bc789124c21241340329f83be23f50341ba10705
