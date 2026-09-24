@@ -1,5 +1,0 @@
-witness_preerase_image.bin not included in this transfer (4 MB file dropped the device link).
-Copy it manually from:
-  esp32-main\ESP_LOCAL_007\witness\ESP_LOCAL_007_WITNESS_RMT_V1\witness_evidence_preimage_B0002-B0015.bin
-Rename to witness_preerase_image.bin. Expected SHA-256:
-  a347208bc950daf350a3e57e98bb6155b45a45bba23469ad0810db05dfbe1d8e
