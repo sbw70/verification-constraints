@@ -1,0 +1,16 @@
+ESP-LOCAL-007 AUTHORITY #2
+
+test_id=ESP_LOCAL_007
+endpoint_runtime=ESP_LOCAL_006
+runtime_reused_unchanged=true
+contention_variable_only=true
+device_id=esp32-xiao-servo-02
+context=esp_local_006
+action=move_servo
+max_uses=1
+nonce=b3e5571eee07d3e37ca757b54a549a3e
+canonical={"action":"move_servo","context":"esp_local_006","device_id":"esp32-xiao-servo-02","max_uses":1,"nonce":"b3e5571eee07d3e37ca757b54a549a3e"}
+authority_id_sha256=066fd59f04ba90f1476ea388a84e125a349a54435552205c0aaa6d5adfa14545
+trusted_provider_public_raw=48852270ce16654edeef2a1c3d0930af4b990e1bf5060fb3221996434f63e5b1
+trusted_private_key_sha256=DA0A36F274EFC6E3CE1C7643800B952B1AA2895201E5A6D6852D308729466509
+signature_b64=oD/gud28uD5tCy2yRURfVEsejixcJ4FClJ2222fhaJNGKuDf4/6e2/sjpxTbNyay7PbujCweZD9b62uvO/0MAA==
