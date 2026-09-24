@@ -1,0 +1,12 @@
+The tested runtime binary is withheld because ESP-IDF compiles the Wi-Fi SSID and
+password (from local_wifi_config.h) directly into the app image, and the password
+is the one credential kept private.
+
+Its identity is still fixed by hash for the evidence record:
+  ESP_LOCAL_007_CONCURRENT.bin  SHA-256:
+  6266f600f1d463b0d73878374fad178cae62497dbf38854e4df92a69a44b4abf
+
+To reproduce: build firmware/ with your own local_wifi_config.h. A rebuild will not
+match the hash above (compile-time stamps + a different Wi-Fi password), which is
+expected — the source and sdkconfig are the reproducible artifacts, the hash is the
+identity of the specific tested build.
