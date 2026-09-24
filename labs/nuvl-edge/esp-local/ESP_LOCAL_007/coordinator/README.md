@@ -1,259 +1,197 @@
-# ESP-LOCAL-007 Coordinator
+# ESP-LOCAL-007 Coordinator Tools
 
-This directory contains the coordinator used for the ESP-LOCAL-007 concurrent-requester contention test.
+This directory contains the host-side coordination and verification utilities used by ESP-LOCAL-007.
 
-The coordinator does not decide whether an authority is valid and does not participate in persistent authority consumption. Its role is to arrange a controlled concurrent presentation of identical request bytes, coordinate the independent hardware witness, and record requester-level timing and responses as machine-readable evidence.
+The tools in this directory do not implement provider authority or endpoint enforcement. They coordinate concurrent requester release, inspect persistent-state evidence, and verify the independent witness configuration.
 
-The authoritative scored run is **R003 (2026-09-23)**.
+## Files
 
-## File
+### `esp_local_007_coordinator.py`
 
-- `esp_local_007_coordinator.py` — opens and arms requester connections, gates release on the endpoint's exact READY response, releases identical bytes through a Python thread barrier, controls the witness run, records per-requester timestamps and responses, and writes a JSON evidence record.
+Host-side coordinator for the concurrent-requester contention test.
 
-## Test role
+The coordinator:
 
-ESP-LOCAL-007 asks whether simultaneous presentation of the same valid, provider-issued, single-use authority can enlarge that authority into more than one physical execution.
+1. Opens multiple TCP requester connections to the endpoint.
+2. Waits for the exact ESP-LOCAL-007 `READY` response from every requester connection.
+3. Holds all armed requester threads at a shared barrier.
+4. Releases identical request bytes to all requesters as closely together as the host scheduler permits.
+5. Captures each endpoint response and associated timestamps independently.
+6. Starts, marks, and stops the independent witness run over its UDP control interface.
+7. Calculates requester send-start skew.
+8. Writes the coordinator observations to a machine-readable JSON evidence file.
 
-For the scored R003 run:
+The default mode is a rehearsal. It sends a deliberately malformed request that is rejected before authority consumption.
 
-- endpoint: `esp32-xiao-servo-02`, `192.168.0.186:19061`
-- witness: `esp32-witness-007`, `192.168.0.216:19072`
-- requesters: 2
-- authority: AUTH2
-- `max_uses`: 1
-- coordinator release send-start skew: **42.7 µs**
-- requester result: **1 accepted, 1 denied**
-- independent physical result: **1 servo-like burst**
-- final authority state: **SPENT**
+A live authority is sent only when `--live` is supplied. Before a live run, the coordinator computes the authority ID from the exact canonical authority bytes in the request file and requires that ID to be typed back before release.
 
-The coordinator's accepted/denied counts are requester-level network evidence only. ESP-LOCAL-007 scoring also requires endpoint execution logs, independent witness evidence, and a final persistent-state readback.
-
-## Coordination sequence
-
-A run proceeds in this order:
-
-1. Select rehearsal or live request bytes.
-2. In live mode, load the frozen provider request without reserializing it.
-3. Decode the canonical authority bytes and independently compute the authority ID as SHA-256 over those exact bytes.
-4. Query the witness and start a named witness run.
-5. Open all requester TCP connections to the endpoint.
-6. Require the exact unsolicited READY object from every requester connection.
-7. Hold every armed requester at a shared thread barrier.
-8. Release the identical request bytes from all requester threads.
-9. Capture each response independently with timestamps.
-10. Mark requester completion at the witness.
-11. Stop the witness run and query post-run witness status.
-12. Write one machine-readable coordinator evidence JSON file.
-
-The release is aborted if a requester does not receive the exact READY object. A denial line, timeout, closed connection, or any other response is not treated as READY.
-
-## Rehearsal mode
-
-Rehearsal is the default mode.
+Example rehearsal:
 
 ~~~powershell
-python .\esp_local_007_coordinator.py --run-id RH003
+python esp_local_007_coordinator.py --run-id RH003
 ~~~
 
-The rehearsal payload is deliberately malformed and is expected to be rejected before persistent authority consumption. It exercises connection setup, READY gating, barrier release, response collection, witness control, and evidence generation without presenting the real authority.
-
-A rehearsal is not evidence that the bounded-authority property passed. It verifies the coordination path before the one-shot live presentation.
-
-## Live mode
-
-Live mode presents the frozen provider request:
+Example live run:
 
 ~~~powershell
-python .\esp_local_007_coordinator.py --run-id R003 --live
+python esp_local_007_coordinator.py --run-id R003 --live
 ~~~
 
-The default request file is:
+The default live request file is:
 
 ~~~text
 ../provider/ESP_LOCAL_007_AUTH2_REQUEST.json
 ~~~
 
-Before any live release, the coordinator:
-
-1. loads the frozen request bytes;
-2. extracts and decodes `authority_b64`;
-3. computes the authority ID from the canonical authority bytes;
-4. displays the decoded authority and computed ID; and
-5. requires the authority ID to be typed back exactly.
-
-A mismatch aborts before the request is sent.
-
-Live presentation of a single-use authority is intentionally one-shot. The coordinator contains no automatic retry of a live authority presentation.
-
-## READY gating
-
-The endpoint's exact expected READY line is:
+The coordinator requires this exact endpoint READY object:
 
 ~~~json
 {"ready":true,"test":"ESP_LOCAL_007"}
 ~~~
 
-Every requester must receive that exact object before the barrier can release.
+If any requester does not receive that exact object, the shared barrier is aborted and no coordinated request release occurs.
 
-This requirement is important to the test design. Merely opening two TCP connections does not establish concurrent execution inside the endpoint. READY confirms that each connection has been accepted by the concurrent runtime and has reached the point immediately before request receipt.
-
-If one requester fails this gate, the barrier is broken for all requester threads and no coordinated release occurs.
-
-## Request-byte preservation
-
-The coordinator does not parse and regenerate the frozen wire request before transmission.
-
-The request file is loaded as bytes, checked for the expected envelope shape, and transmitted with only the terminating newline added. This preserves the exact provider-generated request representation used by the endpoint's strict parser.
-
-Every requester in a live run receives the same `request_line` object.
-
-## Timing evidence
-
-For each requester, the coordinator records:
-
-- connection start;
-- connection completion;
-- READY receipt;
-- pre-send release timestamp;
-- post-send timestamp;
-- response receipt;
-- raw response;
-- parsed response; and
-- requester error, if any.
-
-Release timing uses `time.perf_counter_ns()`. The evidence summary reports the difference between the earliest and latest requester pre-send timestamps as `release_send_skew_ns`.
-
-R003 recorded:
-
-~~~text
-release_send_skew_ns = 42700
-~~~
-
-This is a measured coordinator send-start skew, not a claim that the endpoint executed both code paths within exactly 42.7 µs.
-
-## Witness coordination
-
-Unless `--skip-witness` is supplied, the coordinator wraps requester activity in an independent witness run:
-
-~~~text
-STATUS
-START <run-id> <UTC-anchor>
-MARK requesters_complete
-STOP <UTC-anchor>
-STATUS
-~~~
-
-The witness has no authority role. For R003, the independent ESP32-S3 RMT witness observed the endpoint's servo signal electrically and recorded the physical pulse evidence separately from the coordinator.
-
-`--skip-witness` is suitable only for endpoint-only rehearsal or diagnostics. A scored ESP-LOCAL-007 result requires the independent witness.
-
-## R003 result
-
-The coordinator recorded:
-
-~~~text
-requesters: 2
-accepted:   1
-denied:     1
-errored:    0
-send skew:  42700 ns
-~~~
-
-The losing requester was denied `state_invalid`. Endpoint evidence showed that it did not cross the physical execution boundary.
-
-The coordinator result alone is not the PASS determination. The scored R003 record was completed by correlating it with:
-
-- exactly one endpoint `PWM_COMMAND_BEGIN`;
-- exactly one endpoint `PWM_COMMAND_END`;
-- exactly one endpoint `ACCEPT_EXECUTED`;
-- one independent servo-like witness burst;
-- zero witness capture overflows, truncations, and errors; and
-- final `nuvl_state` readback showing AUTH2 durably SPENT.
-
-The witness burst contained 50 servo-valid pulses, 1999–2000 µs wide, with 20000–20001 µs periods and a duration of approximately 982 ms.
-
-## R003 witness-summary timing artifact
-
-R003 exposed a coordinator timing issue that does **not** change the raw physical observation.
-
-The coordinator sent `STOP` roughly 29 ms before the witness's 100 ms quiet-gap interval had elapsed. As a result, the witness `run_end` summary finalized with `servo_like_bursts: 0` before the active burst had been closed and counted.
-
-The subsequent raw `burst_end` event recorded:
-
-~~~text
-burst_run: R003
-pulses: 50
-servo_like: true
-duration_us: 982013
-period_out_of_range: 0
-~~~
-
-The R003 evidence therefore uses the raw `burst_end` event as the physical burst record and retains the `run_end` discrepancy as a documented measurement artifact.
-
-A future coordinator revision should wait approximately 200 ms after requester completion before issuing witness `STOP`, allowing the witness quiet-gap classifier to close the burst before the run summary is generated. That change was **not** part of the R003 tested coordinator and must not be retroactively attributed to R003.
-
-## Earlier runs
-
-### R001
-
-R001 produced one accepted requester, one endpoint execution, a denied competing requester, and a final SPENT authority. The original interrupt-driven witness did not capture the physical burst reliably enough to satisfy the independent physical criterion.
-
-R001 is retained as `INCONCLUSIVE_WITNESS_CAPTURE`, not as an ESP-LOCAL-007 contention failure.
-
-### R002
-
-R002 presented the already-spent AUTH1 request to an endpoint provisioned for AUTH2. Both requesters were denied `authority_state_mismatch`, no PWM execution occurred, and the witness observed no physical execution.
-
-R002 is retained as a negative control and setup misfire, not as the scored contention run.
-
-## Evidence JSON
-
-The coordinator writes:
+Coordinator evidence is written as:
 
 ~~~text
 ESP_LOCAL_007_COORDINATOR_<RUN_ID>_<unix-time>.json
 ~~~
 
-The record includes:
+The coordinator's accepted/denied counts are network-level observations. They do not by themselves establish physical execution or final persistent state.
 
-- test ID and run ID;
-- rehearsal/live mode;
-- computed authority ID for live runs;
-- endpoint and witness addresses;
-- witness pre-run status;
-- witness START reply;
-- witness STOP reply;
-- witness post-run status;
-- all requester timing and response records;
-- accepted, denied, and error counts;
-- denial reasons;
-- release send skew; and
-- UTC recording time.
+---
 
-The R003 coordinator evidence file is:
+### `decode_nuvl_state.py`
+
+Offline decoder for a raw `nuvl_state` partition dump.
+
+The utility scans the entire partition image for the NUVL state-record magic value rather than assuming that NVS placed the record at a fixed offset.
+
+For each candidate record it decodes and reports:
+
+- magic;
+- record version;
+- authority state;
+- reserved byte;
+- 32-byte authority ID;
+- stored CRC-32; and
+- independently computed CRC-32.
+
+Recognized authority states are:
 
 ~~~text
-ESP_LOCAL_007_COORDINATOR_R003_1790183932.json
+1 = UNSPENT
+2 = SPENT
 ~~~
 
-Coordinator JSON is one evidence stream. It must be evaluated together with the endpoint serial log, witness evidence, and persistent-state readback.
+The record format decoded by this utility is:
 
-## Relevant R003 artifacts
+~~~text
+uint32_t magic
+uint16_t version
+uint8_t  state
+uint8_t  reserved
+uint8_t  authority_id[32]
+uint32_t crc32
+~~~
 
-| Artifact | Identifier / SHA-256 |
-|---|---|
-| AUTH2 request | `55f4380f4f50b2c68e6b4dfd1cb6e9b405fb938a498ae680ff36a5d248fc236a` |
-| AUTH2 authority ID | `066fd59f04ba90f1476ea388a84e125a349a54435552205c0aaa6d5adfa14545` |
-| Concurrent runtime source | `179029cb805fa93ca593f1433454311b4640a8aca0421228c88a8cffda9cf356` |
-| Concurrent runtime binary | `6266f600f1d463b0d73878374fad178cae62497dbf38854e4df92a69a44b4abf` |
-| Pre-race AUTH2 UNSPENT partition | `38327e63133030933c23b8d5d816fa85729a4aeb48f3e14fc3e71ee9fb35340f` |
-| Post-race AUTH2 SPENT partition | `b87b8deba8d08c602af86ff3bac7636a02f0bc8dec5a4401d162b955384d4471` |
-| Witness R003 run file | `cad594e3fc18a0baa90f6a11bc789124c21241340329f83be23f50341ba10705` |
+CRC verification uses standard reflected CRC-32 over the first 40 bytes of the record, matching the firmware state-record validation.
 
-## Claim boundary
+Usage:
 
-The coordinator supports a controlled test of concurrent presentation. It does not itself establish at-most-once execution.
+~~~powershell
+python decode_nuvl_state.py <partition-dump.bin>
+~~~
 
-The complete R003 evidence establishes that, on the tested ESP-IDF/NVS endpoint and witness configuration, concurrent presentation of one valid single-use provider authority resulted in at most one physical execution.
+This utility provides an independent host-side interpretation of raw persistent-state evidence. It does not modify the partition image.
 
-It does not establish resistance to provider private-key theft, compromised endpoint firmware, denial-of-service or availability loss, persistent-state tampering or rollback, time-based validity, or storage-stack-independent persistence behavior.
+---
+
+### `witness_loopback_check.py`
+
+Pre-race witness wiring check.
+
+This utility verifies that the temporary GPIO6-to-GPIO4 loopback used during witness validation has been removed before a scored run.
+
+It:
+
+1. Requests witness `STATUS`.
+2. Starts a witness run named `LOOPCHK`.
+3. Requests the witness `SELFTEST`.
+4. Allows the self-test pulse train to complete.
+5. Stops the witness run.
+6. Directs evaluation to the witness's own `run_end` record.
+
+Interpretation:
+
+~~~text
+servo_like_bursts = 0
+    GPIO6 self-test loopback is removed.
+    GPIO4 is not observing the witness's own test output.
+
+servo_like_bursts >= 1
+    GPIO6 remains connected to GPIO4.
+    The scored witness configuration has not been restored.
+~~~
+
+The utility sends no request to the endpoint and presents no authority. It is a witness-configuration check only.
+
+Usage:
+
+~~~powershell
+python witness_loopback_check.py
+~~~
+
+The witness serial evidence remains authoritative for the observed `run_end` result; the script prints the UDP command replies so the control sequence can also be verified.
+
+---
+
+### `witness_probe.py`
+
+Non-invasive witness activity probe.
+
+This utility polls the witness `STATUS` endpoint five times at approximately one-second intervals and reports:
+
+- `pulse_seq`;
+- `queue_depth`;
+- `queue_drops`; and
+- witness connection state.
+
+Usage:
+
+~~~powershell
+python witness_probe.py
+~~~
+
+The probe is used to distinguish continuing electrical activity on the witness input from a static or one-time transition.
+
+It does not contact the endpoint, send an authority, start a scored run, or alter endpoint persistent state.
+
+Because it only requests witness status, it can be run repeatedly during witness diagnostics.
+
+## Network configuration
+
+The published tools use the tested ESP-LOCAL-007 lab addresses:
+
+~~~text
+Endpoint
+192.168.0.186:19061 TCP
+
+Witness
+192.168.0.216:19072 UDP
+~~~
+
+These addresses identify the tested lab configuration and may be changed when reproducing the test on a different network.
+
+## Role separation
+
+The four utilities have distinct roles:
+
+| File | Role | Sends authority | Modifies endpoint state |
+|---|---|---:|---:|
+| `esp_local_007_coordinator.py` | Concurrent request release and evidence capture | Live mode only | Only through normal endpoint processing |
+| `decode_nuvl_state.py` | Offline persistent-state decoding | No | No |
+| `witness_loopback_check.py` | Witness wiring/self-test verification | No | No |
+| `witness_probe.py` | Witness status/activity polling | No | No |
+
+None of these host-side utilities can originate or enlarge provider-issued authority. Authority acceptance and durable consumption remain endpoint enforcement functions; the witness remains independent of the authority path.
