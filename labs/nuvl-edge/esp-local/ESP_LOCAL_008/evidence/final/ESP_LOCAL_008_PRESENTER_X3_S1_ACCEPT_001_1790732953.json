@@ -1,0 +1,90 @@
+{
+  "test_id": "ESP_LOCAL_008",
+  "run_id": "X3_S1_ACCEPT_001",
+  "live": true,
+  "authority_label": "AUTH-X3",
+  "authority_id": "5222af8445ee67ba8712f2469c91449a841c777cb40b9395d22c9bb1f30388ef",
+  "target": {
+    "label": "servo1",
+    "identity": "esp32-xiao-servo-01",
+    "host": "192.168.0.81",
+    "port": 19081
+  },
+  "expected_verdict": "accepted",
+  "response": {
+    "status": "accepted",
+    "reason": "executed",
+    "line": "{\"status\":\"accepted\",\"reason\":\"executed\"}"
+  },
+  "scored_match": true,
+  "error": null,
+  "timing": {
+    "connect_start": 1790732961.3562953,
+    "connect_done": 1790732961.3640938,
+    "send": 1790732961.3641226,
+    "response": 1790732962.4853919
+  },
+  "witness": {
+    "host": "192.168.0.216",
+    "port": 19072,
+    "status_before": {
+      "type": "status_reply",
+      "ip": "192.168.0.216",
+      "connected": true,
+      "control_port": 19072,
+      "gpio": 5,
+      "capture_engine": "rmt_rx",
+      "capture_ready": true,
+      "capture_queue_depth": 0,
+      "capture_overflows": 0,
+      "capture_truncations": 0,
+      "capture_errors": 0,
+      "rx_buffer_symbols": 256,
+      "capture_filter_min_ns": 1250,
+      "pulse_seq": 0,
+      "burst_seq": 0,
+      "session_file": "S_f6ff36a8_B0070.jl",
+      "device_id": "esp32-witness-007",
+      "session": "esp32-witness-007-f6ff36a8-B0070",
+      "run": "NONE"
+    },
+    "start": {
+      "type": "start_reply",
+      "ok": true,
+      "detail": "R_X3_S1_ACCEPT_001.jl",
+      "device_id": "esp32-witness-007",
+      "session": "esp32-witness-007-f6ff36a8-B0070",
+      "run": "X3_S1_ACCEPT_001"
+    },
+    "stop": {
+      "type": "stop_reply",
+      "ok": true,
+      "detail": "1b7247e7f4639556b66a3db3f14c4054229cd724dfb180107f1b7b645124021d",
+      "device_id": "esp32-witness-007",
+      "session": "esp32-witness-007-f6ff36a8-B0070",
+      "run": "NONE"
+    },
+    "status_after": {
+      "type": "status_reply",
+      "ip": "192.168.0.216",
+      "connected": true,
+      "control_port": 19072,
+      "gpio": 5,
+      "capture_engine": "rmt_rx",
+      "capture_ready": true,
+      "capture_queue_depth": 0,
+      "capture_overflows": 0,
+      "capture_truncations": 0,
+      "capture_errors": 0,
+      "rx_buffer_symbols": 256,
+      "capture_filter_min_ns": 1250,
+      "pulse_seq": 49,
+      "burst_seq": 1,
+      "session_file": "S_f6ff36a8_B0070.jl",
+      "device_id": "esp32-witness-007",
+      "session": "esp32-witness-007-f6ff36a8-B0070",
+      "run": "NONE"
+    }
+  },
+  "recorded_at_utc": "2026-09-30T01:49:24.342290+00:00"
+}
