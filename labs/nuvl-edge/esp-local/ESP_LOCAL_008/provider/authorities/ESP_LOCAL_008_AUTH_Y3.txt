@@ -1,0 +1,15 @@
+ESP-LOCAL-008 AUTHORITY Y3
+
+test_id=ESP_LOCAL_008
+enforcement_point=signed_target_binding
+target_label=Y3
+device_id=esp32-xiao-servo-02
+context=esp_local_008
+action=move_servo
+max_uses=1
+nonce=045c3bbf278c91bfe2605cacb5bca37d
+canonical={"action":"move_servo","context":"esp_local_008","device_id":"esp32-xiao-servo-02","max_uses":1,"nonce":"045c3bbf278c91bfe2605cacb5bca37d"}
+authority_id_sha256=2c7ded33c6d5cc142c6f4ba91c04add1803fc361d00f34b9d288b3bb67f711fa
+trusted_provider_public_raw=48852270ce16654edeef2a1c3d0930af4b990e1bf5060fb3221996434f63e5b1
+trusted_private_key_sha256=DA0A36F274EFC6E3CE1C7643800B952B1AA2895201E5A6D6852D308729466509
+signature_b64=wjp+Tzb53cf+wyumymaoddXiZN699QOB9rt913dLEsOvhqi2LS6fyXSk++EV3+Hojzu/PfUUHw4NcpYu3ct1AQ==

@@ -1,0 +1,15 @@
+ESP-LOCAL-008 AUTHORITY X3
+
+test_id=ESP_LOCAL_008
+enforcement_point=signed_target_binding
+target_label=X3
+device_id=esp32-xiao-servo-01
+context=esp_local_008
+action=move_servo
+max_uses=1
+nonce=86062287c3d8be01446bf80ec69131bf
+canonical={"action":"move_servo","context":"esp_local_008","device_id":"esp32-xiao-servo-01","max_uses":1,"nonce":"86062287c3d8be01446bf80ec69131bf"}
+authority_id_sha256=5222af8445ee67ba8712f2469c91449a841c777cb40b9395d22c9bb1f30388ef
+trusted_provider_public_raw=48852270ce16654edeef2a1c3d0930af4b990e1bf5060fb3221996434f63e5b1
+trusted_private_key_sha256=DA0A36F274EFC6E3CE1C7643800B952B1AA2895201E5A6D6852D308729466509
+signature_b64=IjeC3gOUGKS1uQJJfaG8bghRxDf5QEND/Aa9Cvbr/t7tQrCMqXKtW9stOPDS3rM+Kk6qYCwFKG2E8GxAtYrqAw==
