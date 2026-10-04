@@ -133,7 +133,7 @@ def utc_now_iso():
 # ----------------------------------------------------------------------
 
 def request_file_for(authority: str) -> Path:
-    base = Path(__file__).resolve().parent.parent / "provider"
+    base = Path(__file__).resolve().parent.parent / "provider" / "authorities"
     return base / f"ESP_LOCAL_008_AUTH_{authority}_REQUEST.json"
 
 
