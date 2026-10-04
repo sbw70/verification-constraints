@@ -12,3 +12,4 @@ idf_component_register(
         lwip
         mbedtls
         monocypher
+        )
