@@ -26,10 +26,8 @@ For a correct-target case, the evidence must establish target match, valid UNSPE
 
 ## Directory Layout
 
-    evidence/
+        evidence/
     |-- README.md
-    |
-    |-- ESP_LOCAL_008_X3_S1_ACCEPT_001_ENDPOINT.log
     |
     |-- final/
     |   |-- ESP_LOCAL_008_PRESENTER_X2_S2_DENY_001_1790729436.json
@@ -37,6 +35,7 @@ For a correct-target case, the evidence must establish target match, valid UNSPE
     |   |-- ESP_LOCAL_008_PRESENTER_Y2_S2_ACCEPT_001_1790730312.json
     |   |-- ESP_LOCAL_008_PRESENTER_Y3_S1_DENY_001_1790733844.json
     |   |-- ESP_LOCAL_008_X2_S2_DENY_001_ENDPOINT.log
+    |   |-- ESP_LOCAL_008_X3_S1_ACCEPT_001_ENDPOINT.log
     |   |-- ESP_LOCAL_008_Y2_S2_ACCEPT_001_ENDPOINT.log
     |   `-- ESP_LOCAL_008_Y3_S1_DENY_001_ENDPOINT.log
     |
