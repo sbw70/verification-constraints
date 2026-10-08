@@ -31,11 +31,11 @@ These architectures do not, by themselves, solve:
 - general denial-of-service protection
 - malicious provider execution
 
-## Core Assumption
+## Authority Invariant
 
-Execution authority remains scoped to the provider-controlled boundary.
+Execution authority remains scoped to the provider-controlled boundary by design. External systems may observe, relay, store, or present artifacts only within their constrained roles; they do not gain authority to independently derive, elevate, amplify, reinterpret, or substitute execution authority.
 
-External systems may observe, relay, store, or present artifacts only within their constrained roles. They may not independently derive, elevate, amplify, reinterpret, or substitute execution authority.
+The architecture does not depend on knowing an adversary's motivation, resources, or capability. It defines the conditions under its control and constrains the consequences available to components operating within those conditions.
 
 ## Reference Implementation
 
