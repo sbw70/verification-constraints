@@ -1,0 +1,325 @@
+{
+    "manifest_version":  1,
+    "test_series":  "MP-001",
+    "purpose":  "Distributed multi-provider baseline with provider-scoped authorization, independent provider execution authority, authenticated boundary provenance, and non-authoritative association capture.",
+    "contract_sha256":  "7db3a52907af48d2524995e15b947600e534555758338cc38ce2594ff633ff4e",
+    "association_recorder_sha256":  "fad60dfc8df53337d2e41288c2c4973442258cae4240945ebbd0aa8920550bfc",
+    "provider_registry_sha256":  "59d739588427d87313e3434982d943a9c82bad26c3fe3deb7d5488efadb6088d",
+    "expected_providers":  [
+                               "PROVIDER_A",
+                               "PROVIDER_B"
+                           ],
+    "verification_context":  "CTX_ALPHA",
+    "claim_boundaries":  {
+                             "physical_execution_witness":  false,
+                             "cross_host_clock_authority":  false,
+                             "implementation_diversity_claimed":  false,
+                             "crash_window_replay_persistence_claimed":  false,
+                             "concurrent_replay_claimed":  false,
+                             "power_loss_replay_persistence_claimed":  false
+                         },
+    "runs":  [
+                 {
+                     "run_id":  "B01",
+                     "class":  "baseline",
+                     "raw_request_utf8":  "{\"action\":\"mp001_test\",\"nonce\":\"MP001-B01\"}",
+                     "expected":  {
+                                      "PROVIDER_A":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "PROVIDER_B":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "association_verified_lifecycles":  2
+                                  }
+                 },
+                 {
+                     "run_id":  "B02",
+                     "class":  "baseline",
+                     "raw_request_utf8":  "{\"action\":\"mp001_test\",\"nonce\":\"MP001-B02\"}",
+                     "expected":  {
+                                      "PROVIDER_A":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "PROVIDER_B":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "association_verified_lifecycles":  2
+                                  }
+                 },
+                 {
+                     "run_id":  "B03",
+                     "class":  "baseline",
+                     "raw_request_utf8":  "{\"action\":\"mp001_test\",\"nonce\":\"MP001-B03\"}",
+                     "expected":  {
+                                      "PROVIDER_A":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "PROVIDER_B":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "association_verified_lifecycles":  2
+                                  }
+                 },
+                 {
+                     "run_id":  "B04",
+                     "class":  "baseline",
+                     "raw_request_utf8":  "{\"action\":\"mp001_test\",\"nonce\":\"MP001-B04\"}",
+                     "expected":  {
+                                      "PROVIDER_A":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "PROVIDER_B":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "association_verified_lifecycles":  2
+                                  }
+                 },
+                 {
+                     "run_id":  "B05",
+                     "class":  "baseline",
+                     "raw_request_utf8":  "{\"action\":\"mp001_test\",\"nonce\":\"MP001-B05\"}",
+                     "expected":  {
+                                      "PROVIDER_A":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "PROVIDER_B":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "association_verified_lifecycles":  2
+                                  }
+                 },
+                 {
+                     "run_id":  "B06",
+                     "class":  "baseline",
+                     "raw_request_utf8":  "{\"action\":\"mp001_test\",\"nonce\":\"MP001-B06\"}",
+                     "expected":  {
+                                      "PROVIDER_A":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "PROVIDER_B":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "association_verified_lifecycles":  2
+                                  }
+                 },
+                 {
+                     "run_id":  "B07",
+                     "class":  "baseline",
+                     "raw_request_utf8":  "{\"action\":\"mp001_test\",\"nonce\":\"MP001-B07\"}",
+                     "expected":  {
+                                      "PROVIDER_A":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "PROVIDER_B":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "association_verified_lifecycles":  2
+                                  }
+                 },
+                 {
+                     "run_id":  "B08",
+                     "class":  "baseline",
+                     "raw_request_utf8":  "{\"action\":\"mp001_test\",\"nonce\":\"MP001-B08\"}",
+                     "expected":  {
+                                      "PROVIDER_A":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "PROVIDER_B":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "association_verified_lifecycles":  2
+                                  }
+                 },
+                 {
+                     "run_id":  "B09",
+                     "class":  "baseline",
+                     "raw_request_utf8":  "{\"action\":\"mp001_test\",\"nonce\":\"MP001-B09\"}",
+                     "expected":  {
+                                      "PROVIDER_A":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "PROVIDER_B":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "association_verified_lifecycles":  2
+                                  }
+                 },
+                 {
+                     "run_id":  "B10",
+                     "class":  "baseline",
+                     "raw_request_utf8":  "{\"action\":\"mp001_test\",\"nonce\":\"MP001-B10\"}",
+                     "expected":  {
+                                      "PROVIDER_A":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "PROVIDER_B":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "association_verified_lifecycles":  2
+                                  }
+                 },
+                 {
+                     "run_id":  "N01",
+                     "class":  "bad_provider_authorization",
+                     "raw_request_utf8":  "{\"action\":\"mp001_test\",\"nonce\":\"MP001-N01\"}",
+                     "test_action":  "corrupt PROVIDER_A authorization signature; leave PROVIDER_B authorization intact",
+                     "expected":  {
+                                      "PROVIDER_A":  [
+                                                         "DENY"
+                                                     ],
+                                      "PROVIDER_A_reason":  "auth_bad_sig",
+                                      "PROVIDER_A_execution_count":  0,
+                                      "PROVIDER_B":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "association_verified_lifecycles":  1
+                                  }
+                 },
+                 {
+                     "run_id":  "N02",
+                     "class":  "hostile_relay",
+                     "raw_request_utf8":  "{\"action\":\"mp001_test\",\"nonce\":\"MP001-N02\"}",
+                     "test_action":  "relay substitutes a different request_repr and recomputes the non-secret mechanical binding while forwarding the original provider authorizations",
+                     "expected":  {
+                                      "PROVIDER_A":  [
+                                                         "DENY"
+                                                     ],
+                                      "PROVIDER_A_reason":  "auth_request_mismatch",
+                                      "PROVIDER_A_execution_count":  0,
+                                      "PROVIDER_B":  [
+                                                         "DENY"
+                                                     ],
+                                      "PROVIDER_B_reason":  "auth_request_mismatch",
+                                      "PROVIDER_B_execution_count":  0,
+                                      "association_verified_lifecycles":  0
+                                  }
+                 },
+                 {
+                     "run_id":  "N03",
+                     "class":  "forged_boundary",
+                     "transport":  "direct_to_association",
+                     "test_action":  "submit a boundary package claiming PROVIDER_A with an invalid boundary signature",
+                     "expected":  {
+                                      "association_sig_valid":  false,
+                                      "association_verification_code":  "bad_sig",
+                                      "association_verified_lifecycles":  0,
+                                      "provider_execution_required":  false
+                                  }
+                 },
+                 {
+                     "run_id":  "N04",
+                     "class":  "duplicate_boundary",
+                     "raw_request_utf8":  "{\"action\":\"mp001_test\",\"nonce\":\"MP001-N04\"}",
+                     "test_action":  "perform a valid distributed execution, then resubmit the exact raw PROVIDER_A COMPLETE package to the association",
+                     "expected":  {
+                                      "PROVIDER_A":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "PROVIDER_B":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "duplicate_provider":  "PROVIDER_A",
+                                      "duplicate_stage":  "COMPLETE",
+                                      "duplicate_sig_valid":  true,
+                                      "duplicate_detected":  true,
+                                      "association_verified_lifecycles":  2,
+                                      "distinct_provider_count_after_duplicate":  2
+                                  }
+                 },
+                 {
+                     "run_id":  "N05",
+                     "class":  "one_provider_only",
+                     "raw_request_utf8":  "{\"action\":\"mp001_test\",\"nonce\":\"MP001-N05\"}",
+                     "test_action":  "PROVIDER_B unavailable; PROVIDER_A remains available",
+                     "expected":  {
+                                      "PROVIDER_A":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "PROVIDER_B":  [
+
+                                                     ],
+                                      "association_verified_lifecycles":  1,
+                                      "distributed_two_provider_completion_observed":  false
+                                  }
+                 },
+                 {
+                     "run_id":  "N06",
+                     "class":  "authorization_replay",
+                     "raw_request_utf8":  "{\"action\":\"mp001_test\",\"nonce\":\"MP001-N06\"}",
+                     "test_action":  "present the same request body and the same intact PROVIDER_A and PROVIDER_B authorization packages twice sequentially",
+                     "expected":  {
+                                      "first_PROVIDERA":  [
+                                                              "START",
+                                                              "EXECUTED",
+                                                              "COMPLETE"
+                                                          ],
+                                      "first_PROVIDERB":  [
+                                                              "START",
+                                                              "EXECUTED",
+                                                              "COMPLETE"
+                                                          ],
+                                      "second_PROVIDERA":  [
+                                                               "DENY"
+                                                           ],
+                                      "second_PROVIDERA_reason":  "auth_spent",
+                                      "second_PROVIDERA_execution_count":  0,
+                                      "second_PROVIDERB":  [
+                                                               "DENY"
+                                                           ],
+                                      "second_PROVIDERB_reason":  "auth_spent",
+                                      "second_PROVIDERB_execution_count":  0,
+                                      "first_association_verified_lifecycles":  2,
+                                      "second_execution_count":  0
+                                  }
+                 }
+             ]
+}
