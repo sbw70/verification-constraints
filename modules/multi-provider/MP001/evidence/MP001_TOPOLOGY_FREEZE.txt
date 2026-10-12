@@ -1,0 +1,47 @@
+MP-001 BASELINE TOPOLOGY FREEZE
+
+UTC: 2026-10-07T17:07:22.4562273Z
+
+COORDINATOR / ASSOCIATION
+Host: Xer0trust
+OS: Windows
+IPv4: 192.168.1.102
+Role: Operator, coordinator, association, evidence collection
+
+NUVL RELAY
+Host: nuvl-relay
+Hardware: Raspberry Pi 3B+
+OS: Debian 13
+IPv4: 192.168.1.100
+Interface: eth0
+Role: Stateless NUVL intermediary only
+Wi-Fi: DOWN
+
+PROVIDER A
+Host: Xer0trust-3
+Hardware: Dell Latitude E5450
+OS: Linux Mint 22.3
+IPv4 Ethernet: 192.168.1.118
+Ethernet: 100 Mb/s full duplex
+Role: Independent Provider A
+Default route: eno1 metric 100
+Wi-Fi fallback: metric 600
+
+PROVIDER B
+Host: Xer0trust2
+Hardware: HP Laptop 14-dk1xxx
+OS: Linux Mint 22.3
+IPv4 Ethernet: 192.168.1.106
+Ethernet: 1000 Mb/s full duplex
+Role: Independent Provider B
+Default route: eno1 metric 100
+Wi-Fi fallback: metric 600
+
+REQUESTER / ATTACKER
+Hardware: Chromebook
+Role: Request generation and low-rate hostile traffic
+
+NETWORK
+Baseline subnet: 192.168.1.0/24
+Gateway: 192.168.1.1
+OPNsense: X0T-vault

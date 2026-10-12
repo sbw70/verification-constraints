@@ -1,0 +1,88 @@
+MP-001 PRE-DEPLOYMENT BASELINE
+UTC: 2026-10-07T16:51:46.8974228Z
+
+=== OMNIBOOK / COORDINATOR ===
+Xer0trust
+
+Windows IP Configuration
+
+
+Ethernet adapter vEthernet (WSL (Hyper-V firewall)):
+
+   Connection-specific DNS Suffix  . : 
+   Link-local IPv6 Address . . . . . : fe80::59f0:71f2:ea33:7d4b%42
+   IPv4 Address. . . . . . . . . . . : 172.17.32.1
+   Subnet Mask . . . . . . . . . . . : 255.255.240.0
+   Default Gateway . . . . . . . . . : 
+
+Wireless LAN adapter Local Area Connection* 1:
+
+   Media State . . . . . . . . . . . : Media disconnected
+   Connection-specific DNS Suffix  . : 
+
+Wireless LAN adapter Local Area Connection* 2:
+
+   Media State . . . . . . . . . . . : Media disconnected
+   Connection-specific DNS Suffix  . : 
+
+Wireless LAN adapter Wi-Fi:
+
+   Connection-specific DNS Suffix  . : localdomain
+   Link-local IPv6 Address . . . . . : fe80::f0e:35b3:d522:66a8%19
+   IPv4 Address. . . . . . . . . . . : 192.168.1.102
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . : fe80::2e0:67ff:fe30:7471%19
+                                       192.168.1.1
+
+Ethernet adapter Bluetooth Network Connection:
+
+   Media State . . . . . . . . . . . : Media disconnected
+   Connection-specific DNS Suffix  . : 
+=== PI 3B+ / NUVL RELAY / 192.168.1.100 ===
+
+Pinging 192.168.1.100 with 32 bytes of data:
+Reply from 192.168.1.100: bytes=32 time=4ms TTL=64
+Reply from 192.168.1.100: bytes=32 time=6ms TTL=64
+
+Ping statistics for 192.168.1.100:
+    Packets: Sent = 2, Received = 2, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 4ms, Maximum = 6ms, Average = 5ms
+nuvl-relay
+Python 3.13.5
+git version 2.47.3
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+eth0             UP             192.168.1.100/24 fe80::462:5eb3:8fc3:5b4d/64 
+wlan0            DOWN           
+=== DELL / PROVIDER A / 192.168.1.118 ===
+
+Pinging 192.168.1.118 with 32 bytes of data:
+Reply from 192.168.1.118: bytes=32 time=6ms TTL=64
+Reply from 192.168.1.118: bytes=32 time=7ms TTL=64
+
+Ping statistics for 192.168.1.118:
+    Packets: Sent = 2, Received = 2, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 6ms, Maximum = 7ms, Average = 6ms
+Xer0trust-3
+Python 3.12.3
+git version 2.43.0
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+eno1             UP             192.168.1.118/24 fe80::64ef:17e:36b1:8a93/64 
+wlp2s0           UP             192.168.1.158/24 2600:1016:a112:1e2d:ffe7:7c0:d3a0:5b06/64 2600:1016:a112:1e2d:59b0:c69a:156a:1036/64 fe80::12b3:dd51:b168:a92c/64 
+=== HP XER0TRUST2 / PROVIDER B / 192.168.1.106 ===
+
+Pinging 192.168.1.106 with 32 bytes of data:
+Reply from 192.168.1.106: bytes=32 time=78ms TTL=64
+Reply from 192.168.1.106: bytes=32 time=89ms TTL=64
+
+Ping statistics for 192.168.1.106:
+    Packets: Sent = 2, Received = 2, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 78ms, Maximum = 89ms, Average = 83ms
+Xer0trust2
+Python 3.12.3
+git version 2.43.0
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+eno1             UP             192.168.1.106/24 fe80::3300:d495:ec4e:becd/64 
+wlp2s0           UP             192.168.1.107/24 fe80::7561:34b6:fa23:8daa/64 
