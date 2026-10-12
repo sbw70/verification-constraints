@@ -4,7 +4,7 @@ import os
 import socket
 import time
 
-PI_IP = YOUR PI IP"
+PI_IP = "YOUR PI IP"
 PORT = 8089
 ARTIFACT_FILE = "poc003_artifacts.json"
 
