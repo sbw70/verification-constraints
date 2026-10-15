@@ -1,0 +1,65 @@
+{
+    "manifest_version":  1,
+    "test_series":  "MP-002",
+    "purpose":  "Provider-local policy divergence with valid provider-specific authorization: Provider A permits the operation while Provider B independently denies the same request under Provider B local policy.",
+    "contract_sha256":  "e795f55172ea27d8ee434679ab9ea4a1b07e1154a708dfd5ad846fdd0f4ab18d",
+    "association_recorder_sha256":  "fad60dfc8df53337d2e41288c2c4973442258cae4240945ebbd0aa8920550bfc",
+    "provider_registry_sha256":  "59d739588427d87313e3434982d943a9c82bad26c3fe3deb7d5488efadb6088d",
+    "expected_providers":  [
+                               "PROVIDER_A",
+                               "PROVIDER_B"
+                           ],
+    "claim_boundaries":  {
+                             "physical_execution_witness":  false,
+                             "cross_host_clock_authority":  false,
+                             "implementation_diversity_claimed":  false,
+                             "crash_window_replay_persistence_claimed":  false,
+                             "concurrent_replay_claimed":  false,
+                             "power_loss_replay_persistence_claimed":  false,
+                             "compromised_provider_claimed":  false,
+                             "association_independent_reverification_claimed":  false
+                         },
+    "runs":  [
+                 {
+                     "run_id":  "B01",
+                     "class":  "control_both_permit",
+                     "verification_context":  "CTX_ALPHA",
+                     "raw_request_utf8":  "{\"action\":\"mp002_test\",\"nonce\":\"MP002-B01\"}",
+                     "expected":  {
+                                      "PROVIDER_A":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "PROVIDER_B":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "association_verified_lifecycles":  2
+                                  }
+                 },
+                 {
+                     "run_id":  "D01",
+                     "class":  "provider_local_policy_divergence",
+                     "verification_context":  "CTX_MP002_DIVERGE",
+                     "raw_request_utf8":  "{\"action\":\"mp002_test\",\"nonce\":\"MP002-D01\"}",
+                     "test_action":  "Both providers receive valid provider-specific authorization for the same request. Provider A permits execution. Provider B local policy denies execution before authorization consumption.",
+                     "expected":  {
+                                      "PROVIDER_A":  [
+                                                         "START",
+                                                         "EXECUTED",
+                                                         "COMPLETE"
+                                                     ],
+                                      "PROVIDER_B":  [
+                                                         "DENY"
+                                                     ],
+                                      "PROVIDER_B_reason":  "policy_denied",
+                                      "PROVIDER_B_execution_count":  0,
+                                      "PROVIDER_B_authorization_consumed":  false,
+                                      "association_verified_lifecycles":  1,
+                                      "association_verified_provider_b_denials":  1
+                                  }
+                 }
+             ]
+}
