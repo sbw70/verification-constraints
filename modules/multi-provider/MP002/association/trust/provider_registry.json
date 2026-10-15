@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "providers": {
+    "PROVIDER_A": {
+      "key_id": "sha256:e4664ee3b7bb0012fb7d8f763c9df74594d8a6bec8488d97532a5846cc04b6ff",
+      "public_key_file": "trust/provider_a_public.pem"
+    },
+    "PROVIDER_B": {
+      "key_id": "sha256:db764408aa319642363057d804f0c2a3d2c7dd22de86ae4a6d6549cb97f60225",
+      "public_key_file": "trust/provider_b_public.pem"
+    }
+  }
+}
