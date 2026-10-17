@@ -1,0 +1,146 @@
+﻿MP003 OPERATOR NOTES
+DATE: 2026-10-15
+TEST: Provider authority blast-radius isolation
+SESSION_ID: MP003_SCORED_20261015
+CLAIM: Possession of Provider A's legitimate issuance authority must not confer Provider B execution authority.
+
+NETWORK / HOSTS
+Requester / attacker harness: Chromebook
+Relay: nuvl-relay / 192.168.1.100
+Provider A: Xer0trust-3 / 192.168.1.118
+Provider B: Xer0trust2 / 192.168.1.106
+Association: Xer0trust / 192.168.1.102
+
+NETWORK CHANGES SINCE PREVIOUS TEST
+Chromebook connected.
+Challenge traffic stopped.
+Managed switch on desk, not connected.
+Existing multi-provider topology otherwise unchanged.
+
+PRE-RUN CONDITIONS
+Contract SHA256: ac368500126f3314faa7f5193a07bbb78061c10e1931606778b6414702b9579b
+Manifest SHA256: 85ac48ff64f7b94d078ceb0638240980d30013a78cf3d850964abbd895eb7368
+Baseline SHA256: 72d4cf87109e4f59ed71a531cb2dd5247aa26631fcb2ff1f36ad40b5a6a0a4ff
+No scored MP003 case has run.
+
+CASE LOG
+
+OPERATOR ERRORS / MISFIRES
+
+FINAL STATE
+
+SHUTDOWN
+
+PRE-RUN RESIDUAL STATE DISCOVERED 2026-10-15 21:52:20 -04:00
+Both providers contained one prior execution/spent authorization before scored MP003.
+This is a precondition/state-cleanliness issue. No scored MP003 case is attributed to these records.
+Provider A residual hashes:
+399a1f28ca63dcdae18f0d0b23d19a1f117b44460914da9bc7b63e0cb443924d  provider_a_spent_state.json
+74252f1809f9d4269b51c67277e59ed40d82ee6302c2496a31cde84c2aa3f948  provider_a_execution.jsonl
+Provider B residual hashes:
+fdf42a4072bd5d8b46e31cef020d1dc022f245a94b70c28fc62a9105e3c3d1c5  provider_b_spent_state.json
+d129e2779e9360497bc421fa840f65883ae626c0258e1fe80458656411c0320c  provider_b_execution.jsonl
+
+PRE-RUN STATE RESET 2026-10-15 22:00:09 -04:00
+Initial reset command produced malformed JSON because quoting was stripped across PowerShell/SSH. No scored case had run.
+Malformed files were replaced using base64 transport with canonical UTF-8 JSON.
+Provider A clean spent-state SHA256: 83ded5bcd92bba97d36bc87429032033af118ef8e8e7537a55fd7e0152874013
+Provider B clean spent-state SHA256: 83ded5bcd92bba97d36bc87429032033af118ef8e8e7537a55fd7e0152874013
+Provider A execution log absent.
+Provider B execution log absent.
+Scored MP003 remains not started.
+
+B01 RECONSTRUCTION / CORRECTION 2026-10-15 22:18:30 -04:00
+B01 had already executed before the later state-cleanliness inspection.
+B01 request SHA256: 882a7d207f5b1ab04754204d7cef48050a22ac6dc718d407313fe6d28b3187a3
+Both B01 authorization request_repr values match the request SHA256.
+Both B01 authorization contexts are CTX_MP003_B01.
+Provider A B01 authorization_id: a6fd6f0495346baea8f728120be4da655b9e3a1653666a4e6793e797e8f1e2e4
+Provider B B01 authorization_id: 52d0874f009fda1833d940530848969a642266a1ba7565c534b2e71e8fbdf25f
+Earlier classification of these provider records as pre-run residual state was incorrect; they are B01 post-execution state.
+Provider state was reset after B01 and before C01. No C01/C02/C03/B02 scored case has run.
+B01 recovered Provider A execution SHA256: 74252f1809f9d4269b51c67277e59ed40d82ee6302c2496a31cde84c2aa3f948
+B01 recovered Provider A spent-state SHA256: 399a1f28ca63dcdae18f0d0b23d19a1f117b44460914da9bc7b63e0cb443924d
+B01 recovered Provider B execution SHA256: d129e2779e9360497bc421fa840f65883ae626c0258e1fe80458656411c0320c
+B01 recovered Provider B spent-state SHA256: fdf42a4072bd5d8b46e31cef020d1dc022f245a94b70c28fc62a9105e3c3d1c5
+
+R2 CLEAN RESTART 2026-10-15 22:27:43 -04:00
+Initial partial MP003 session retained unchanged at evidence\MP003_PARTIAL_20261015_RETAINED.
+B01 evidence from the initial partial session remains preserved there.
+New clean scored campaign directory: evidence\MP003_SCORED_20261015_R2.
+Provider A and Provider B spent state clean; execution logs absent.
+Association, Provider A, Provider B, and relay confirmed down before R2 start.
+R2 scored cases have not started.
+
+B01 R2 HARNESS MISFIRE 2026-10-15 22:39:28 -04:00
+Mint scripts created provider_a_authorization.json.b64 and provider_b_authorization.json.b64.
+Harness attempted to read non-existent provider_a_authorization.b64 / provider_b_authorization.b64.
+Empty authorization header values were forwarded; both providers emitted signed DENY auth_malformed.
+HTTP 204 reflected relay receipt only. Scored B01 condition was not reached.
+No authorization was consumed and no execution was expected from this misfire.
+
+B01 R2 SCORED PASS 2026-10-15 22:41:21 -04:00
+Association records 4-7 show valid A START, B START, A COMPLETE, B COMPLETE.
+Provider A executed and consumed authorization aac7988b08e14b382105470d20c9cc3b15abf50ff288cba615cb962e5d12cfc1.
+Provider B executed and consumed authorization 92a84e45db900b5ce25807cb8d16267657a922f29ded3a11908f6ef7d8c1771b.
+B01_CONTROL=PASS.
+Earlier auth_malformed records 2-3 are retained harness misfire evidence and are not scored as B01.
+
+CORRECTION TO B01 R2 HARNESS MISFIRE NOTE 2026-10-15 23:17:14 -04:00
+The misfire note says empty authorization headers were forwarded. provider_b.py maps an empty value to auth_missing, not auth_malformed. The observed auth_malformed means the forwarded header values were non-empty but undecodable (likely shell error/placeholder text from the missing .b64 path). Misfire classification unchanged; records 2-3 remain retained, unscored.
+
+PRE-C01 PROVIDER STATE 2026-10-15 23:17:14 -04:00
+Verified over SSH. Runtimes match manifest. Live state byte-identical to B01_CONTROL after-files:
+A spent 18d967932ce7dfa84d25308905aae8d549bcb766b063f46286992d0fa28515c5 / exec 829cf00186a58c187d08763944654d436c54b2c02684fa8b8c584fb7562d7aae (1 spent aac7988b..., 1 exec)
+B spent 818b07c26c41d5b240123b0cd4f5a69f2cbc95fcc3eeafd3abd88237f22d4157 / exec 1703aad4f1a0810e283be3d5215b36800dadd2b3474451214f292dcde008a2e1 (1 spent 92a84e45..., 1 exec)
+Preflight\ artifacts are not used for scoring (minted for preflight requests).
+
+C01 R2 SCORED PASS 2026-10-15 23:23:14 -04:00
+Sent 2026-10-15 23:20:22.923 -04:00, HTTP 204. Request df7e42b3cef18610fe16e2c8fb2b55a6b7674b70391d92a7da470fceee1f7005, CTX_MP003_C01. A header only (B absent per manifest).
+A auth minted with attacker copy of A issuance key: 6e3ce147b1337f74451823a78cef40011378c88e2e4103f2ffcd82845dc7de1a, package 2ed0222f966b2219a11b33cccee2a348e07ae77de63a2284b86b96cbd335f23c.
+Association 8 B DENY auth_missing; 9 A START; 10 A COMPLETE; all sig_valid, op 54791a16...
+Post-state (scp): A spent 2 (aac7988b..., 6e3ce147...), A exec 2; B spent/exec byte-unchanged (818b07c2... / 1703aad4...).
+C01_COMPROMISED_A_TO_A=PASS
+
+C02 R2 SCORED PASS 2026-10-15 23:26:00 -04:00
+Sent 2026-10-15 23:23:52.474 -04:00, HTTP 204. Request 31d07e2a0439fb1b178b55a392472e4bf228c62dbea23958dc3b635f7558b5cb, CTX_MP003_C02. Same A auth in both A and B headers (per manifest).
+A auth minted with attacker copy of A issuance key: 0e2ed472caeda2781354e5545f870f70d00910a49019e230e9d7d09edfcb1689, package c98c44faefe52a3ab30b7bebed2a50a55b629f7619b8ff15f42509fc71f5edde.
+Association 11 B DENY auth_provider_mismatch (names auth 0e2ed472...); 12 A START; 13 A COMPLETE; all sig_valid, op 7632943d...
+Post-state (scp): A spent 3, A exec 3; B spent/exec byte-unchanged (818b07c2... / 1703aad4...), 0e2ed472 not in B spent.
+C02_PROVIDER_A_AUTH_TO_B=PASS
+
+C03 R2 SCORED PASS 2026-10-15 23:29:29 -04:00
+Sent 2026-10-15 23:27:15.330 -04:00, HTTP 204. Request ec26c89a462ebfbb0ad722ca22df73cf9e8a9b92544bf1e4703cad18f217c6a9, CTX_MP003_C03. B header only (A absent per manifest).
+Forged authorization claiming PROVIDER_B, correctly derived auth id 11e016ab2b09c0cb8a1a5349974b9580ea64580d809ee4f76f54e5e6bab0c902, signed with attacker copy of A issuance key; package e42f3ab66287e7440c8b478f186c6016eedab9b7f65747326d53960ebfc98714.
+Association 14 B DENY auth_bad_sig (names 11e016ab...; auth id check passed, signature check failed); 15 A DENY auth_missing; both sig_valid, op 312439e3... No START/COMPLETE from either provider.
+Post-state (scp): A unchanged since C02 (539ec627... / f5cc5025...); B spent/exec byte-unchanged (818b07c2... / 1703aad4...), 11e016ab not in B spent.
+C03_CLAIM_B_SIGNED_BY_A=PASS
+
+B02 R2 SCORED PASS 2026-10-15 23:34:11 -04:00
+Sent 2026-10-15 23:30:10.639 -04:00, HTTP 204. Request e7eed63cc0d960bdac1abe76076a05975e437cdb38c279db1a81019a1a64003f, CTX_MP003_B02. B header only (A absent per manifest).
+Legitimate B auth 8f0e91c818c7bce6e3252244fc59fa404a808bfe4c2da4e1547aa597f75134a1, package 915298a336bef0c16b4dbafd9d53f1898e9e0f9a4bf8dadad52aa5f28fd2167b.
+Association 16 A DENY auth_missing; 17 B START; 18 B COMPLETE; all sig_valid, op b4b82766...
+B02_POST_ATTACK_B_HEALTH=PASS
+
+FINAL STATE (R2) 2026-10-15 23:34:11 -04:00
+A executions 3, A spent 3 (aac7988b..., 6e3ce147..., 0e2ed472...): spent 539ec62758281220d6025ca653fafaae59f24ad19f5ea90f3613d357f2c4bbf0 / exec f5cc50251cfeaf9ae500b1272b8ea81ca08d602d3627635dfba7da48eb4bb9db
+B executions 2, B spent 2 (92a84e45..., 8f0e91c8...): spent 8228e5e53d1778f53fc49b836b40a80ccbfaff5ba44ae1c5ca36de3f5e0c1dc5 / exec cf422d6db5ef648816fbcad593a9d98e1a5304fccc57bec32c4b2b8532e1b4bd
+Association: 19 records, hash chain verified, SESSION_END submission_count 17, all 17 submissions sig_valid/registry_match/no duplicates.
+FINAL_RECORD_HASH 4c3282924708f504323bbd2cb1188bd0f2071e54a66b5bdb928e344abaa0a906
+ASSOCIATION_JSONL_SHA256 50af864099a7eb91970866a664005caa24042224d2b69525e0e9610c53eb642a
+
+SHUTDOWN
+Association stopped first (Ctrl+C), SESSION_END written, FINAL_RECORD_HASH printed matches log.
+
+SHUTDOWN COMPLETE / TRANSCRIPTS RETAINED 2026-10-15 23:37:47 -0400
+Provider A, Provider B and relay stopped by operator Ctrl+C after association shutdown. Each printed a KeyboardInterrupt traceback from serve_forever (no signal handler); this is the normal stop path, not a fault. Durable state had already been captured post-B02.
+Provider console transcripts independently agree with association records 2-18 (A local_seq 1-3 for B01/C01/C02; B local_seq 1-2 for B01/B02, no B EXECUTED between them).
+Console output for association, Provider A, Provider B and relay was copied verbatim from operator-pasted terminal output into evidence/MP003_SCORED_20261015_R2/operator_transcripts/ (operator transcripts, not process-written log files):
+771fdd630261495bd84ba37e1776a6c2657254cd79691bf9bbe0ab64e406cc8b  association_console.txt
+63096a08d9f1dfb218ca035dc1303977cb9f649c1e352ac5e54c3fddd58b30b5  provider_a_console.txt
+9cec726be0f129de1930b4b32c72e64d03fd8aad4008f07a8203825bba8bc7f4  provider_b_console.txt
+016c46a2e7faf80b5f0ac5679271a57ade807b5b67c096aadc210af7a6904782  relay_console.txt
+SHA256SUMS.txt regenerated to include transcripts. Previous SHA256SUMS 7a375202e564d7f13c9e71d6fbd454cac559d3f7e11a0955170940b55cafd3af superseded by 73e31c55530fc63297070d041afdc00acd9f49f279ed5ec9467897af70b6a1dc. No other evidence file changed.
+
+CORRECTION - REQUESTER HOST 2026-10-15 23:54:43 -0400
+Operator confirms the Chromebook was not involved in MP003. The header line "Requester / attacker harness: Chromebook" and the network-change line "Chromebook connected" are incorrect as to role. C01, C02, C03 and B02 were sent from the OmniBook (Xer0trust, 192.168.1.102) via curl.exe in Window 1, as recorded in each case relay_send_record.txt. Original lines retained unedited.

@@ -1,0 +1,8 @@
+CASE=C03
+SENT_LOCAL=2026-10-15 23:27:15.330 -04:00
+RELAY=http://192.168.1.100:8080/nuvl
+CONTEXT=CTX_MP003_C03
+HEADER_A=ABSENT (per manifest)
+HEADER_B=forged_provider_b_claim_signed_by_a.json.b64 (claims PROVIDER_B, signed with compromised A issuance key)
+REQUEST=request.json (ec26c89a462ebfbb0ad722ca22df73cf9e8a9b92544bf1e4703cad18f217c6a9)
+HTTP_STATUS=204
