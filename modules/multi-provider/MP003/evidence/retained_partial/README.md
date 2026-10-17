@@ -51,7 +51,7 @@ Times are operator-local (UTC−4) unless noted.
 
 4. **State misclassified (21:52).** During a later state-cleanliness check, each provider was found to hold one execution and one spent authorization. These were initially recorded as pre-run residual state. That classification was wrong: they were this session's B01 results.
 
-5. **Provider reset (22:00).** Provider spent state was reset and execution logs were removed before any C case. The first reset command produced malformed JSON because quoting was stripped across PowerShell/SSH. The files were then rewritten correctly using base64 transport. Provider state copies named `*_before_reset` are preserved in `../pre_run_state/`; their file timestamps (16:54–16:56) are earlier than this reset entry — see that directory's README.
+5. **Provider reset (22:00).** Provider spent state was reset and execution logs were removed before any C case. The first reset command produced malformed JSON because quoting was stripped across PowerShell/SSH. The files were then rewritten correctly using base64 transport. Pre-test provider state copies from this attempt are preserved in `../pre_run_state/`.
 
 6. **Reconstruction (22:18).** The operator reconciled the "residual" state against this session's B01 and corrected the classification in the operator notes. The `*_after_B01` files in `B01_CONTROL/` are that recovered state. Their JSON content is identical to the files in `../pre_run_state/`, but they are not byte-identical: each `pre_run_state` copy has 1–2 extra trailing bytes (a line ending added during capture), so their SHA-256 values differ.
 
