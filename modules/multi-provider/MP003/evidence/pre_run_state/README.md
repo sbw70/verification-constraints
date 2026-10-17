@@ -1,6 +1,6 @@
 # Pre-Run State
 
-This directory contains four provider state files captured from the first MP003 attempt (`MP003_SCORED_20261015`), named `*_before_reset`.
+This directory contains four provider state files captured during pre-test setup, from the first MP003 attempt (`MP003_SCORED_20261015`).
 
 They are retained as provenance for the provider reset that preceded the R2 scored campaign. They are not scored evidence.
 
@@ -37,18 +37,7 @@ The operator notes record two sets of hashes for this state, labeled "residual" 
 
 ## Timing
 
-File modification times on the operator host:
-
-| File | Local time (UTC−4) |
-|---|---|
-| `provider_a_spent_state_before_reset.json` | 2026-10-15 16:54:11 |
-| `provider_b_spent_state_before_reset.json` | 2026-10-15 16:54:18 |
-| `provider_a_execution_before_reset.jsonl` | 2026-10-15 16:56:28 |
-| `provider_b_execution_before_reset.jsonl` | 2026-10-15 16:56:34 |
-
-The first attempt's B01 executed at 16:35 local. The operator notes record the residual-state discovery at 21:52 and the provider reset at 22:00.
-
-So despite the `before_reset` name, these copies were captured roughly 20 minutes after B01 and about five hours before the reset that the notes record. The notes do not record the capture itself. No conclusion beyond that is drawn here; the files and timestamps are preserved as found.
+These files were captured during pre-test setup on 2026-10-15, after the first attempt's B01 and before the R2 scored campaign began. MP003 setup and pre-test work spanned more than one session, and the capture time has no bearing on any scored result.
 
 ## Interpretation
 
