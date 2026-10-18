@@ -1,8 +1,0 @@
-CASE=B02
-SENT_LOCAL=2026-10-15 23:30:10.639 -04:00
-RELAY=http://192.168.1.100:8080/nuvl
-CONTEXT=CTX_MP003_B02
-HEADER_A=ABSENT (per manifest)
-HEADER_B=provider_b_authorization.json.b64 (legitimate Provider B authorization)
-REQUEST=request.json (e7eed63cc0d960bdac1abe76076a05975e437cdb38c279db1a81019a1a64003f)
-HTTP_STATUS=204
