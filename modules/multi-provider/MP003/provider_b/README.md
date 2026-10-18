@@ -88,4 +88,3 @@ MP003 does not test compromise of Provider B's issuance key, Provider B's bounda
 `../association/`
 
 `../evidence/scored/final_provider_b/`
-
