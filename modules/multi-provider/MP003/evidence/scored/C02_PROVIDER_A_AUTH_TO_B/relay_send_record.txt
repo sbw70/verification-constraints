@@ -1,0 +1,8 @@
+CASE=C02
+SENT_LOCAL=2026-10-15 23:23:52.474 -04:00
+RELAY=http://192.168.1.100:8080/nuvl
+CONTEXT=CTX_MP003_C02
+HEADER_A=provider_a_authorization.json.b64
+HEADER_B=provider_a_authorization.json.b64 (same Provider A authorization, per manifest)
+REQUEST=request.json (31d07e2a0439fb1b178b55a392472e4bf228c62dbea23958dc3b635f7558b5cb)
+HTTP_STATUS=204
