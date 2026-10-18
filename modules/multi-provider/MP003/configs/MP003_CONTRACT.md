@@ -610,4 +610,3 @@ whether execution begins.
 
 The association verifies and records provider statements but does not confer,
 combine, or replace provider authority.
-
