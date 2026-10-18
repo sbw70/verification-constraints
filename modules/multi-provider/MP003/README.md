@@ -320,4 +320,3 @@ Provider authority remained provider-scoped.
 That is the MP003 result.
 
 Next: **MP004** — independent offline re-verification of the recorded provider evidence.
-
