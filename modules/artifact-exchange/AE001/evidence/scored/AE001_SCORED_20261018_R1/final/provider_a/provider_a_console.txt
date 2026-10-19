@@ -1,0 +1,12 @@
+MP001_PROVIDER_A
+Listening on 0.0.0.0:19090
+Provider ID: PROVIDER_A
+Boundary key ID: sha256:e4664ee3b7bb0012fb7d8f763c9df74594d8a6bec8488d97532a5846cc04b6ff
+Spent state: /home/seth/ARTIFACT_EXHANGE/AE001_SCORED_20261018_R1/runtime/provider_a/provider_a_spent_state.json
+Spent entries loaded: 0
+Execution log: /home/seth/ARTIFACT_EXHANGE/AE001_SCORED_20261018_R1/runtime/provider_a/provider_a_execution.jsonl
+PROVIDER_A DENY operation_id=9a650fff5e9dbcb1a1a86c2538e6bc98d21db50d14a62d2edd685d1383939d01 reason=auth_missing authorization_id=None sent=True
+PROVIDER_A DENY operation_id=9a063156e10187ac29a0aa0274b8d4794b4609b69f6a3e634802c2e0f0c40369 reason=auth_missing authorization_id=None sent=True
+PROVIDER_A DENY operation_id=9b7b778dd984ce5d7d0080b097e25caac0283fdf1e838fb7476a1792f7007105 reason=auth_missing authorization_id=None sent=True
+PROVIDER_A DENY operation_id=86cf31e6155d32b43aa6c5d4fe31e863eca7a76698824955ab5219290ae7be67 reason=auth_missing authorization_id=None sent=True
+AE001_ROLE_STOPPED provider_a
