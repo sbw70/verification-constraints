@@ -1,5 +1,154 @@
-# Deliberately altered laboratory copies
+# MP004 Test Fixtures
 
-N01_record.json changes record 4's signed boundary value while retaining its signature. N02_record.json changes one signature bit. N03_wrong_anchor.json specifies the original A event and the B trust anchor. N04_summary.json is an unsigned, deliberately false C02 execution summary. N05a_record.json changes only recorder classifications of the valid package. N05b_record.json combines N01's altered package with recorder fields claiming validity.
+This directory contains the deliberately altered or misleading inputs used by the MP004 negative cases.
 
-The fixtures are intentionally invalid or misleading test inputs, not canonical MP003 evidence. Each run's fixture_manifest.json identifies recipes, source record/hash and exact output hashes. The verifier checks or generates these deterministic fixture bytes before evaluating negatives. N03 and N04 have fixed descriptor/summary semantics implemented by the harness; they are not a general-purpose summary-analysis interface.
+These files are not canonical MP003 evidence.
+
+They are controlled laboratory fixtures derived from preserved MP003 records so the verifier can be tested against specific failure conditions.
+
+## Source basis
+
+The negative fixtures are derived from preserved MP003 association record 4 or, for N04, from the fixed C02 operation identified in the locked MP004 run manifest.
+
+The exact source record, transformation recipe, expected outcome, and fixture hash for each case are recorded in the per-run `fixture_manifest.json`.
+
+The original MP003 evidence remains unchanged.
+
+## Fixtures
+
+### `N01_record.json`
+
+Derived from MP003 record 4.
+
+The signed event's `boundary_value` is replaced while the original provider signature is retained.
+
+The surrounding copied recorder fields still describe the original record.
+
+Expected result:
+
+`signature_invalid`
+
+This tests whether changing signed event content is detected independently of recorder metadata.
+
+### `N02_record.json`
+
+Derived from MP003 record 4.
+
+The event is preserved, but one bit of the decoded provider signature is changed and the signature is re-encoded.
+
+Expected result:
+
+`signature_invalid`
+
+This isolates signature modification from event modification.
+
+### `N03_wrong_anchor.json`
+
+Descriptor for the wrong-trust-anchor case.
+
+It identifies:
+
+- source record 4;
+- `PROVIDER_B` as the deliberately incorrect verification anchor.
+
+The unchanged source event belongs to Provider A.
+
+The scored harness performs both:
+
+- a direct Ed25519 verification attempt with Provider B's public key;
+- a check that the normal provider-to-key mapping refuses the incorrect anchor.
+
+Expected result:
+
+- direct signature verification fails;
+- production trust mapping rejects the substitution.
+
+This file is a fixed test descriptor, not a provider event or general-purpose trust configuration.
+
+### `N04_summary.json`
+
+An unsigned, deliberately false interpretation of the MP003 C02 operation.
+
+It claims:
+
+- `provider_id`: `PROVIDER_B`
+- `stage`: `EXECUTED`
+
+for the fixed C02 operation.
+
+The authenticated Provider B evidence for that operation is a signed:
+
+`DENY auth_provider_mismatch`
+
+Expected result:
+
+`contradicted_by_authenticated_denial`
+
+This fixture tests whether a later unsigned assertion can override authenticated provider evidence.
+
+It cannot.
+
+The case does not claim universal or physical proof of non-execution. It establishes only that this supplied summary conflicts with the authenticated provider statement.
+
+### `N05a_record.json`
+
+Derived from valid MP003 record 4.
+
+The raw provider package is left unchanged.
+
+Only recorder-added classifications are changed to claim:
+
+- `sig_valid = false`
+- `registry_match = false`
+- `verification_code = laboratory_false_invalid`
+
+Expected result:
+
+the provider package still authenticates successfully, and the disagreement with recorder metadata is reported.
+
+This tests false-negative recorder metadata.
+
+### `N05b_record.json`
+
+Uses the same signed-field tamper as N01 while retaining recorder fields that claim:
+
+- `sig_valid = true`
+- `registry_match = true`
+- `verification_code = ok`
+
+Expected result:
+
+the altered provider package is rejected despite the favorable recorder metadata.
+
+This tests false-positive recorder metadata.
+
+## Fixture role
+
+The fixtures separate two questions that MP004 treats independently:
+
+1. What do the raw provider-signed bytes prove cryptographically?
+2. What does the surrounding recorder metadata claim about those bytes?
+
+The verifier answers the first question without trusting the second.
+
+The N01, N02, N05a, and N05b files preserve enough recorder structure to make disagreement observable while still forcing the verifier to derive its result from the raw provider package.
+
+N03 and N04 are smaller fixed descriptors because those cases test trust-anchor substitution and later interpretation rather than modification of a complete recorder record.
+
+## Integrity and reproducibility
+
+Each MP004 run records fixture hashes in its `fixture_manifest.json`.
+
+The fixture recipes are deterministic and tied to specific source records.
+
+A fixture is valid for the scored test only if its generated bytes match the fixed expected hash.
+
+## Limits
+
+These fixtures are synthetic negative-test inputs.
+
+They are not evidence that the original MP003 records were tampered with, misclassified, or falsely summarized during the MP003 campaign.
+
+They do not establish physical execution, physical non-execution, evidence completeness, immutable storage, or provider authorization issuance.
+
+Their purpose is limited to testing the behavior of the MP004 offline evidence verifier under defined adverse inputs.
