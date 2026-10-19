@@ -1,0 +1,1 @@
+Initial install command used a relative source path from the MP004 working directory and failed before creating any run. Corrected to absolute source path. No evidence changed.

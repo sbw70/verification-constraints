@@ -1,0 +1,30 @@
+Provider ID: PROVIDER_B
+Boundary key ID: sha256:db764408aa319642363057d804f0c2a3d2c7dd22de86ae4a6d6549cb97f60225
+Spent state: /home/seth/MULTI_PROVIDER_003/provider_b/provider_b_spent_state.json
+Spent entries loaded: 0
+Execution log: /home/seth/MULTI_PROVIDER_003/provider_b/provider_b_execution.jsonl
+PROVIDER_B DENY operation_id=d54eb3b904fd9c9a619dc59130ea48c9e193845c2c4fdc0eab17e56c2e0f2d7e reason=auth_malformed authorization_id=None sent=True
+PROVIDER_B START operation_id=d54eb3b904fd9c9a619dc59130ea48c9e193845c2c4fdc0eab17e56c2e0f2d7e authorization_id=92a84e45db900b5ce25807cb8d16267657a922f29ded3a11908f6ef7d8c1771b sent=True
+PROVIDER_B EXECUTED operation_id=d54eb3b904fd9c9a619dc59130ea48c9e193845c2c4fdc0eab17e56c2e0f2d7e authorization_id=92a84e45db900b5ce25807cb8d16267657a922f29ded3a11908f6ef7d8c1771b local_seq=1
+PROVIDER_B COMPLETE operation_id=d54eb3b904fd9c9a619dc59130ea48c9e193845c2c4fdc0eab17e56c2e0f2d7e authorization_id=92a84e45db900b5ce25807cb8d16267657a922f29ded3a11908f6ef7d8c1771b sent=True
+PROVIDER_B DENY operation_id=54791a1682b73664b437a898f811ff010ebf6fafdec734893efd0f4c1b472d58 reason=auth_missing authorization_id=None sent=True
+PROVIDER_B DENY operation_id=7632943dc48cc26846bcd85a32a71f2d5f928b88a8bbe0cd939a5980caf9ef85 reason=auth_provider_mismatch authorization_id=0e2ed472caeda2781354e5545f870f70d00910a49019e230e9d7d09edfcb1689 sent=True
+PROVIDER_B DENY operation_id=312439e34530f05c22ee33efed6dfe7abad16aebd13a7b4f505284ffe673728b reason=auth_bad_sig authorization_id=11e016ab2b09c0cb8a1a5349974b9580ea64580d809ee4f76f54e5e6bab0c902 sent=True
+PROVIDER_B START operation_id=b4b827664deba623158a0f6e13816d95c34bdfbcad23d5076d707a770d187b9a authorization_id=8f0e91c818c7bce6e3252244fc59fa404a808bfe4c2da4e1547aa597f75134a1 sent=True
+PROVIDER_B EXECUTED operation_id=b4b827664deba623158a0f6e13816d95c34bdfbcad23d5076d707a770d187b9a authorization_id=8f0e91c818c7bce6e3252244fc59fa404a808bfe4c2da4e1547aa597f75134a1 local_seq=2
+PROVIDER_B COMPLETE operation_id=b4b827664deba623158a0f6e13816d95c34bdfbcad23d5076d707a770d187b9a authorization_id=8f0e91c818c7bce6e3252244fc59fa404a808bfe4c2da4e1547aa597f75134a1 sent=True
+^CTraceback (most recent call last):
+  File "/home/seth/MULTI_PROVIDER_003/provider_b/provider_b.py", line 920, in <module>
+    main()
+  File "/home/seth/MULTI_PROVIDER_003/provider_b/provider_b.py", line 916, in main
+    ).serve_forever()
+      ^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/socketserver.py", line 235, in serve_forever
+    ready = selector.select(poll_interval)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/selectors.py", line 415, in select
+    fd_event_list = self._selector.poll(timeout)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+
+seth@Xer0trust2:~/MULTI_PROVIDER_003/provider_b$

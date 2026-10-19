@@ -1,0 +1,18 @@
+{
+  "status": "PASS",
+  "unchanged_copied_files": 144,
+  "nested_checksum_entries_checked": 86,
+  "frozen_lock_hashes_checked": 4,
+  "fixture_hashes_checked": 6,
+  "scored_verifier_unchanged": true,
+  "original_test_suite_unchanged": true,
+  "portable_tests": {
+    "tests": 9,
+    "status": "PASS",
+    "adaptation": "Only ROOT assignment changed"
+  },
+  "staging_replay": "PASS",
+  "private_key_files_present": [],
+  "python_cache_files_present": false,
+  "remote_publication_performed": false
+}

@@ -1,0 +1,27 @@
+MP001_ASSOCIATION_RECORDER
+Session: MP003_SCORED_20261015_R2
+Listening on 0.0.0.0:9191
+Recorder SHA256: fad60dfc8df53337d2e41288c2c4973442258cae4240945ebbd0aa8920550bfc
+Registry SHA256: 59d739588427d87313e3434982d943a9c82bad26c3fe3deb7d5488efadb6088d
+Manifest SHA256: 85ac48ff64f7b94d078ceb0638240980d30013a78cf3d850964abbd895eb7368
+Contract SHA256: ac368500126f3314faa7f5193a07bbb78061c10e1931606778b6414702b9579b
+Registered providers: PROVIDER_A, PROVIDER_B
+OBSERVED seq=1 provider=PROVIDER_B stage=DENY sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=2 provider=PROVIDER_A stage=DENY sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=3 provider=PROVIDER_A stage=START sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=4 provider=PROVIDER_B stage=START sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=5 provider=PROVIDER_A stage=COMPLETE sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=6 provider=PROVIDER_B stage=COMPLETE sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=7 provider=PROVIDER_B stage=DENY sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=8 provider=PROVIDER_A stage=START sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=9 provider=PROVIDER_A stage=COMPLETE sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=10 provider=PROVIDER_B stage=DENY sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=11 provider=PROVIDER_A stage=START sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=12 provider=PROVIDER_A stage=COMPLETE sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=13 provider=PROVIDER_B stage=DENY sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=14 provider=PROVIDER_A stage=DENY sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=15 provider=PROVIDER_A stage=DENY sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=16 provider=PROVIDER_B stage=START sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=17 provider=PROVIDER_B stage=COMPLETE sig_valid=True code=ok duplicate_of=None
+FINAL_RECORD_HASH: 4c3282924708f504323bbd2cb1188bd0f2071e54a66b5bdb928e344abaa0a906
+PS C:\Users\holiw\esp32-main\MULTI_PROVIDER_003\association>

@@ -1,0 +1,14 @@
+test_boolean_version_is_not_integer_version (__main__.IndependentVerifierTests.test_boolean_version_is_not_integer_version) ... ok
+test_duplicate_fields_rejected (__main__.IndependentVerifierTests.test_duplicate_fields_rejected) ... ok
+test_metadata_absence (__main__.IndependentVerifierTests.test_metadata_absence) ... ok
+test_nonfinite_json_rejected (__main__.IndependentVerifierTests.test_nonfinite_json_rejected) ... ok
+test_padded_signature_rejected (__main__.IndependentVerifierTests.test_padded_signature_rejected) ... ok
+test_path_escape_rejected (__main__.IndependentVerifierTests.test_path_escape_rejected) ... ok
+test_production_trust_loader_rejects_swapped_key (__main__.IndependentVerifierTests.test_production_trust_loader_rejects_swapped_key) ... ok
+test_unicode_signed_change_fails (__main__.IndependentVerifierTests.test_unicode_signed_change_fails) ... ok
+test_unknown_claims_cannot_select_key (__main__.IndependentVerifierTests.test_unknown_claims_cannot_select_key) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.009s
+
+OK

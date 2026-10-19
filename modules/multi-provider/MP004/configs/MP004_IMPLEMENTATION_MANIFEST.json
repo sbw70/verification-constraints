@@ -1,0 +1,9 @@
+{
+  "phase": "PRE_SCORING_IMPLEMENTATION_LOCK",
+  "verifier_sha256": "452111ef7b7f96e2f42d14a416605ba53ee5b878b3dc05ce2729f6dc9db096c7",
+  "tests_sha256": "3af53cc8caf1a71d12e0cb62f4c02afb008eb771468723192a70401c53ec72a3",
+  "python_executable": "C:\\Users\\holiw\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+  "cryptography": "50.0.2",
+  "fixture_manifest_sha256": "8c79dd7812c73964bfe38c5ab527f63364996b85bf0a18971bc28b6243e423e6",
+  "frozen_inputs_unchanged": true
+}

@@ -1,0 +1,351 @@
+{
+  "version": 1,
+  "status": "LOCKED_PRE_IMPLEMENTATION",
+  "published_commit": "fa541618b1a3bc58700a81b29129b17b35b1e0fc",
+  "contract_sha256": "25142f6aba0700eec4bb038f75f0f86848b59ee19b4571f6d47fcde79ae0b16b",
+  "source_manifest_sha256": "54057faa64026fb8560be9f41b0cc5e2758114deb6113a97e2731b51903301f1",
+  "publication_comparison_sha256": "8f7b8c1549c05ea371ad4ea46914d12485e1bbbe17aff57c81b6cab7d77d1139",
+  "association_path": "source/MP003/evidence/scored/association.jsonl",
+  "source_path_base": "source/MP003",
+  "trust_registry": "source/MP003/association/provider_registry.json",
+  "expected_submission_count": 17,
+  "expected_contextual_count": 15,
+  "records": [
+    {
+      "record_seq": 2,
+      "raw_package_sha256": "d5dd9b3108698ef3e1b18a67bfb168f4cbb2c819c7e7ae6ab5d0cf6523ff28d9",
+      "scope": "authentication_only_retained_misfire"
+    },
+    {
+      "record_seq": 3,
+      "raw_package_sha256": "8aa3ec747509066cf50aa8666de6b9a50126705fc6ec2927fe2fc6038e82d20d",
+      "scope": "authentication_only_retained_misfire"
+    },
+    {
+      "record_seq": 4,
+      "raw_package_sha256": "fc4dd4b19d7ebb219e650cb9f83e72b33a10e6b2b46354639506b98fb491cb4e",
+      "scope": "authentication_and_campaign_assertions",
+      "run": "B01",
+      "request_path": "evidence/scored/B01_CONTROL/request.json",
+      "context": "CTX_MP003_B01",
+      "authorization_path": "evidence/scored/B01_CONTROL/provider_a_authorization.json",
+      "expected": {
+        "provider_id": "PROVIDER_A",
+        "stage": "START",
+        "reason_code": null,
+        "binding": "cb7db69aa5af52378fb2e6a33720e6d697bb37ccfd1a45d32cb736e46709a4b8",
+        "operation_id": "d54eb3b904fd9c9a619dc59130ea48c9e193845c2c4fdc0eab17e56c2e0f2d7e",
+        "authorization_id": "aac7988b08e14b382105470d20c9cc3b15abf50ff288cba615cb962e5d12cfc1",
+        "authorization_nonce": "211c8419a7144b256782e21f6de2c674"
+      }
+    },
+    {
+      "record_seq": 5,
+      "raw_package_sha256": "2f8622a8f12d9183573ac3e6408dcb74359e3e70fe6e897d0cc79e9cd28b0dc5",
+      "scope": "authentication_and_campaign_assertions",
+      "run": "B01",
+      "request_path": "evidence/scored/B01_CONTROL/request.json",
+      "context": "CTX_MP003_B01",
+      "authorization_path": "evidence/scored/B01_CONTROL/provider_b_authorization.json",
+      "expected": {
+        "provider_id": "PROVIDER_B",
+        "stage": "START",
+        "reason_code": null,
+        "binding": "cb7db69aa5af52378fb2e6a33720e6d697bb37ccfd1a45d32cb736e46709a4b8",
+        "operation_id": "d54eb3b904fd9c9a619dc59130ea48c9e193845c2c4fdc0eab17e56c2e0f2d7e",
+        "authorization_id": "92a84e45db900b5ce25807cb8d16267657a922f29ded3a11908f6ef7d8c1771b",
+        "authorization_nonce": "f9e87e93e89f798a1321025e18125d54"
+      }
+    },
+    {
+      "record_seq": 6,
+      "raw_package_sha256": "a84ef1e73b3f3ffa1d5e321aa902e0cd80850abdff64cdfe485f3a4a95dee0f2",
+      "scope": "authentication_and_campaign_assertions",
+      "run": "B01",
+      "request_path": "evidence/scored/B01_CONTROL/request.json",
+      "context": "CTX_MP003_B01",
+      "authorization_path": "evidence/scored/B01_CONTROL/provider_a_authorization.json",
+      "expected": {
+        "provider_id": "PROVIDER_A",
+        "stage": "COMPLETE",
+        "reason_code": null,
+        "binding": "cb7db69aa5af52378fb2e6a33720e6d697bb37ccfd1a45d32cb736e46709a4b8",
+        "operation_id": "d54eb3b904fd9c9a619dc59130ea48c9e193845c2c4fdc0eab17e56c2e0f2d7e",
+        "authorization_id": "aac7988b08e14b382105470d20c9cc3b15abf50ff288cba615cb962e5d12cfc1",
+        "authorization_nonce": "211c8419a7144b256782e21f6de2c674"
+      }
+    },
+    {
+      "record_seq": 7,
+      "raw_package_sha256": "4d6941c66e08d501f27acff070ad9d6ed708a3d111d08cf8afee0c93c77902ce",
+      "scope": "authentication_and_campaign_assertions",
+      "run": "B01",
+      "request_path": "evidence/scored/B01_CONTROL/request.json",
+      "context": "CTX_MP003_B01",
+      "authorization_path": "evidence/scored/B01_CONTROL/provider_b_authorization.json",
+      "expected": {
+        "provider_id": "PROVIDER_B",
+        "stage": "COMPLETE",
+        "reason_code": null,
+        "binding": "cb7db69aa5af52378fb2e6a33720e6d697bb37ccfd1a45d32cb736e46709a4b8",
+        "operation_id": "d54eb3b904fd9c9a619dc59130ea48c9e193845c2c4fdc0eab17e56c2e0f2d7e",
+        "authorization_id": "92a84e45db900b5ce25807cb8d16267657a922f29ded3a11908f6ef7d8c1771b",
+        "authorization_nonce": "f9e87e93e89f798a1321025e18125d54"
+      }
+    },
+    {
+      "record_seq": 8,
+      "raw_package_sha256": "fdddf1977fe66de52cbf15c88a158cebe9c17641b73300634a8d9167baeb741c",
+      "scope": "authentication_and_campaign_assertions",
+      "run": "C01",
+      "request_path": "evidence/scored/C01_COMPROMISED_A_TO_A/request.json",
+      "context": "CTX_MP003_C01",
+      "authorization_path": null,
+      "expected": {
+        "provider_id": "PROVIDER_B",
+        "stage": "DENY",
+        "reason_code": "auth_missing",
+        "binding": "eb4540a445d090c626796cc489841033ef5289c42091b92784263dff8bc7d0b7",
+        "operation_id": "54791a1682b73664b437a898f811ff010ebf6fafdec734893efd0f4c1b472d58",
+        "authorization_id": null,
+        "authorization_nonce": null
+      }
+    },
+    {
+      "record_seq": 9,
+      "raw_package_sha256": "d513e7472627aa09b09f912292e796e5246d996d121afc13ecb46a3ff41c856f",
+      "scope": "authentication_and_campaign_assertions",
+      "run": "C01",
+      "request_path": "evidence/scored/C01_COMPROMISED_A_TO_A/request.json",
+      "context": "CTX_MP003_C01",
+      "authorization_path": "evidence/scored/C01_COMPROMISED_A_TO_A/provider_a_authorization.json",
+      "expected": {
+        "provider_id": "PROVIDER_A",
+        "stage": "START",
+        "reason_code": null,
+        "binding": "eb4540a445d090c626796cc489841033ef5289c42091b92784263dff8bc7d0b7",
+        "operation_id": "54791a1682b73664b437a898f811ff010ebf6fafdec734893efd0f4c1b472d58",
+        "authorization_id": "6e3ce147b1337f74451823a78cef40011378c88e2e4103f2ffcd82845dc7de1a",
+        "authorization_nonce": "4323797ff618e83c8821ca21fa819294"
+      }
+    },
+    {
+      "record_seq": 10,
+      "raw_package_sha256": "839d38d68bf186646bb0a29e28defce561aa91764f5cf7d4af4c77dffca468e2",
+      "scope": "authentication_and_campaign_assertions",
+      "run": "C01",
+      "request_path": "evidence/scored/C01_COMPROMISED_A_TO_A/request.json",
+      "context": "CTX_MP003_C01",
+      "authorization_path": "evidence/scored/C01_COMPROMISED_A_TO_A/provider_a_authorization.json",
+      "expected": {
+        "provider_id": "PROVIDER_A",
+        "stage": "COMPLETE",
+        "reason_code": null,
+        "binding": "eb4540a445d090c626796cc489841033ef5289c42091b92784263dff8bc7d0b7",
+        "operation_id": "54791a1682b73664b437a898f811ff010ebf6fafdec734893efd0f4c1b472d58",
+        "authorization_id": "6e3ce147b1337f74451823a78cef40011378c88e2e4103f2ffcd82845dc7de1a",
+        "authorization_nonce": "4323797ff618e83c8821ca21fa819294"
+      }
+    },
+    {
+      "record_seq": 11,
+      "raw_package_sha256": "d7b5cd00969e0969750efb7a2dc3308404b01d32b4b3a87c8336e42ddce054c3",
+      "scope": "authentication_and_campaign_assertions",
+      "run": "C02",
+      "request_path": "evidence/scored/C02_PROVIDER_A_AUTH_TO_B/request.json",
+      "context": "CTX_MP003_C02",
+      "authorization_path": "evidence/scored/C02_PROVIDER_A_AUTH_TO_B/provider_a_authorization.json",
+      "expected": {
+        "provider_id": "PROVIDER_B",
+        "stage": "DENY",
+        "reason_code": "auth_provider_mismatch",
+        "binding": "4a3cc0a524ae678d59245fb7345cda00e202e56b32acbea1dfc1e35bd02bef89",
+        "operation_id": "7632943dc48cc26846bcd85a32a71f2d5f928b88a8bbe0cd939a5980caf9ef85",
+        "authorization_id": "0e2ed472caeda2781354e5545f870f70d00910a49019e230e9d7d09edfcb1689",
+        "authorization_nonce": "c49f7f885902cd61fa594fb9f9e8824c"
+      }
+    },
+    {
+      "record_seq": 12,
+      "raw_package_sha256": "4121d00a062008121f8c1614ddcd8637e46fe35f4067f3e230c2d274c0146188",
+      "scope": "authentication_and_campaign_assertions",
+      "run": "C02",
+      "request_path": "evidence/scored/C02_PROVIDER_A_AUTH_TO_B/request.json",
+      "context": "CTX_MP003_C02",
+      "authorization_path": "evidence/scored/C02_PROVIDER_A_AUTH_TO_B/provider_a_authorization.json",
+      "expected": {
+        "provider_id": "PROVIDER_A",
+        "stage": "START",
+        "reason_code": null,
+        "binding": "4a3cc0a524ae678d59245fb7345cda00e202e56b32acbea1dfc1e35bd02bef89",
+        "operation_id": "7632943dc48cc26846bcd85a32a71f2d5f928b88a8bbe0cd939a5980caf9ef85",
+        "authorization_id": "0e2ed472caeda2781354e5545f870f70d00910a49019e230e9d7d09edfcb1689",
+        "authorization_nonce": "c49f7f885902cd61fa594fb9f9e8824c"
+      }
+    },
+    {
+      "record_seq": 13,
+      "raw_package_sha256": "db182d7575a62e3a9492417ad9f1a14e0649ec49205733ede4c586d68e7b51f3",
+      "scope": "authentication_and_campaign_assertions",
+      "run": "C02",
+      "request_path": "evidence/scored/C02_PROVIDER_A_AUTH_TO_B/request.json",
+      "context": "CTX_MP003_C02",
+      "authorization_path": "evidence/scored/C02_PROVIDER_A_AUTH_TO_B/provider_a_authorization.json",
+      "expected": {
+        "provider_id": "PROVIDER_A",
+        "stage": "COMPLETE",
+        "reason_code": null,
+        "binding": "4a3cc0a524ae678d59245fb7345cda00e202e56b32acbea1dfc1e35bd02bef89",
+        "operation_id": "7632943dc48cc26846bcd85a32a71f2d5f928b88a8bbe0cd939a5980caf9ef85",
+        "authorization_id": "0e2ed472caeda2781354e5545f870f70d00910a49019e230e9d7d09edfcb1689",
+        "authorization_nonce": "c49f7f885902cd61fa594fb9f9e8824c"
+      }
+    },
+    {
+      "record_seq": 14,
+      "raw_package_sha256": "d970241856d314ffab25a907d512f643662ddc56d0ed722dc89a32958b1d72dc",
+      "scope": "authentication_and_campaign_assertions",
+      "run": "C03",
+      "request_path": "evidence/scored/C03_CLAIM_B_SIGNED_BY_A/request.json",
+      "context": "CTX_MP003_C03",
+      "authorization_path": "evidence/scored/C03_CLAIM_B_SIGNED_BY_A/forged_provider_b_claim_signed_by_a.json",
+      "expected": {
+        "provider_id": "PROVIDER_B",
+        "stage": "DENY",
+        "reason_code": "auth_bad_sig",
+        "binding": "45cd78cc4087bbdab0eb97acbfd2b822b3221ff752404d78b6cc92519370fe04",
+        "operation_id": "312439e34530f05c22ee33efed6dfe7abad16aebd13a7b4f505284ffe673728b",
+        "authorization_id": "11e016ab2b09c0cb8a1a5349974b9580ea64580d809ee4f76f54e5e6bab0c902",
+        "authorization_nonce": "a63f6f615167488fe040c65d44c69606"
+      }
+    },
+    {
+      "record_seq": 15,
+      "raw_package_sha256": "dcb36f01eb2998fae59eb458e6ea84bb4e6d8b7324a473b9e934822404b5b224",
+      "scope": "authentication_and_campaign_assertions",
+      "run": "C03",
+      "request_path": "evidence/scored/C03_CLAIM_B_SIGNED_BY_A/request.json",
+      "context": "CTX_MP003_C03",
+      "authorization_path": null,
+      "expected": {
+        "provider_id": "PROVIDER_A",
+        "stage": "DENY",
+        "reason_code": "auth_missing",
+        "binding": "45cd78cc4087bbdab0eb97acbfd2b822b3221ff752404d78b6cc92519370fe04",
+        "operation_id": "312439e34530f05c22ee33efed6dfe7abad16aebd13a7b4f505284ffe673728b",
+        "authorization_id": null,
+        "authorization_nonce": null
+      }
+    },
+    {
+      "record_seq": 16,
+      "raw_package_sha256": "00e91b92facedb95e6774ec9bd4b415fbe4e086a40e0fffde520d0626e6a5b4a",
+      "scope": "authentication_and_campaign_assertions",
+      "run": "B02",
+      "request_path": "evidence/scored/B02_POST_ATTACK_B_HEALTH/request.json",
+      "context": "CTX_MP003_B02",
+      "authorization_path": null,
+      "expected": {
+        "provider_id": "PROVIDER_A",
+        "stage": "DENY",
+        "reason_code": "auth_missing",
+        "binding": "77014e67cdedc9987bdba94f949cbc5a7dbe806e4d39083aa9a62e69f52f4932",
+        "operation_id": "b4b827664deba623158a0f6e13816d95c34bdfbcad23d5076d707a770d187b9a",
+        "authorization_id": null,
+        "authorization_nonce": null
+      }
+    },
+    {
+      "record_seq": 17,
+      "raw_package_sha256": "f6a391280c4f34a40232897057863d3bb260166447f53bb5e196ec02e0733bb3",
+      "scope": "authentication_and_campaign_assertions",
+      "run": "B02",
+      "request_path": "evidence/scored/B02_POST_ATTACK_B_HEALTH/request.json",
+      "context": "CTX_MP003_B02",
+      "authorization_path": "evidence/scored/B02_POST_ATTACK_B_HEALTH/provider_b_authorization.json",
+      "expected": {
+        "provider_id": "PROVIDER_B",
+        "stage": "START",
+        "reason_code": null,
+        "binding": "77014e67cdedc9987bdba94f949cbc5a7dbe806e4d39083aa9a62e69f52f4932",
+        "operation_id": "b4b827664deba623158a0f6e13816d95c34bdfbcad23d5076d707a770d187b9a",
+        "authorization_id": "8f0e91c818c7bce6e3252244fc59fa404a808bfe4c2da4e1547aa597f75134a1",
+        "authorization_nonce": "8d45b974433702ff3fb45abffcd799c4"
+      }
+    },
+    {
+      "record_seq": 18,
+      "raw_package_sha256": "9b08259a16c61d8c4464b14ee34644282b3808d873442ba5510cc8ae3f1572a6",
+      "scope": "authentication_and_campaign_assertions",
+      "run": "B02",
+      "request_path": "evidence/scored/B02_POST_ATTACK_B_HEALTH/request.json",
+      "context": "CTX_MP003_B02",
+      "authorization_path": "evidence/scored/B02_POST_ATTACK_B_HEALTH/provider_b_authorization.json",
+      "expected": {
+        "provider_id": "PROVIDER_B",
+        "stage": "COMPLETE",
+        "reason_code": null,
+        "binding": "77014e67cdedc9987bdba94f949cbc5a7dbe806e4d39083aa9a62e69f52f4932",
+        "operation_id": "b4b827664deba623158a0f6e13816d95c34bdfbcad23d5076d707a770d187b9a",
+        "authorization_id": "8f0e91c818c7bce6e3252244fc59fa404a808bfe4c2da4e1547aa597f75134a1",
+        "authorization_nonce": "8d45b974433702ff3fb45abffcd799c4"
+      }
+    }
+  ],
+  "fixture_recipes": [
+    {
+      "id": "N01",
+      "output": "fixtures/N01_record.json",
+      "source_record_seq": 4,
+      "expected": "signature_invalid",
+      "recipe": "Set event.boundary_value to 64 zeroes (64 ones if already zero), preserve original signature, canonicalize package and replace raw_body_b64 only in copied record"
+    },
+    {
+      "id": "N02",
+      "output": "fixtures/N02_record.json",
+      "source_record_seq": 4,
+      "expected": "signature_invalid",
+      "recipe": "Flip bit 0 of decoded signature byte 0, reencode unpadded base64url, preserve event; canonicalize package and replace raw_body_b64 in copied record"
+    },
+    {
+      "id": "N03",
+      "output": "fixtures/N03_wrong_anchor.json",
+      "source_record_seq": 4,
+      "expected": "direct_signature_invalid_and_mapping_rejected",
+      "recipe": "Reference unchanged record 4 and PROVIDER_B public key; perform explicit direct cryptographic check and separate production mapping refusal"
+    },
+    {
+      "id": "N04",
+      "output": "fixtures/N04_summary.json",
+      "source_record_seq": 11,
+      "expected": "contradicted_by_authenticated_denial",
+      "recipe": "Unsigned JSON object with provider_id PROVIDER_B, operation_id from manifest record 11, stage EXECUTED, source_case C02"
+    },
+    {
+      "id": "N05a",
+      "output": "fixtures/N05a_record.json",
+      "source_record_seq": 4,
+      "expected": "signature_valid_and_classification_disagreement",
+      "recipe": "Copy record 4; set sig_valid false, registry_match false, verification_code laboratory_false_invalid; preserve raw_body_b64"
+    },
+    {
+      "id": "N05b",
+      "output": "fixtures/N05b_record.json",
+      "source_record_seq": 4,
+      "expected": "signature_invalid_and_classification_disagreement",
+      "recipe": "Copy N01 record; set sig_valid true, registry_match true, verification_code ok"
+    }
+  ],
+  "required_case_ids": [
+    "B01",
+    "N01",
+    "N02",
+    "N03",
+    "N04",
+    "N05a",
+    "N05b"
+  ],
+  "fixture_manifest_status": "TO_BE_GENERATED_BEFORE_SCORING",
+  "verifier_status": "NOT_IMPLEMENTED",
+  "scoring_status": "NOT_RUN"
+}
