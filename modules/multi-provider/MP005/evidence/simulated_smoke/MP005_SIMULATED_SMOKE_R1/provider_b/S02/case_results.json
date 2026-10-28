@@ -1,1 +1,0 @@
-{"assertions":{"expected_reason":true,"no_silent_state_initialization":true,"no_usable_server":true,"startup_failed":true},"case":"S02","classification":"LOCAL_STARTUP_CHARACTERIZATION_NOT_PRIMARY_MP005","live_rehearsal":"NOT_RUN","provider":"provider_b","scored_MP005":"NOT_RUN","status":"PASS"}

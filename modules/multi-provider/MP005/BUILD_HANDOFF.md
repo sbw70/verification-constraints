@@ -1,5 +1,0 @@
-# Current MP005 handoff — R3 independently reviewed PASS
-
-Provider A/B S00–S05 independently PASS within tested local Linux scope. R1/R2/R3 remain byte-for-byte unchanged. See notes/MP005_R3_INDEPENDENT_REVIEW.json, notes/MP005_R3_REVIEW_SUPPLEMENT.json and OPERATOR_HANDOFF/START_HERE.md. Current runtime/config identities are recorded in OPERATOR_HANDOFF/CANDIDATE_IDENTITIES.json. Earlier preparation packages and R3 NOT_RUN reports are historical, not the current readiness state.
-
-Remaining gate: verified current live physical-role/hostname/IP map, runtime/state/ledger/log/evidence paths and continuous association-log transport. Minimal later host-local collection is prepared in OPERATOR_HANDOFF/DISCOVERY_NEXT.md and has NOT been executed. No final lock, live preflight, rehearsal, scored run or GitHub mutation. Entire mutually consistent ledger+snapshot rollback prevention remains unestablished. Final freeze and each live phase require their separate resolved prerequisites and authorization.

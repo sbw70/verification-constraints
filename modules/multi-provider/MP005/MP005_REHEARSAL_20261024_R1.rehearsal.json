@@ -1,8 +1,0 @@
-{
-    "authorized":  true,
-    "phase":  "rehearsal",
-    "session_id":  "MP005_REHEARSAL_20261024_R1",
-    "operator_approval_scope":  "R01_R02_REHEARSAL_FULL",
-    "scope_enforcement":  "OPERATOR_ONLY_NOT_ENFORCED_BY_HARNESS",
-    "canonical_lock_sha256":  "08039d757d20ad9f111427779a8ec9276f5ecbf90f313f7b2b18c6b975c52b36"
-}

@@ -1,1 +1,0 @@
-{"assertions":{"expected_reason":true,"no_execution_log":true,"no_ledger_initialization_or_repair":true,"no_usable_server":true,"snapshot_not_used_as_authority":true,"startup_failed":true},"case":"S02","classification":"HARDENED_LOCAL_STARTUP_ONLY","live_rehearsal":"NOT_RUN","provider":"provider_b","scored_MP005":"NOT_RUN","status":"PASS"}
