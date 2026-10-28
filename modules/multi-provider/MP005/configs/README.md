@@ -1,4 +1,3 @@
-```markdown
 # MP005 — Configuration and Integrity Manifests
 
 ## Purpose
