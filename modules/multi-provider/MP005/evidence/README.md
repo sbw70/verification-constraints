@@ -1,4 +1,3 @@
-```markdown
 # MP005 — Experimental Evidence
 
 ## Purpose
