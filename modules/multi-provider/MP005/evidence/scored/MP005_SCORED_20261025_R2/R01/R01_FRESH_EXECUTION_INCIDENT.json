@@ -1,0 +1,22 @@
+﻿{
+    "session_id":  "MP005_SCORED_20261025_R2",
+    "case":  "R01",
+    "provider":  "PROVIDER_A",
+    "classification":  "NON_PASS",
+    "restart_durability_verified":  true,
+    "exact_replay_denied":  true,
+    "fresh_authorization_consumed":  true,
+    "fresh_execution_recorded":  false,
+    "fresh_signed_complete_observed":  false,
+    "ledger_entries_before":  1,
+    "ledger_entries_after":  2,
+    "execution_records_before":  1,
+    "execution_records_after":  1,
+    "ledger_chain_valid":  true,
+    "suspected_cause":  "SSH output pipe disconnected; possible BrokenPipeError during provider START logging",
+    "root_cause_confirmed":  false,
+    "authorization_retried":  false,
+    "association_evidence_sha256":  "bb469ffdeb1de25fb064f710a54094433bbccf657de35d7547786e2d843bdee7",
+    "after_fresh_snapshot_sha256":  "20225c880c74ad3fea701a348096692bb9fad59d0b1601157997e021def013fb",
+    "note":  "Diagnostic observation only. Not a canonical scored PASS."
+}

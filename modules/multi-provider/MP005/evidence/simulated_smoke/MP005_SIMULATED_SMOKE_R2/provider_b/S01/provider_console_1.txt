@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/home/seth/MP005_R2_CANDIDATE/harness/launch_provider.py", line 26, in <module>
+    try:main()
+        ^^^^^^
+  File "/home/seth/MP005_R2_CANDIDATE/harness/launch_provider.py", line 24, in main
+    m.main()
+  File "/home/seth/MP005_R2_CANDIDATE/provider_b/provider_b.py", line 946, in main
+    SPENT = load_spent_state()
+            ^^^^^^^^^^^^^^^^^^
+  File "/home/seth/MP005_R2_CANDIDATE/provider_b/provider_b.py", line 299, in load_spent_state
+    raise RuntimeError("consume_ledger_missing")
+RuntimeError: consume_ledger_missing

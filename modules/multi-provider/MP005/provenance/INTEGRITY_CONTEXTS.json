@@ -1,0 +1,16 @@
+{
+  "rule": "Historical records remain byte-for-byte unchanged. Resolve campaign inventories against their original capture directory or historical configuration overlay, never against the current configuration by default.",
+  "evidence_SHA256SUMS": "Paths are relative to the directory containing each inventory.",
+  "current_config_lock": "Paths relative to repository root.",
+  "historical_config_locks": "Paths beginning configs/ resolve to the same-named file beside the historical lock when present; other config dependencies fall back to current configs/. This reconstructs the retained historical configuration overlay.",
+  "baseline_pre_hardening_config_inventory": "Paths relative to baseline/pre_hardening/configs/.",
+  "validated_code_inventory": "provenance/R3_VALIDATED_CODE_SHA256SUMS.txt paths are relative to repository root.",
+  "baseline_source_manifests": "baseline_source entries resolve against baseline/pre_hardening/. Frozen implementation and harness entries use their snapshot root, falling back to repository-root files only when absent from the overlay.",
+  "simulation_manifest_contexts": {
+    "R1": "baseline/pre_hardening",
+    "R2": "baseline/pre_R3",
+    "R3": "."
+  },
+  "preservation_JSON_inventories": "files and *_all_file_hashes are relative to the named evidence/simulated_smoke/MP005_SIMULATED_SMOKE_R1, R2 or R3 session.",
+  "administrative_inventory_exclusions": "Obsolete whole-workspace/prompt packet inventories are excluded rather than edited. Original bytes and per-file reasons are preserved in the separate audit deliverables and unchanged source collection."
+}

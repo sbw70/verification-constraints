@@ -1,0 +1,64 @@
+{
+  "source_file": "notes/MP005_HARDENING_HANDOFF.json",
+  "source_sha256": "959e7ad830e62809cc57b0f227c6f600e1bfda74ac70245fc27daeca12b0fd83",
+  "record_scope": "Historical hardening technical observations extracted without next-step instructions",
+  "technical_fields": {
+    "implementation_hashes": {
+      "provider_a/provider_a.py": {
+        "baseline": "c875582b275f270b8e68af69ed4ee84896e83815cdf33b7d7c5ccc813fe2e606",
+        "candidate": "a8ab30e1a0a8780097d5edb9da7623a0a19a762b17d6b0459bb8abf351a01398"
+      },
+      "provider_b/provider_b.py": {
+        "baseline": "5e0ab4b79df4c97bc7bc324d63da85711728d625b82306cdce6c92592e2ee13e",
+        "candidate": "c7d3ab6dc95532fd3634c4ce5a27b7c4518dcbb50bf12a5ab96f724cc7b10e08"
+      },
+      "intermediary/nuvl_multi_relay.py": {
+        "baseline": "09d458cc8e3e13706b5463deffea0e14fcd784011a629623a09b9bd5ee04d6f4",
+        "candidate": "09d458cc8e3e13706b5463deffea0e14fcd784011a629623a09b9bd5ee04d6f4"
+      },
+      "association/association_recorder.py": {
+        "baseline": "fad60dfc8df53337d2e41288c2c4973442258cae4240945ebbd0aa8920550bfc",
+        "candidate": "fad60dfc8df53337d2e41288c2c4973442258cae4240945ebbd0aa8920550bfc"
+      }
+    },
+    "R1_preservation": {
+      "unchanged": true,
+      "files_checked": 198,
+      "inventory_sha256": "4b4a02db0d67d79d0dccb7d1ed451345407e8064640f72b9bad0e6c7ef1ec0bc"
+    },
+    "offline_checks": 39,
+    "syntax_files": 17,
+    "recorder_compatibility": "PASS_OFFLINE_FOR_BOTH_CANDIDATE_PROVIDERS; NO_RECORDER_CHANGE",
+    "R2": {
+      "provider_a": {
+        "S00": "NOT_RUN",
+        "S01": "NOT_RUN",
+        "S02": "NOT_RUN",
+        "S03": "NOT_RUN"
+      },
+      "provider_b": {
+        "S00": "NOT_RUN",
+        "S01": "NOT_RUN",
+        "S02": "NOT_RUN",
+        "S03": "NOT_RUN"
+      }
+    },
+    "R2_runtime_observations": {
+      "snapshot_rollback_resurrected": "NOT_OBSERVED_R2_NOT_RUN",
+      "replay_changed_ledger_or_execution": "NOT_OBSERVED_R2_NOT_RUN",
+      "fresh_advances_once": "NOT_OBSERVED_R2_NOT_RUN",
+      "signed_seq_head_evidence": "OFFLINE_SYNTHETIC_CHECK_ONLY; R2_RUNTIME_EVIDENCE_PENDING"
+    },
+    "linux_command": "python3 -B simulation/run.py --session MP005_SIMULATED_SMOKE_R2",
+    "dependencies": [
+      "Python 3.10+",
+      "cryptography>=41,<51",
+      "native Linux filesystem supporting file and directory fsync",
+      "Linux /proc",
+      "copied candidate tree INCLUDING unchanged R1 evidence and baseline"
+    ],
+    "portable": true,
+    "execution_limitation": "Current Windows workspace cannot execute Linux R2. No WSL workaround or persistence shim. Operator must run prepared entry point in approved local Linux environment.",
+    "full_history_rollback_limitation": "MP005 does not establish resistance to rollback of the entire local provider history, including both the consumption ledger and its materialized snapshot. Externally preserved signed ledger-head evidence provides a comparison point but is not used in this test as a remote execution-authority check."
+  }
+}

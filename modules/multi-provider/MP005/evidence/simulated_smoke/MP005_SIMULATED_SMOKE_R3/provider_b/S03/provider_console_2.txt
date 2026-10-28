@@ -1,0 +1,12 @@
+{"event": "SNAPSHOT_RECOVERED_FROM_LEDGER", "ledger_head": "088df7d88c9030dd900e375c3119ce6a2a651abf7ef829dfa06344aee7ca774f", "ledger_seq": 1, "preserved_snapshot": null, "provider_id": "PROVIDER_B", "reason": "valid_prefix_behind"}
+MP002_PROVIDER_B
+Listening on 127.0.0.1:60683
+Provider ID: PROVIDER_B
+Boundary key ID: sha256:db764408aa319642363057d804f0c2a3d2c7dd22de86ae4a6d6549cb97f60225
+Spent state: /home/seth/MP005_R3_CANDIDATE/evidence/simulated_smoke/MP005_SIMULATED_SMOKE_R3/provider_b/S03/state/provider_b_spent_state.json
+Spent entries loaded: 1
+Execution log: /home/seth/MP005_R3_CANDIDATE/evidence/simulated_smoke/MP005_SIMULATED_SMOKE_R3/provider_b/S03/state/provider_b_execution.jsonl
+PROVIDER_B DENY operation_id=2c1c030a5c4ff75072c44a2c9ea1edaf09385694d725c08a302e22d5a8b8fdc5 reason=auth_spent authorization_id=14fed13b5b41f9450c2ffa8bba553674e1fc3176645e0823dc73d3d58de30914 sent=True
+PROVIDER_B START operation_id=688777bb7557392ff9159987d916bc0069b36551991adc45f223d83d384ed5a7 authorization_id=8c346902762dc20e9defb785e29f364648f935794767bfd874a8db77b904f80b sent=True
+PROVIDER_B EXECUTED operation_id=688777bb7557392ff9159987d916bc0069b36551991adc45f223d83d384ed5a7 authorization_id=8c346902762dc20e9defb785e29f364648f935794767bfd874a8db77b904f80b local_seq=1
+PROVIDER_B COMPLETE operation_id=688777bb7557392ff9159987d916bc0069b36551991adc45f223d83d384ed5a7 authorization_id=8c346902762dc20e9defb785e29f364648f935794767bfd874a8db77b904f80b sent=True

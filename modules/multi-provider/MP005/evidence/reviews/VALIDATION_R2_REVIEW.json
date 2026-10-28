@@ -1,0 +1,12 @@
+{
+  "R2_complete_evidence_review": true,
+  "review_sha256": "9e07d80d264296bc1b2d49c2be9ae138214e108dbbf6981476c70a2649e90195",
+  "R1_unchanged": true,
+  "R2_unchanged": true,
+  "R2_scope": "PASS_ALL_8",
+  "snapshot_policy_blocker": true,
+  "final_lock_exists": false,
+  "live_use_authorized": false,
+  "prior_preparation_validation": "VALIDATION.json (historical preparation results; R2 NOT_RUN there describes its time of creation)",
+  "current_readiness": "READINESS.json"
+}

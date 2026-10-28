@@ -1,0 +1,110 @@
+{
+  "status": "HARDENED_DRAFT_R2_NOT_RUN_NOT_AUTHORIZED",
+  "primary_claim": "In the tested implementation, provider authorization consumption is recorded in a durable hash-linked provider-local ledger before execution. Across an idle forced process restart, previously consumed authority remains spent. Rolling back the materialized spent-state snapshot alone does not resurrect consumed authority because provider state is reconstructed from the validated consumption ledger.",
+  "source_commit": "fa541618b1a3bc58700a81b29129b17b35b1e0fc",
+  "cases": {
+    "R01_PROVIDER_A_RESTART_DURABILITY": {
+      "target": "PROVIDER_A",
+      "phases": [
+        "consume",
+        "identity",
+        "OPERATOR_FORCED_IDLE_TERMINATION_CHECKPOINT",
+        "manual_restart_proof",
+        "exact_replay_auth_spent",
+        "fresh_authority"
+      ],
+      "status": "NOT_RUN"
+    },
+    "R02_PROVIDER_B_RESTART_DURABILITY": {
+      "target": "PROVIDER_B",
+      "phases": [
+        "consume",
+        "identity",
+        "OPERATOR_FORCED_IDLE_TERMINATION_CHECKPOINT",
+        "manual_restart_proof",
+        "exact_replay_auth_spent",
+        "fresh_authority"
+      ],
+      "status": "NOT_RUN"
+    }
+  },
+  "simulation": {
+    "R1": {
+      "classification": "BASELINE_CHARACTERIZATION_ONLY",
+      "evidence": "evidence/simulated_smoke/MP005_SIMULATED_SMOKE_R1",
+      "inventory_sha256": "4b4a02db0d67d79d0dccb7d1ed451345407e8064640f72b9bad0e6c7ef1ec0bc",
+      "results_reference": "evidence/simulated_smoke/MP005_SIMULATED_SMOKE_R1/case_results.json"
+    },
+    "R2": {
+      "session": "MP005_SIMULATED_SMOKE_R2",
+      "command": "python3 -B simulation/run.py --session MP005_SIMULATED_SMOKE_R2",
+      "provider_a": {
+        "S00": "NOT_RUN",
+        "S01": "NOT_RUN",
+        "S02": "NOT_RUN",
+        "S03": "NOT_RUN"
+      },
+      "provider_b": {
+        "S00": "NOT_RUN",
+        "S01": "NOT_RUN",
+        "S02": "NOT_RUN",
+        "S03": "NOT_RUN"
+      }
+    }
+  },
+  "live_rehearsal": "NOT_RUN",
+  "scored_campaign": "NOT_RUN",
+  "timeout_seconds": 15,
+  "relay_url": "UNVERIFIED_REQUIRES_LIVE_PREFLIGHT",
+  "relay_listen_host": "0.0.0.0",
+  "relay_port": 8080,
+  "association_url": "UNVERIFIED_REQUIRES_LIVE_PREFLIGHT",
+  "association_listen_host": "0.0.0.0",
+  "association_port": 9191,
+  "addresses_unverified_no_contact": true,
+  "deployments": {
+    "provider_a": {
+      "host": "UNVERIFIED_REQUIRES_LIVE_PREFLIGHT",
+      "runtime_path": "REQUIRES_AUTHORIZED_LIVE_PREFLIGHT",
+      "state_dir": "REQUIRES_AUTHORIZED_LIVE_PREFLIGHT",
+      "spent_state_path": "REQUIRES_AUTHORIZED_LIVE_PREFLIGHT",
+      "execution_log_path": "REQUIRES_AUTHORIZED_LIVE_PREFLIGHT",
+      "ingest_url": "UNVERIFIED_REQUIRES_LIVE_PREFLIGHT",
+      "consume_ledger_path": "REQUIRES_AUTHORIZED_LIVE_PREFLIGHT"
+    },
+    "provider_b": {
+      "host": "UNVERIFIED_REQUIRES_LIVE_PREFLIGHT",
+      "runtime_path": "REQUIRES_AUTHORIZED_LIVE_PREFLIGHT",
+      "state_dir": "REQUIRES_AUTHORIZED_LIVE_PREFLIGHT",
+      "spent_state_path": "REQUIRES_AUTHORIZED_LIVE_PREFLIGHT",
+      "execution_log_path": "REQUIRES_AUTHORIZED_LIVE_PREFLIGHT",
+      "ingest_url": "UNVERIFIED_REQUIRES_LIVE_PREFLIGHT",
+      "consume_ledger_path": "REQUIRES_AUTHORIZED_LIVE_PREFLIGHT"
+    }
+  },
+  "candidate_hashes": {
+    "MP005_CONTRACT.md": "81758445b879095fd7640f09c389c3a79e5858ad29b61c17be7b4265cf64cda2",
+    "MP005_SOURCE_MANIFEST.json": "9bfe4eb5bdccf7fc903446fdeb5697eb3b27d9c007eac48dcfb76a7b83cf72dc",
+    "MP005_IMPLEMENTATION_MANIFEST.json": "4857cd0243fcf82931fd10ab165d3adbf0a845ad324ba13ef9410c69c0264656",
+    "MP005_HARNESS_MANIFEST.json": "8d01f5f6e197134dd89332845c11c657e4000bd532e3a4b45d65d6d116c0ee19"
+  },
+  "live_kill_automated": false,
+  "live_lock_created": false,
+  "limitation": "MP005 does not establish resistance to rollback of the entire local provider history, including both the consumption ledger and its materialized snapshot. Externally preserved signed ledger-head evidence provides a comparison point but is not used in this test as a remote execution-authority check.",
+  "source_manifest_sha256": "9bfe4eb5bdccf7fc903446fdeb5697eb3b27d9c007eac48dcfb76a7b83cf72dc",
+  "implementation_manifest_sha256": "4857cd0243fcf82931fd10ab165d3adbf0a845ad324ba13ef9410c69c0264656",
+  "harness_manifest_sha256": "8d01f5f6e197134dd89332845c11c657e4000bd532e3a4b45d65d6d116c0ee19",
+  "contract_sha256": "81758445b879095fd7640f09c389c3a79e5858ad29b61c17be7b4265cf64cda2",
+  "live_preflight_status": "NOT_RUN",
+  "live_rehearsal_status": "NOT_RUN",
+  "scored_status": "NOT_RUN",
+  "mandatory_next_step": "LOCAL_LINUX_R2_THEN_STOP_FOR_OPERATOR_REVIEW",
+  "historical_live_addresses_do_not_use": true,
+  "approved_simulation_environment": {
+    "operator_identified_host": "xer0trust-4",
+    "host_address": "192.168.1.106",
+    "role": "PAVILION_LOCAL_LINUX_SIMULATION_ONLY",
+    "transport_access": "PASSWORD_BASED_OPERATOR_ACCESS; NO_SSH_NEEDED_FOR_LOCAL_BUILD"
+  },
+  "historical_live_addresses_removed": true
+}

@@ -1,0 +1,76 @@
+{
+  "status": "DRAFT_NOT_AUTHORIZED",
+  "primary_claim": "In the tested implementation, when the same durable provider state is preserved across a forced process restart performed while idle, previously consumed provider authorization remains spent: exact replay is denied without another execution, while fresh valid provider authorization remains usable after restart.",
+  "source_commit": "fa541618b1a3bc58700a81b29129b17b35b1e0fc",
+  "cases": {
+    "R01_PROVIDER_A_RESTART_DURABILITY": {
+      "target": "PROVIDER_A",
+      "phases": [
+        "consume",
+        "identity",
+        "OPERATOR_FORCED_IDLE_TERMINATION_CHECKPOINT",
+        "manual_restart_proof",
+        "exact_replay_auth_spent",
+        "fresh_authority"
+      ],
+      "status": "NOT_RUN"
+    },
+    "R02_PROVIDER_B_RESTART_DURABILITY": {
+      "target": "PROVIDER_B",
+      "phases": [
+        "consume",
+        "identity",
+        "OPERATOR_FORCED_IDLE_TERMINATION_CHECKPOINT",
+        "manual_restart_proof",
+        "exact_replay_auth_spent",
+        "fresh_authority"
+      ],
+      "status": "NOT_RUN"
+    }
+  },
+  "simulation": {
+    "S00": "NOT_RUN",
+    "S01": "NOT_RUN",
+    "S02": "NOT_RUN",
+    "S03": "NOT_RUN",
+    "required_platform": "linux",
+    "only_numeric_loopback_network": true,
+    "session": "MP005_SIMULATED_SMOKE_R1"
+  },
+  "live_rehearsal": "NOT_RUN",
+  "scored_campaign": "NOT_RUN",
+  "timeout_seconds": 15,
+  "relay_url": "http://192.168.1.100:8080/nuvl",
+  "relay_listen_host": "0.0.0.0",
+  "relay_port": 8080,
+  "association_url": "http://192.168.1.102:9191/boundary",
+  "association_listen_host": "0.0.0.0",
+  "association_port": 9191,
+  "addresses_unverified_no_contact": true,
+  "deployments": {
+    "provider_a": {
+      "host": "192.168.1.118",
+      "runtime_path": "REQUIRES_AUTHORIZED_LIVE_PREFLIGHT",
+      "state_dir": "REQUIRES_AUTHORIZED_LIVE_PREFLIGHT",
+      "spent_state_path": "REQUIRES_AUTHORIZED_LIVE_PREFLIGHT",
+      "execution_log_path": "REQUIRES_AUTHORIZED_LIVE_PREFLIGHT",
+      "ingest_url": "http://192.168.1.118:9090/ingest"
+    },
+    "provider_b": {
+      "host": "192.168.1.106",
+      "runtime_path": "REQUIRES_AUTHORIZED_LIVE_PREFLIGHT",
+      "state_dir": "REQUIRES_AUTHORIZED_LIVE_PREFLIGHT",
+      "spent_state_path": "REQUIRES_AUTHORIZED_LIVE_PREFLIGHT",
+      "execution_log_path": "REQUIRES_AUTHORIZED_LIVE_PREFLIGHT",
+      "ingest_url": "http://192.168.1.106:9090/ingest"
+    }
+  },
+  "candidate_hashes": {
+    "MP005_CONTRACT.md": "b4859868f9f6bcaa6d100fb89dfeafb384e95e8fbd49959d8c5c039eace2be25",
+    "MP005_SOURCE_MANIFEST.json": "90f41266e17869449a70403baba697a2196d499e007adab49cf519912c3fe913",
+    "MP005_IMPLEMENTATION_MANIFEST.json": "63e267b32864251d19bd74130430fed292d159ab795454b7292f8de187b53810",
+    "MP005_HARNESS_MANIFEST.json": "2a985ec95d7fcba21da032b6947ffc36f0fab0da04e699daf698ed79c37244f4"
+  },
+  "live_kill_automated": false,
+  "live_lock_created": false
+}

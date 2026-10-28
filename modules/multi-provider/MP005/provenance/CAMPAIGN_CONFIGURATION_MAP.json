@@ -1,0 +1,35 @@
+[
+  {
+    "session_id": "MP005_REHEARSAL_20261024_R1",
+    "configuration_directory": "configs/history/MP005_REHEARSAL_LOCK_20261025",
+    "recorder_session_start": "evidence/preflight/MP005_REHEARSAL_20261024_R1/association/recorder.jsonl",
+    "contract_sha256": "6c02f54a445e74d151a0cc574de0966e02e0f8af16a850bcaba47c711469816a",
+    "run_manifest_sha256": "17fa1a4e947a700c50fc56207ec501a7cec7ca4808a6c04c98399f6c15252e8d",
+    "authorization": "MP005_REHEARSAL_20261024_R1.rehearsal.json",
+    "lock_sha256": "08039d757d20ad9f111427779a8ec9276f5ecbf90f313f7b2b18c6b975c52b36",
+    "checks": "Recorder SESSION_START contract/run-manifest hashes and authorization lock hash match retained bytes",
+    "outcome_scope": "Refer to original case_results and reviews; no new tests run"
+  },
+  {
+    "session_id": "MP005_SCORED_20261025_R2",
+    "configuration_directory": "configs/history/MP005_SCORED_20261025_R2",
+    "recorder_session_start": "evidence/scored/MP005_SCORED_20261025_R2/association/recorder.jsonl",
+    "contract_sha256": "aa04ff6c437acafb8d8dfd63918f44a68ee4c9b843392c455fa17e6bbba4487d",
+    "run_manifest_sha256": "664ab2724df066f1405fcd579590f8745dee83314745db021bc76d6aecd1da3c",
+    "authorization": "MP005_SCORED_20261025_R2.scored.json",
+    "lock_sha256": "1f309e8a0ccb5850e3e9297aacff600634313d79846eb3bf1a80372d19076974",
+    "checks": "Recorder SESSION_START contract/run-manifest hashes and authorization lock hash match retained bytes",
+    "outcome_scope": "R01_NON_PASS_R02_NOT_RUN"
+  },
+  {
+    "session_id": "MP005_SCORED_20261026_R3",
+    "configuration_directory": "configs",
+    "recorder_session_start": "evidence/scored/MP005_SCORED_20261026_R3/association/recorder.jsonl",
+    "contract_sha256": "9e68503d4788287a34cc7e8ef3f1313f0b49eaaa7c10098dda9407761c9a3324",
+    "run_manifest_sha256": "25a0334640651210eb2d22d3df0cb695e0499508d784d7c1463332b7267e8b93",
+    "authorization": "MP005_SCORED_20261026_R3.scored.json",
+    "lock_sha256": "beb89d3c68e5d83ada267df95b686ecb7cf49e4dd51dfddd18039a00d223804d",
+    "checks": "Recorder SESSION_START contract/run-manifest hashes and authorization lock hash match retained bytes",
+    "outcome_scope": "Refer to original case_results and reviews; no new tests run"
+  }
+]

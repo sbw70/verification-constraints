@@ -1,0 +1,24 @@
+MP001_ASSOCIATION_RECORDER
+Session: MP005_SCORED_20261026_R3
+Listening on 0.0.0.0:9191
+Recorder SHA256: fad60dfc8df53337d2e41288c2c4973442258cae4240945ebbd0aa8920550bfc
+Registry SHA256: 59d739588427d87313e3434982d943a9c82bad26c3fe3deb7d5488efadb6088d
+Manifest SHA256: 25a0334640651210eb2d22d3df0cb695e0499508d784d7c1463332b7267e8b93
+Contract SHA256: 9e68503d4788287a34cc7e8ef3f1313f0b49eaaa7c10098dda9407761c9a3324
+Registered providers: PROVIDER_A, PROVIDER_B
+OBSERVED seq=1 provider=PROVIDER_B stage=DENY sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=2 provider=PROVIDER_A stage=START sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=3 provider=PROVIDER_A stage=COMPLETE sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=4 provider=PROVIDER_B stage=DENY sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=5 provider=PROVIDER_A stage=DENY sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=6 provider=PROVIDER_B stage=DENY sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=7 provider=PROVIDER_A stage=START sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=8 provider=PROVIDER_A stage=COMPLETE sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=9 provider=PROVIDER_A stage=DENY sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=10 provider=PROVIDER_B stage=START sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=11 provider=PROVIDER_B stage=COMPLETE sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=12 provider=PROVIDER_A stage=DENY sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=13 provider=PROVIDER_B stage=DENY sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=14 provider=PROVIDER_A stage=DENY sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=15 provider=PROVIDER_B stage=START sig_valid=True code=ok duplicate_of=None
+OBSERVED seq=16 provider=PROVIDER_B stage=COMPLETE sig_valid=True code=ok duplicate_of=None

@@ -1,0 +1,308 @@
+{
+  "provider_a": {
+    "sha256": "c875582b275f270b8e68af69ed4ee84896e83815cdf33b7d7c5ccc813fe2e606",
+    "inspection": "STATIC_ONLY_NO_PROVIDER_EXECUTION",
+    "facts": [
+      {
+        "id": "provider_specific_state",
+        "finding": "Provider-specific spent-state JSON and execution-log paths are defined relative to the source BASE_DIR; launcher may override paths in memory.",
+        "source": {
+          "path": "provider_a/provider_a.py"
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "startup_load",
+        "finding": "main assigns SPENT = load_spent_state() before constructing ThreadingHTTPServer and calling serve_forever.",
+        "source": {
+          "function": "main",
+          "start_line": 868,
+          "end_line": 904
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "missing_state",
+        "finding": "Missing spent-state file raises spent_state_missing; no implicit empty initialization.",
+        "source": {
+          "function": "load_spent_state",
+          "start_line": 236,
+          "end_line": 262
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "invalid_state",
+        "finding": "JSON parse errors fail startup; top-level non-object, version unequal to 1 or spent non-dict raises spent_state_invalid. This is not per-entry semantic validation.",
+        "source": {
+          "function": "load_spent_state",
+          "start_line": 236,
+          "end_line": 262
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "consume_before_start",
+        "finding": "process_artifact calls consume_authorization and returns DENY on failure before constructing START.",
+        "source": {
+          "function": "process_artifact",
+          "start_line": 512,
+          "end_line": 762
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "temporary_write",
+        "finding": "atomic_write_json writes canonical bytes to sibling <name>.tmp.",
+        "source": {
+          "function": "atomic_write_json",
+          "start_line": 208,
+          "end_line": 233
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "temporary_fsync",
+        "finding": "Temporary file is flushed and fsynced before replacement.",
+        "source": {
+          "function": "atomic_write_json",
+          "start_line": 208,
+          "end_line": 233
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "atomic_replace",
+        "finding": "os.replace replaces the spent-state path after temporary-file fsync.",
+        "source": {
+          "function": "atomic_write_json",
+          "start_line": 208,
+          "end_line": 233
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "directory_fsync",
+        "finding": "Containing directory is opened and fsynced after replacement, then closed. No platform shim is present.",
+        "source": {
+          "function": "atomic_write_json",
+          "start_line": 208,
+          "end_line": 233
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "memory_after_persist",
+        "finding": "consume_authorization persists a candidate first; SPENT.clear/update occur only after persistence returns successfully.",
+        "source": {
+          "function": "consume_authorization",
+          "start_line": 275,
+          "end_line": 302
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "signed_start_order",
+        "finding": "START generation/signing/sending occurs only after consume_authorization returns success.",
+        "source": {
+          "function": "process_artifact",
+          "start_line": 512,
+          "end_line": 762
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "execution_fsync",
+        "finding": "append_execution appends canonical JSONL and flushes/fsyncs the file.",
+        "source": {
+          "function": "append_execution",
+          "start_line": 305,
+          "end_line": 342
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "no_shutdown_persistence",
+        "finding": "No signal/atexit/shutdown persistence handler exists; consumption persistence is in the normal request path.",
+        "source": {
+          "path": "provider_a/provider_a.py"
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "sequence_limitation",
+        "finding": "EXECUTION_SEQ is initialized to 0; append_execution increments it; startup does not reconstruct it from the execution log. Never score continuity.",
+        "source": {
+          "function": "append_execution",
+          "start_line": 305,
+          "end_line": 342
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "rollback_scope",
+        "finding": "load_spent_state accepts structurally valid supplied state; no external checkpoint, generation/freshness anchor or anti-rollback check was found. This is static analysis, not an S03 result.",
+        "source": {
+          "function": "load_spent_state",
+          "start_line": 236,
+          "end_line": 262
+        },
+        "verified_statically": true
+      }
+    ],
+    "provider_b_policy_gate": false
+  },
+  "provider_b": {
+    "sha256": "5e0ab4b79df4c97bc7bc324d63da85711728d625b82306cdce6c92592e2ee13e",
+    "inspection": "STATIC_ONLY_NO_PROVIDER_EXECUTION",
+    "facts": [
+      {
+        "id": "provider_specific_state",
+        "finding": "Provider-specific spent-state JSON and execution-log paths are defined relative to the source BASE_DIR; launcher may override paths in memory.",
+        "source": {
+          "path": "provider_b/provider_b.py"
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "startup_load",
+        "finding": "main assigns SPENT = load_spent_state() before constructing ThreadingHTTPServer and calling serve_forever.",
+        "source": {
+          "function": "main",
+          "start_line": 880,
+          "end_line": 916
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "missing_state",
+        "finding": "Missing spent-state file raises spent_state_missing; no implicit empty initialization.",
+        "source": {
+          "function": "load_spent_state",
+          "start_line": 238,
+          "end_line": 264
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "invalid_state",
+        "finding": "JSON parse errors fail startup; top-level non-object, version unequal to 1 or spent non-dict raises spent_state_invalid. This is not per-entry semantic validation.",
+        "source": {
+          "function": "load_spent_state",
+          "start_line": 238,
+          "end_line": 264
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "consume_before_start",
+        "finding": "process_artifact calls consume_authorization and returns DENY on failure before constructing START.",
+        "source": {
+          "function": "process_artifact",
+          "start_line": 514,
+          "end_line": 774
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "temporary_write",
+        "finding": "atomic_write_json writes canonical bytes to sibling <name>.tmp.",
+        "source": {
+          "function": "atomic_write_json",
+          "start_line": 210,
+          "end_line": 235
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "temporary_fsync",
+        "finding": "Temporary file is flushed and fsynced before replacement.",
+        "source": {
+          "function": "atomic_write_json",
+          "start_line": 210,
+          "end_line": 235
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "atomic_replace",
+        "finding": "os.replace replaces the spent-state path after temporary-file fsync.",
+        "source": {
+          "function": "atomic_write_json",
+          "start_line": 210,
+          "end_line": 235
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "directory_fsync",
+        "finding": "Containing directory is opened and fsynced after replacement, then closed. No platform shim is present.",
+        "source": {
+          "function": "atomic_write_json",
+          "start_line": 210,
+          "end_line": 235
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "memory_after_persist",
+        "finding": "consume_authorization persists a candidate first; SPENT.clear/update occur only after persistence returns successfully.",
+        "source": {
+          "function": "consume_authorization",
+          "start_line": 277,
+          "end_line": 304
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "signed_start_order",
+        "finding": "START generation/signing/sending occurs only after consume_authorization returns success.",
+        "source": {
+          "function": "process_artifact",
+          "start_line": 514,
+          "end_line": 774
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "execution_fsync",
+        "finding": "append_execution appends canonical JSONL and flushes/fsyncs the file.",
+        "source": {
+          "function": "append_execution",
+          "start_line": 307,
+          "end_line": 344
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "no_shutdown_persistence",
+        "finding": "No signal/atexit/shutdown persistence handler exists; consumption persistence is in the normal request path.",
+        "source": {
+          "path": "provider_b/provider_b.py"
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "sequence_limitation",
+        "finding": "EXECUTION_SEQ is initialized to 0; append_execution increments it; startup does not reconstruct it from the execution log. Never score continuity.",
+        "source": {
+          "function": "append_execution",
+          "start_line": 307,
+          "end_line": 344
+        },
+        "verified_statically": true
+      },
+      {
+        "id": "rollback_scope",
+        "finding": "load_spent_state accepts structurally valid supplied state; no external checkpoint, generation/freshness anchor or anti-rollback check was found. This is static analysis, not an S03 result.",
+        "source": {
+          "function": "load_spent_state",
+          "start_line": 238,
+          "end_line": 264
+        },
+        "verified_statically": true
+      }
+    ],
+    "provider_b_policy_gate": true
+  }
+}

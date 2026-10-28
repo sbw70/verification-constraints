@@ -1,0 +1,14 @@
+﻿{
+    "session_id":  "MP005_REHEARSAL_20261024_R1",
+    "decision":  "ACCEPTED_FOR_SCORED_PREREQUISITE",
+    "accepted_utc":  "2026-10-26T01:12:19.9219052Z",
+    "rehearsal_review_reference":  "C:\\Users\\holiw\\esp32-main\\MULTI_PROVIDER_005\\evidence\\reviews\\MP005_REHEARSAL_20261024_R1.review.json",
+    "rehearsal_review_sha256":  "94826bbac8b18d59802edb71a18fd04dad4ad51ded63d518d89f7f46ab7035b0",
+    "accepted_cases":  [
+                           "R01",
+                           "R02"
+                       ],
+    "limitations_acknowledged":  true,
+    "independent_ed25519_external_audit":  "OUTSTANDING",
+    "scored_campaign_authorized":  false
+}
