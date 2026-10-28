@@ -1,4 +1,3 @@
-```markdown
 # MP005 — Provider A
 
 ## Purpose
