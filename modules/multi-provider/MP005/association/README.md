@@ -1,4 +1,3 @@
-```markdown
 # MP005 — Association and Boundary Evidence Recorder
 
 ## Purpose
