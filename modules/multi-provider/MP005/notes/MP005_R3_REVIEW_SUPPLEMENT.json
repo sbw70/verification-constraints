@@ -1,0 +1,44 @@
+{
+  "from_R2_source_changes": {
+    "provider_a": {
+      "R2_runtime_sha256": "a8ab30e1a0a8780097d5edb9da7623a0a19a762b17d6b0459bb8abf351a01398",
+      "R3_runtime_sha256": "79e4994c955ca842af04a8fd650a33d49de040bab95b821ded9e63e16866f2b6",
+      "changed_functions": [
+        "load_spent_state"
+      ],
+      "added_functions": [
+        "classify_snapshot",
+        "preserve_malformed_snapshot",
+        "reject_json_constant"
+      ],
+      "all_other_functions_and_module_level_behavior_unchanged": true,
+      "exact_diff": "notes/provider_a_R3_REVIEW_FROM_R2.patch",
+      "diff_sha256": "e8ef2763e9033aea7b2ec48fde6ee0e5052478df8cbf215a7542acccce13c20a"
+    },
+    "provider_b": {
+      "R2_runtime_sha256": "c7d3ab6dc95532fd3634c4ce5a27b7c4518dcbb50bf12a5ab96f724cc7b10e08",
+      "R3_runtime_sha256": "618ec76ef5dd3bfa3ba7b1ad3941ed0516a7511b72957d7efb82ec565905b605",
+      "changed_functions": [
+        "load_spent_state"
+      ],
+      "added_functions": [
+        "classify_snapshot",
+        "preserve_malformed_snapshot",
+        "reject_json_constant"
+      ],
+      "all_other_functions_and_module_level_behavior_unchanged": true,
+      "exact_diff": "notes/provider_b_R3_REVIEW_FROM_R2.patch",
+      "diff_sha256": "6a48ae6755c0057bf82067e2a2becc34f96b84fed2ab7dbeafeafa37b84663f0"
+    }
+  },
+  "local_evidence_roots": [
+    "evidence/simulated_smoke"
+  ],
+  "scored_evidence_found_under_MP005": false,
+  "review_evidence_limits": [
+    "R3 runtime checks exact agreement, genesis-prefix recovery, ahead refusal and equal-seq head/spent refusal.",
+    "Missing/malformed cache recovery, nonempty-prefix and older-nonprefix classification, unreadable state handling: code/offline support, not additional R3 runtime experiments.",
+    "No power-loss/crash-window, OS attestation, concurrency or full-history freshness claim."
+  ],
+  "new_experiments_executed_during_review": false
+}

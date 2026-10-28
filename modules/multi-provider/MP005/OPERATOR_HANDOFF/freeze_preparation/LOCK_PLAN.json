@@ -1,0 +1,26 @@
+{
+  "status": "R3_TECHNICAL_REVIEW_PASSED_PENDING_LIVE_FACTS_NOT_A_LOCK",
+  "blocked_by": [
+    "CURRENT_LIVE_TOPOLOGY_PATHS_AND_TRANSPORT_UNVERIFIED",
+    "FINAL_LIVE_FREEZE_AND_PHASE_AUTHORIZATIONS_ABSENT"
+  ],
+  "canonical_lock": "configs/MP005_LOCK_SHA256SUMS.txt",
+  "validated_code_inventory": "R3_VALIDATED_CODE_SHA256SUMS.txt",
+  "R3_review_sha256": "f9c258fd609aa7bdb1e60598c23d5f232a6b5c4745e2a94e5897a8b291208887",
+  "candidate_config_hashes": {
+    "MP005_HARNESS_MANIFEST.json": "2b80c3d21ff184c0f6e6c05362e762458ece9652bfa904697a36b1a75a4f4913",
+    "MP005_IMPLEMENTATION_MANIFEST.json": "f3dee215cf954e93ffe4ac139b55411dc8e30716ad014abfc55602abc8539c2e",
+    "MP005_RUN_MANIFEST.json": "10875093fa51a662d645911a274732063989c392f30ef6d505e9d0aa7ec5e0a7",
+    "MP005_SOURCE_MANIFEST.json": "67c58b11bf425281307cc6ded447024f8d0193abb3e061d6025973d6b8c0bfb4",
+    "MP005_CONTRACT.md": "cf9caa370aacd332f33a91d3a5b27581372b37291e79ed094270fd81cc7fce17"
+  },
+  "sequence": [
+    "Separately authorized minimal host-local identity collection; no historical-IP probing.",
+    "Fill and verify topology/path/transport map; intentionally reconcile candidate config.",
+    "Finalize narrow R01/R02 contract and all four manifests, preserve prior candidate definitions.",
+    "Generate canonical final lock and verify deployment/packet identities.",
+    "Finalize packet readiness only after all checks; rehearsal authorization remains a separate operator decision."
+  ],
+  "locked_files_created": false,
+  "phase_authorization_created": false
+}

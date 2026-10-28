@@ -1,0 +1,24 @@
+MP005 hardening prerequisite check — 2026-10-20
+
+Status: STOPPED pending R1 evidence location and approved local Linux access.
+
+The new hardening handoff states MP005_SIMULATED_SMOKE_R1 ran on Pavilion/local Linux and requires preserving that evidence unchanged before hardening. No evidence directory or R1 artifacts were found in the current MULTI_PROVIDER_005 tree. A bounded filename search of that tree and Documents\Codex found no R1 evidence. This does not establish that R1 is absent elsewhere. The reported R1 outcomes have not been independently verified here.
+
+Needed from operator:
+1. The path/location of the original MP005_SIMULATED_SMOKE_R1 evidence and associated Linux tree.
+2. How the approved Pavilion/local Linux environment can be accessed. The previously accepted WSL access limitation remains unresolved; no WSL retry or workaround was attempted.
+
+Completed read-only inspection and offline check:
+- Baseline A/B hashes still match the previously verified MP003 source.
+- The unchanged association recorder verifies the entire canonical event, including additional fields, and preserves raw submission bytes plus unknown fields.
+- A synthetic in-process Ed25519 check for BOTH providers accepted signed ledger_seq/head fields and rejected changing ledger_head after signing.
+- Results and baseline hashes: MP005_HARDENING_PRECHECK_20261020.json in this directory.
+- This check is not R1, R2, provider execution, or MP005 property evidence.
+
+No provider implementation, relay, association source, draft contract, or manifests changed.
+No provider/server started. No live host contact. No Linux simulation executed.
+R2 A and B S00/S01/S02/S03: NOT_RUN.
+No live rehearsal, scored campaign, final contract lock, or GitHub mutation.
+No existing R1 evidence was altered; preservation has NOT been verified because its location is unknown.
+
+Next authorized work after prerequisites are resolved: inventory/preserve R1 and baseline identities, implement ledger hardening only in MP005, update harness/drafts/manifests, run authorized loopback-only local Linux R2 if accessible, then mandatory operator review stop.

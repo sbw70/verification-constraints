@@ -1,0 +1,48 @@
+{
+    "status":  "NOT_READY",
+    "hardening_completed":  true,
+    "provider_hashes_verified":  true,
+    "R1_total_files":  199,
+    "R1_inventory_listed_files_verified":  198,
+    "R1_unchanged":  true,
+    "R2_status":  "COMPLETE_PRIOR_IMPLEMENTATION_ONLY",
+    "R2_review_status":  "PASS_EARLIER_SCOPE_POLICY_REJECTED_AS_FINAL",
+    "final_contract_hash":  "6c02f54a445e74d151a0cc574de0966e02e0f8af16a850bcaba47c711469816a",
+    "final_run_manifest_hash":  "17fa1a4e947a700c50fc56207ec501a7cec7ca4808a6c04c98399f6c15252e8d",
+    "missing_locked_files":  [
+
+                             ],
+    "unresolved_CHECK_ME_items":  [
+                                      {
+                                          "issue":  "Service reachability, association-log operation, provider state initialization and evidence transport remain untested on the live machines.",
+                                          "material_to_live_scoring":  true,
+                                          "id":  "LIVE_OPERATIONAL_VALIDATION_PENDING"
+                                      },
+                                      {
+                                          "issue":  "The configuration lock is verified. Live rehearsal still requires separate operator authorization. Scoring requires accepted rehearsal and separate scored authorization.",
+                                          "material_to_live_scoring":  true,
+                                          "id":  "EXPLICIT_PHASE_AUTHORIZATION_ABSENT"
+                                      }
+                                  ],
+    "readiness_report":  "CHECK_ME/MP005_OPERATOR_READINESS.json",
+    "phase_gates_intact":  true,
+    "live_rehearsal":  "NOT_RUN",
+    "scored_run":  "NOT_RUN",
+    "github_mutation":  false,
+    "live_topology_contact_during_preparation":  true,
+    "commands_checked":  "17 Python files compiled; documented CLI options matched argparse; read-only --help and refusal guards tested; PowerShell parse check recorded separately; Linux command runtime validation pending",
+    "note":  "No claim of a complete final operator packet: preparation templates only; required locked uploads absent intentionally.",
+    "powershell_commands_parsed_without_execution":  30,
+    "R2_inventory_verified":  true,
+    "R2_unchanged":  true,
+    "next_operator_action":  "REVIEW_LIVE_PREFLIGHT_PREREQUISITES_AND_SEPARATE_PHASE_AUTHORIZATION",
+    "R3_status":  "COMPLETE",
+    "R3_review_status":  "PASS_FOR_ALL_12_CASES_WITHIN_TESTED_SCOPE",
+    "current_provider_hashes":  {
+                                    "provider_a":  "79e4994c955ca842af04a8fd650a33d49de040bab95b821ded9e63e16866f2b6",
+                                    "provider_b":  "618ec76ef5dd3bfa3ba7b1ad3941ed0516a7511b72957d7efb82ec565905b605"
+                                },
+    "R3_inventory_verified":  true,
+    "R3_unchanged":  true,
+    "live_rehearsal_authorized":  false
+}

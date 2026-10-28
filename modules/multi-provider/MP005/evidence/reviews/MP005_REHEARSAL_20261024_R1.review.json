@@ -1,0 +1,37 @@
+﻿{
+    "session_id":  "MP005_REHEARSAL_20261024_R1",
+    "phase":  "rehearsal",
+    "review_status":  "PENDING_OPERATOR_ACCEPTANCE",
+    "recorded_utc":  "2026-10-26T01:09:24.7677719Z",
+    "canonical_lock_sha256":  "08039d757d20ad9f111427779a8ec9276f5ecbf90f313f7b2b18c6b975c52b36",
+    "cases":  [
+                  {
+                      "case":  "R01",
+                      "scorer_status":  "PASS",
+                      "results_sha256":  "aa31d3bbcff264c59450fc9e4f993dbc47fe5f0746c843a120dfc49fed919340",
+                      "inventory_sha256":  "be16dceb17da47e213a10ba14c1f50b9e93132fd136b7a791209a97b750875d9",
+                      "inventory_entries":  67
+                  },
+                  {
+                      "case":  "R02",
+                      "scorer_status":  "PASS",
+                      "results_sha256":  "aa31d3bbcff264c59450fc9e4f993dbc47fe5f0746c843a120dfc49fed919340",
+                      "inventory_sha256":  "69a500c49e606dede9816276ebd5bb7f1be5f2c972364303062b32d0c7a1e458",
+                      "inventory_entries":  67
+                  }
+              ],
+    "verified_observations":  [
+                                  "R01 and R02 formal scorers returned PASS",
+                                  "Both 67-entry evidence inventories independently hash-checked",
+                                  "Pre/post restart process identities compared",
+                                  "Replay DENY auth_spent records inspected",
+                                  "Replay durable-state equality verified",
+                                  "Original ledger prefixes preserved"
+                              ],
+    "limitations":  [
+                        "Independent Ed25519 re-verification outside the scorer remains outstanding",
+                        "Entire ledger and snapshot rollback resistance not established",
+                        "No power-loss, reboot, or concurrency claim"
+                    ],
+    "scored_authorization_issued":  false
+}

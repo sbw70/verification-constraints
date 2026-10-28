@@ -1,0 +1,5 @@
+MP001_NUVL_MULTI_PROVIDER_RELAY
+Listening on 127.0.0.1:41091
+Provider destinations: 1
+Provider authorization verification: False
+Provider secrets present: False

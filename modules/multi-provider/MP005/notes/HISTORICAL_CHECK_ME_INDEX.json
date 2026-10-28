@@ -1,0 +1,41 @@
+{
+  "classification": "PRESERVED_PRIOR_REPORTS_NOT_ACTIVE_BLOCKERS",
+  "files": [
+    {
+      "old_path": "CHECK_ME\\MP005_HARDENING_PRECHECK_20261020.json",
+      "preserved_path": "notes\\HISTORICAL_CHECK_ME\\MP005_HARDENING_PRECHECK_20261020.json",
+      "sha256": "ec357da26390eb2295c0e14e1989124f773aa0070457836f0635e1cffaef91cb"
+    },
+    {
+      "old_path": "CHECK_ME\\MP005_HARDENING_PREREQUISITES_20261020.txt",
+      "preserved_path": "notes\\HISTORICAL_CHECK_ME\\MP005_HARDENING_PREREQUISITES_20261020.txt",
+      "sha256": "2bc24151c5365f23bb1d51f5bba5f16c45729d6572f369c5d2d2cd4ac24ea130"
+    },
+    {
+      "old_path": "CHECK_ME\\MP005_HASH_CORRECTION_CONFIRMED_20261019.txt",
+      "preserved_path": "notes\\HISTORICAL_CHECK_ME\\MP005_HASH_CORRECTION_CONFIRMED_20261019.txt",
+      "sha256": "c03613784d2e6306028883225dcd9cdc39dd6b508b60c6de48e0056adbca78f2"
+    },
+    {
+      "old_path": "CHECK_ME\\MP005_LOCAL_SIMULATION_ENVIRONMENT_20261019.txt",
+      "preserved_path": "notes\\HISTORICAL_CHECK_ME\\MP005_LOCAL_SIMULATION_ENVIRONMENT_20261019.txt",
+      "sha256": "c2206423be99230d4c05622d413c59e80021ba5e529c037f1bf69ae26adef41b"
+    },
+    {
+      "old_path": "CHECK_ME\\MP005_PHASE1_BUILD_NOTES_20261019.txt",
+      "preserved_path": "notes\\HISTORICAL_CHECK_ME\\MP005_PHASE1_BUILD_NOTES_20261019.txt",
+      "sha256": "5b92407ef71363d25f15da93619e1f112cd74dcd4bbda7a307d6de769f30bc0f"
+    },
+    {
+      "old_path": "CHECK_ME\\MP005_PHASE1_BUILD_SCOPE_20261019.txt",
+      "preserved_path": "notes\\HISTORICAL_CHECK_ME\\MP005_PHASE1_BUILD_SCOPE_20261019.txt",
+      "sha256": "9d894c21fc67f0934aa2fe14a00cef679ac152a6545d4680cc8bdc87c2da8857"
+    },
+    {
+      "old_path": "CHECK_ME\\MP005_SOURCE_IDENTITY_ISSUE_20261019.txt",
+      "preserved_path": "notes\\HISTORICAL_CHECK_ME\\MP005_SOURCE_IDENTITY_ISSUE_20261019.txt",
+      "sha256": "529545ef5c3c7e55bbb0b4eda0c42de88f2bdea4294297153faad18ebc7f873e"
+    }
+  ],
+  "resolution": "Source typo confirmed; directory permissions resolved; baseline inspection/test notes historical; R1 location resolved and evidence verified. Windows Linux-execution limitation accepted; current R2/live blockers are recorded separately."
+}

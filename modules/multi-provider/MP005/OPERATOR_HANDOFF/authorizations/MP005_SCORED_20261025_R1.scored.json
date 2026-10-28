@@ -1,0 +1,12 @@
+{
+    "authorized":  true,
+    "phase":  "scored",
+    "session_id":  "MP005_SCORED_20261025_R1",
+    "operator_approval_scope":  "R01_R02_SCORED_FULL",
+    "scope_enforcement":  "OPERATOR_ONLY_NOT_ENFORCED_BY_HARNESS",
+    "rehearsal_review_reference":  "C:\\Users\\holiw\\esp32-main\\MULTI_PROVIDER_005\\evidence\\reviews\\MP005_REHEARSAL_20261024_R1.acceptance.json",
+    "rehearsal_review_sha256":  "94826bbac8b18d59802edb71a18fd04dad4ad51ded63d518d89f7f46ab7035b0",
+    "acceptance_sha256":  "661d1d688f6a2f1748ea2543562a45c0d156389ae41b1f2670d20c791d5cbe20",
+    "canonical_lock_sha256":  "08039d757d20ad9f111427779a8ec9276f5ecbf90f313f7b2b18c6b975c52b36",
+    "authorized_utc":  "2026-10-26T01:14:45.6878319Z"
+}

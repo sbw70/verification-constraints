@@ -1,0 +1,34 @@
+MP005 STOP — accessible local Linux simulation environment required
+Date: 2026-10-19 (America/New_York)
+
+Source-verification phase completed:
+- Operator-confirmed registry expected-hash correction applied to the handoff identity only.
+- All 17 selected provider/mint/key/relay/recorder/registry/trust files independently matched exact published Git blob identities at fa541618b1a3bc58700a81b29129b17b35b1e0fc before copying.
+- All five expected implementation SHA256 values match, including the corrected registry value.
+- Files copied unchanged into their MP005 role directories.
+- configs/MP005_SOURCE_MANIFEST.json records each identity and classification.
+- Original MP003 and MP004 unchanged.
+
+Blocker:
+The accessible bundled Python is native Windows (win32, Python 3.12.14). The unchanged providers' atomic_write_json function opens and fsyncs the containing directory after os.replace; this is part of the Linux persistence implementation whose identity must be preserved. Native Windows compatibility cannot be assumed or replaced with a different persistence path for these simulations.
+
+A read-only local WSL availability query using C:\Windows\System32\wsl.exe --list --quiet returned:
+Access is denied.
+Error code: Wsl/E_ACCESSDENIED
+
+No provider process or S00/S01/S02/S03 simulation was started. No alternate persistence shim was introduced. The WSL denial is an environment/access blocker, not a provider property failure. Other local Linux environments have not been established as available.
+
+Decision needed:
+Provide an accessible LOCAL Linux execution environment (WSL, local VM or local container), or give instructions for resolving local WSL access. The existing remote laboratory hosts are explicitly prohibited for this phase and will not be used as a workaround. Host accessibility alone is not authorization to contact them.
+
+Status:
+Phase 1 partially complete: source identity verified and unchanged baseline copied; full provider fact inspection, harness, draft live contract/run manifest and local characterization remain pending.
+S00: NOT_RUN
+S01: NOT_RUN
+S02: NOT_RUN
+S03: NOT_RUN
+Live rehearsal: NOT_RUN
+Scored test: NOT_RUN
+No live laboratory host contact. No repository mutation, GitHub writes, branch, PR, commit or push. No final contract lock.
+
+The prior CHECK_ME directory-permission issue remains tooling setup only; it is not test provenance.

@@ -1,0 +1,298 @@
+--- baseline/provider_b/provider_b.py
++++ hardened/provider_b/provider_b.py
+@@ -57,6 +57,8 @@
+     BASE_DIR / "provider_b_execution.jsonl"
+ )
+ 
++CONSUME_LEDGER_PATH = BASE_DIR / "provider_b_consume_ledger.jsonl"
++
+ STATE_LOCK = threading.Lock()
+ EXECUTION_LOCK = threading.Lock()
+ 
+@@ -70,6 +72,7 @@
+         sort_keys=True,
+         separators=(",", ":"),
+         ensure_ascii=False,
++        allow_nan=False,
+     ).encode("utf-8")
+ 
+ 
+@@ -235,72 +238,202 @@
+         os.close(dir_fd)
+ 
+ 
++LEDGER_TAG = b"NUVL-MP-CONSUME-LEDGER-v1|"
++LEDGER_SEQ = 0
++LEDGER_HEAD = None
++LEDGER_FAILED = False
++
++
++def strict_object(pairs):
++    result = {}
++    for key, value in pairs:
++        if key in result:
++            raise ValueError("duplicate_json_key")
++        result[key] = value
++    return result
++
++
++def validate_ledger(raw):
++    spent = {}
++    head = None
++    entries = []
++    if raw and not raw.endswith(b"\n"):
++        raise ValueError("ledger_partial_line")
++    for index, line in enumerate(raw.splitlines(), 1):
++        entry = json.loads(line.decode("utf-8"), object_pairs_hook=strict_object)
++        if not isinstance(entry, dict):
++            raise ValueError("ledger_entry_not_object")
++        if type(entry.get("version")) is not int or entry["version"] != 1:
++            raise ValueError("ledger_version")
++        if entry.get("provider_id") != PROVIDER_ID:
++            raise ValueError("ledger_provider")
++        if type(entry.get("ledger_seq")) is not int or entry["ledger_seq"] != index:
++            raise ValueError("ledger_sequence")
++        for field in ("authorization_id", "authorization_nonce", "operation_id"):
++            if not isinstance(entry.get(field), str) or not entry[field]:
++                raise ValueError("ledger_identity")
++        if "previous_entry_hash" not in entry or entry["previous_entry_hash"] != head:
++            raise ValueError("ledger_previous_hash")
++        core = {k: v for k, v in entry.items() if k != "entry_hash"}
++        if entry.get("entry_hash") != sha256_bytes(LEDGER_TAG + canonical_bytes(core)):
++            raise ValueError("ledger_entry_hash")
++        if canonical_bytes(entry) != line:
++            raise ValueError("ledger_noncanonical")
++        aid = entry["authorization_id"]
++        if aid in spent:
++            raise ValueError("ledger_duplicate_authorization")
++        spent[aid] = {"nonce": entry["authorization_nonce"]}
++        head = entry["entry_hash"]
++        entries.append(entry)
++    return spent, len(entries), head
++
++
++def snapshot_document(entries):
++    return {"version": 1, "spent": entries,
++            "ledger_seq": LEDGER_SEQ, "ledger_head": LEDGER_HEAD}
++
++
++def classify_snapshot(actual, ledger_raw, expected):
++    """Accept exact agreement or a proven prefix; never erase competing JSON history."""
++    fields = {"version", "spent", "ledger_seq", "ledger_head"}
++    if (not isinstance(actual, dict) or set(actual) != fields
++            or type(actual["version"]) is not int or actual["version"] != 1
++            or type(actual["ledger_seq"]) is not int or actual["ledger_seq"] < 0
++            or not isinstance(actual["spent"], dict)):
++        raise RuntimeError("snapshot_structure_invalid")
++    for aid, value in actual["spent"].items():
++        if (not isinstance(aid, str) or not aid or not isinstance(value, dict)
++                or set(value) != {"nonce"} or not isinstance(value["nonce"], str)
++                or not value["nonce"]):
++            raise RuntimeError("snapshot_structure_invalid")
++    seq = actual["ledger_seq"]
++    head = actual["ledger_head"]
++    if ((seq == 0 and head is not None)
++            or (seq > 0 and (not isinstance(head, str) or len(head) != 64
++                            or any(c not in "0123456789abcdef" for c in head)))):
++        raise RuntimeError("snapshot_structure_invalid")
++    if seq > expected["ledger_seq"]:
++        raise RuntimeError("snapshot_ahead_of_ledger")
++    if seq == expected["ledger_seq"]:
++        if canonical_bytes(actual) != canonical_bytes(expected):
++            raise RuntimeError("snapshot_equal_seq_divergent")
++        return None
++    prefix_raw = b"".join(ledger_raw.splitlines(keepends=True)[:seq])
++    prefix_spent, prefix_seq, prefix_head = validate_ledger(prefix_raw)
++    prefix = {"version": 1, "spent": prefix_spent,
++              "ledger_seq": prefix_seq, "ledger_head": prefix_head}
++    if canonical_bytes(actual) != canonical_bytes(prefix):
++        raise RuntimeError("snapshot_not_valid_prefix")
++    return "valid_prefix_behind"
++
++
++def reject_json_constant(value):
++    raise ValueError("nonfinite_json_constant")
++
++
++def preserve_malformed_snapshot(raw):
++    """Durably preserve exact unreadable JSON bytes before replacing cache."""
++    digest = sha256_bytes(raw)
++    preserved = SPENT_STATE_PATH.with_name(SPENT_STATE_PATH.name + ".malformed." + digest + ".bin")
++    try:
++        fd = os.open(str(preserved), os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
++    except FileExistsError:
++        if preserved.read_bytes() != raw:
++            raise RuntimeError("snapshot_preservation_conflict")
++    else:
++        with os.fdopen(fd, "wb") as evidence:
++            if evidence.write(raw) != len(raw):
++                raise OSError("snapshot_preservation_short_write")
++            evidence.flush()
++            os.fsync(evidence.fileno())
++    dir_fd = os.open(str(preserved.parent), os.O_RDONLY)
++    try:
++        os.fsync(dir_fd)
++    finally:
++        os.close(dir_fd)
++    print(json.dumps({"event": "MALFORMED_SNAPSHOT_PRESERVED", "provider_id": PROVIDER_ID,
++                      "path": str(preserved), "sha256": digest, "bytes": len(raw)}, sort_keys=True), flush=True)
++    return str(preserved)
++
++
+ def load_spent_state():
+-    if not SPENT_STATE_PATH.exists():
+-        raise RuntimeError(
+-            "spent_state_missing"
+-        )
+-
+-    raw = json.loads(
+-        SPENT_STATE_PATH.read_text(
+-            encoding="utf-8-sig"
+-        )
+-    )
+-
+-    if (
+-        not isinstance(raw, dict)
+-        or raw.get("version") != 1
+-        or not isinstance(
+-            raw.get("spent"),
+-            dict,
+-        )
+-    ):
+-        raise RuntimeError(
+-            "spent_state_invalid"
+-        )
+-
+-    return dict(
+-        raw["spent"]
+-    )
++    global LEDGER_SEQ, LEDGER_HEAD, LEDGER_FAILED
++    if not CONSUME_LEDGER_PATH.is_file():
++        raise RuntimeError("consume_ledger_missing")
++    try:
++        ledger_raw = CONSUME_LEDGER_PATH.read_bytes()
++        spent, LEDGER_SEQ, LEDGER_HEAD = validate_ledger(ledger_raw)
++    except Exception as exc:
++        raise RuntimeError("consume_ledger_invalid") from exc
++    expected = snapshot_document(spent)
++    recovery = None
++    preserved_path = None
++    try:
++        snapshot_raw = SPENT_STATE_PATH.read_bytes()
++    except FileNotFoundError:
++        recovery = "missing_snapshot"
++    except OSError as exc:
++        # Unreadable is not the same as malformed: do not erase unavailable evidence.
++        raise RuntimeError("snapshot_read_error") from exc
++    else:
++        try:
++            actual = json.loads(snapshot_raw.decode("utf-8"), object_pairs_hook=strict_object,
++                                parse_constant=reject_json_constant)
++        except (ValueError, UnicodeError):
++            # Failure to preserve is fatal. Only syntactically malformed JSON uses
++            # cache recovery; parseable invalid/divergent structures fail closed.
++            preserved_path = preserve_malformed_snapshot(snapshot_raw)
++            recovery = "malformed_snapshot_preserved"
++        else:
++            recovery = classify_snapshot(actual, ledger_raw, expected)
++    if recovery:
++        atomic_write_json(SPENT_STATE_PATH, expected)
++        print(json.dumps({"event": "SNAPSHOT_RECOVERED_FROM_LEDGER",
++                          "provider_id": PROVIDER_ID, "reason": recovery,
++                          "preserved_snapshot": preserved_path,
++                          "ledger_seq": LEDGER_SEQ, "ledger_head": LEDGER_HEAD}, sort_keys=True), flush=True)
++    LEDGER_FAILED = False
++    return spent
+ 
+ 
+ def persist_spent(entries):
+-    atomic_write_json(
+-        SPENT_STATE_PATH,
+-        {
+-            "version": 1,
+-            "spent": entries,
+-        },
+-    )
+-
+-
+-def consume_authorization(
+-    auth_id,
+-    auth_nonce,
+-):
++    atomic_write_json(SPENT_STATE_PATH, snapshot_document(entries))
++
++
++def consume_authorization(auth_id, auth_nonce, op_id):
++    global LEDGER_SEQ, LEDGER_HEAD, LEDGER_FAILED
+     with STATE_LOCK:
+-
+         if auth_id in SPENT:
+             return False, "auth_spent"
+-
+-        candidate = dict(SPENT)
+-
+-        candidate[auth_id] = {
+-            "nonce": auth_nonce,
+-        }
+-
++        if LEDGER_FAILED:
++            return False, "auth_ledger_error"
++        entry = {"version": 1, "provider_id": PROVIDER_ID,
++                 "ledger_seq": LEDGER_SEQ + 1, "authorization_id": auth_id,
++                 "authorization_nonce": auth_nonce, "operation_id": op_id,
++                 "previous_entry_hash": LEDGER_HEAD}
++        entry["entry_hash"] = sha256_bytes(LEDGER_TAG + canonical_bytes(entry))
++        line = canonical_bytes(entry) + b"\n"
+         try:
+-            persist_spent(
+-                candidate
+-            )
++            # Deliberately no O_CREAT: ordinary consumes never initialize history.
++            fd = os.open(str(CONSUME_LEDGER_PATH), os.O_WRONLY | os.O_APPEND)
++            with os.fdopen(fd, "ab") as ledger:
++                if ledger.write(line) != len(line):
++                    raise OSError("short_ledger_write")
++                ledger.flush()
++                os.fsync(ledger.fileno())
+         except Exception:
+-            return False, "auth_state_error"
+-
+-        SPENT.clear()
+-        SPENT.update(
+-            candidate
+-        )
+-
++            # A partial write or failed fsync has uncertain durability. Never retry
++            # a consume in this process, and never truncate/repair the history.
++            LEDGER_FAILED = True
++            return False, "auth_ledger_error"
++        LEDGER_SEQ = entry["ledger_seq"]
++        LEDGER_HEAD = entry["entry_hash"]
++        SPENT[auth_id] = {"nonce": auth_nonce}
++        try:
++            persist_spent(SPENT)
++        except Exception:
++            # Durable ledger is authoritative even though this request cannot execute.
++            return False, "auth_snapshot_error_consumed"
+         return True, None
+ 
+ 
+@@ -387,6 +520,10 @@
+         "reason_code": reason_code,
+     }
+ 
++    with STATE_LOCK:
++        event["ledger_seq"] = LEDGER_SEQ
++        event["ledger_head"] = LEDGER_HEAD
++
+     signature = BOUNDARY_PRIVATE_KEY.sign(
+         BOUNDARY_SIG_TAG
+         + canonical_bytes(event)
+@@ -690,6 +827,7 @@
+         consume_authorization(
+             auth_id,
+             auth_nonce,
++            op_id,
+         )
+     )
+ 

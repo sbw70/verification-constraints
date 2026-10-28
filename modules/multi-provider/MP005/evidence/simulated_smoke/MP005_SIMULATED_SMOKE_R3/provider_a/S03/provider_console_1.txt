@@ -1,0 +1,9 @@
+MP001_PROVIDER_A
+Listening on 127.0.0.1:44693
+Provider ID: PROVIDER_A
+Boundary key ID: sha256:e4664ee3b7bb0012fb7d8f763c9df74594d8a6bec8488d97532a5846cc04b6ff
+Spent state: /home/seth/MP005_R3_CANDIDATE/evidence/simulated_smoke/MP005_SIMULATED_SMOKE_R3/provider_a/S03/state/provider_a_spent_state.json
+Spent entries loaded: 0
+Execution log: /home/seth/MP005_R3_CANDIDATE/evidence/simulated_smoke/MP005_SIMULATED_SMOKE_R3/provider_a/S03/state/provider_a_execution.jsonl
+PROVIDER_A START operation_id=8abf00130e631c36262191c6c28587226f7fb8be9284d412e86961387e5c77a4 authorization_id=8619289076074268898d355aba66bfe3a50379eb197219a008c34ed6c74faeb8 sent=True
+PROVIDER_A EXECUTED operation_id=8abf00130e631c36262191c6c28587226f7fb8be9284d412e86961387e5c77a4 authorization_id=8619289076074268898d355aba66bfe3a50379eb197219a008c34ed6c74faeb8 local_seq=1

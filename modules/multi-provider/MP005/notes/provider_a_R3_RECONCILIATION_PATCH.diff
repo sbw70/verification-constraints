@@ -1,0 +1,115 @@
+--- R2/provider_a/provider_a.py
++++ R3/provider_a/provider_a.py
+@@ -291,29 +291,104 @@
+             "ledger_seq": LEDGER_SEQ, "ledger_head": LEDGER_HEAD}
+ 
+ 
++def classify_snapshot(actual, ledger_raw, expected):
++    """Accept exact agreement or a proven prefix; never erase competing JSON history."""
++    fields = {"version", "spent", "ledger_seq", "ledger_head"}
++    if (not isinstance(actual, dict) or set(actual) != fields
++            or type(actual["version"]) is not int or actual["version"] != 1
++            or type(actual["ledger_seq"]) is not int or actual["ledger_seq"] < 0
++            or not isinstance(actual["spent"], dict)):
++        raise RuntimeError("snapshot_structure_invalid")
++    for aid, value in actual["spent"].items():
++        if (not isinstance(aid, str) or not aid or not isinstance(value, dict)
++                or set(value) != {"nonce"} or not isinstance(value["nonce"], str)
++                or not value["nonce"]):
++            raise RuntimeError("snapshot_structure_invalid")
++    seq = actual["ledger_seq"]
++    head = actual["ledger_head"]
++    if ((seq == 0 and head is not None)
++            or (seq > 0 and (not isinstance(head, str) or len(head) != 64
++                            or any(c not in "0123456789abcdef" for c in head)))):
++        raise RuntimeError("snapshot_structure_invalid")
++    if seq > expected["ledger_seq"]:
++        raise RuntimeError("snapshot_ahead_of_ledger")
++    if seq == expected["ledger_seq"]:
++        if canonical_bytes(actual) != canonical_bytes(expected):
++            raise RuntimeError("snapshot_equal_seq_divergent")
++        return None
++    prefix_raw = b"".join(ledger_raw.splitlines(keepends=True)[:seq])
++    prefix_spent, prefix_seq, prefix_head = validate_ledger(prefix_raw)
++    prefix = {"version": 1, "spent": prefix_spent,
++              "ledger_seq": prefix_seq, "ledger_head": prefix_head}
++    if canonical_bytes(actual) != canonical_bytes(prefix):
++        raise RuntimeError("snapshot_not_valid_prefix")
++    return "valid_prefix_behind"
++
++
++def reject_json_constant(value):
++    raise ValueError("nonfinite_json_constant")
++
++
++def preserve_malformed_snapshot(raw):
++    """Durably preserve exact unreadable JSON bytes before replacing cache."""
++    digest = sha256_bytes(raw)
++    preserved = SPENT_STATE_PATH.with_name(SPENT_STATE_PATH.name + ".malformed." + digest + ".bin")
++    try:
++        fd = os.open(str(preserved), os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
++    except FileExistsError:
++        if preserved.read_bytes() != raw:
++            raise RuntimeError("snapshot_preservation_conflict")
++    else:
++        with os.fdopen(fd, "wb") as evidence:
++            if evidence.write(raw) != len(raw):
++                raise OSError("snapshot_preservation_short_write")
++            evidence.flush()
++            os.fsync(evidence.fileno())
++    dir_fd = os.open(str(preserved.parent), os.O_RDONLY)
++    try:
++        os.fsync(dir_fd)
++    finally:
++        os.close(dir_fd)
++    print(json.dumps({"event": "MALFORMED_SNAPSHOT_PRESERVED", "provider_id": PROVIDER_ID,
++                      "path": str(preserved), "sha256": digest, "bytes": len(raw)}, sort_keys=True), flush=True)
++    return str(preserved)
++
++
+ def load_spent_state():
+     global LEDGER_SEQ, LEDGER_HEAD, LEDGER_FAILED
+     if not CONSUME_LEDGER_PATH.is_file():
+         raise RuntimeError("consume_ledger_missing")
+     try:
+-        spent, LEDGER_SEQ, LEDGER_HEAD = validate_ledger(CONSUME_LEDGER_PATH.read_bytes())
++        ledger_raw = CONSUME_LEDGER_PATH.read_bytes()
++        spent, LEDGER_SEQ, LEDGER_HEAD = validate_ledger(ledger_raw)
+     except Exception as exc:
+         raise RuntimeError("consume_ledger_invalid") from exc
+     expected = snapshot_document(spent)
+     recovery = None
++    preserved_path = None
+     try:
+-        actual = json.loads(SPENT_STATE_PATH.read_text(encoding="utf-8"), object_pairs_hook=strict_object)
+-        if canonical_bytes(actual) != canonical_bytes(expected):
+-            recovery = "mismatch_or_stale"
++        snapshot_raw = SPENT_STATE_PATH.read_bytes()
+     except FileNotFoundError:
+-        recovery = "missing"
+-    except Exception:
+-        recovery = "malformed_or_unreadable"
++        recovery = "missing_snapshot"
++    except OSError as exc:
++        # Unreadable is not the same as malformed: do not erase unavailable evidence.
++        raise RuntimeError("snapshot_read_error") from exc
++    else:
++        try:
++            actual = json.loads(snapshot_raw.decode("utf-8"), object_pairs_hook=strict_object,
++                                parse_constant=reject_json_constant)
++        except (ValueError, UnicodeError):
++            # Failure to preserve is fatal. Only syntactically malformed JSON uses
++            # cache recovery; parseable invalid/divergent structures fail closed.
++            preserved_path = preserve_malformed_snapshot(snapshot_raw)
++            recovery = "malformed_snapshot_preserved"
++        else:
++            recovery = classify_snapshot(actual, ledger_raw, expected)
+     if recovery:
+-        # Failure here aborts startup, before a request server exists.
+         atomic_write_json(SPENT_STATE_PATH, expected)
+         print(json.dumps({"event": "SNAPSHOT_RECOVERED_FROM_LEDGER",
+                           "provider_id": PROVIDER_ID, "reason": recovery,
++                          "preserved_snapshot": preserved_path,
+                           "ledger_seq": LEDGER_SEQ, "ledger_head": LEDGER_HEAD}, sort_keys=True), flush=True)
+     LEDGER_FAILED = False
+     return spent

@@ -1,0 +1,30 @@
+{
+  "status": "R3_PREPARED_NOT_RUN",
+  "runtime_identities": {
+    "provider_a": {
+      "R2_hardened_sha256": "a8ab30e1a0a8780097d5edb9da7623a0a19a762b17d6b0459bb8abf351a01398",
+      "R3_candidate_sha256": "79e4994c955ca842af04a8fd650a33d49de040bab95b821ded9e63e16866f2b6",
+      "MP003_baseline_sha256": "c875582b275f270b8e68af69ed4ee84896e83815cdf33b7d7c5ccc813fe2e606"
+    },
+    "provider_b": {
+      "R2_hardened_sha256": "c7d3ab6dc95532fd3634c4ce5a27b7c4518dcbb50bf12a5ab96f724cc7b10e08",
+      "R3_candidate_sha256": "618ec76ef5dd3bfa3ba7b1ad3941ed0516a7511b72957d7efb82ec565905b605",
+      "MP003_baseline_sha256": "5e0ab4b79df4c97bc7bc324d63da85711728d625b82306cdce6c92592e2ee13e"
+    }
+  },
+  "offline_checks": 73,
+  "R1_R2_preserved": true,
+  "R3_session": "MP005_SIMULATED_SMOKE_R3",
+  "simulation_command": "python3 -B simulation/run.py --session MP005_SIMULATED_SMOKE_R3",
+  "independent_review_command": "python3 -B simulation/review_r3.py --root .",
+  "candidate_root": "C:\\Users\\holiw\\esp32-main\\MULTI_PROVIDER_005",
+  "execution_blocker": "Pavilion access previously established is password-based and no working assistant noninteractive SSH authorization exists. No passwords requested/stored. Run via operator local Pavilion session.",
+  "R3_execution": "NOT_RUN",
+  "R3_independent_review": "NOT_AVAILABLE_UNTIL_FULL_EVIDENCE_COPY_BACK",
+  "freeze_inputs": "NOT_APPROVED_PENDING_R3",
+  "live_contact": false,
+  "rehearsal": "NOT_RUN",
+  "scored": "NOT_RUN",
+  "GitHub_mutation": false,
+  "final_lock_created": false
+}

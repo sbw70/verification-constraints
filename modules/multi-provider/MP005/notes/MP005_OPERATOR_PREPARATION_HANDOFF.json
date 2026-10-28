@@ -1,0 +1,65 @@
+{
+  "status": "NOT_READY",
+  "packet": "C:\\Users\\holiw\\esp32-main\\MULTI_PROVIDER_005\\OPERATOR_HANDOFF",
+  "hardening_completed": true,
+  "provider_hashes": {
+    "provider_a/provider_a.py": "a8ab30e1a0a8780097d5edb9da7623a0a19a762b17d6b0459bb8abf351a01398",
+    "provider_b/provider_b.py": "c7d3ab6dc95532fd3634c4ce5a27b7c4518dcbb50bf12a5ab96f724cc7b10e08"
+  },
+  "candidate_config_hashes": {
+    "MP005_HARNESS_MANIFEST.json": "8d01f5f6e197134dd89332845c11c657e4000bd532e3a4b45d65d6d116c0ee19",
+    "MP005_IMPLEMENTATION_MANIFEST.json": "4857cd0243fcf82931fd10ab165d3adbf0a845ad324ba13ef9410c69c0264656",
+    "MP005_RUN_MANIFEST.json": "26de855aa792447a7ab9525b8f4075c6ad644dac51213d56daa54fd7668b9cb5",
+    "MP005_SOURCE_MANIFEST.json": "9bfe4eb5bdccf7fc903446fdeb5697eb3b27d9c007eac48dcfb76a7b83cf72dc",
+    "MP005_CONTRACT.md": "81758445b879095fd7640f09c389c3a79e5858ad29b61c17be7b4265cf64cda2"
+  },
+  "R2": {
+    "status": "NOT_RUN",
+    "operator_confirmed": "R2 has not run on Pavilion; full copy-back and independent review required",
+    "provider_a": {
+      "S00": "NOT_RUN",
+      "S01": "NOT_RUN",
+      "S02": "NOT_RUN",
+      "S03": "NOT_RUN"
+    },
+    "provider_b": {
+      "S00": "NOT_RUN",
+      "S01": "NOT_RUN",
+      "S02": "NOT_RUN",
+      "S03": "NOT_RUN"
+    },
+    "snapshot_rollback_resurrected": "UNKNOWN_NOT_RUN",
+    "replay_changed_ledger": "UNKNOWN_NOT_RUN",
+    "replay_changed_execution": "UNKNOWN_NOT_RUN",
+    "fresh_advanced_exactly_once": "UNKNOWN_NOT_RUN",
+    "signed_boundary_examples": [],
+    "hardened_provider_hashes": {
+      "provider_a/provider_a.py": "a8ab30e1a0a8780097d5edb9da7623a0a19a762b17d6b0459bb8abf351a01398",
+      "provider_b/provider_b.py": "c7d3ab6dc95532fd3634c4ce5a27b7c4518dcbb50bf12a5ab96f724cc7b10e08"
+    },
+    "final_lock_permitted": false
+  },
+  "final_contract_hash": null,
+  "final_run_manifest_hash": null,
+  "unresolved_CHECK_ME": [
+    {
+      "id": "R2_PENDING",
+      "issue": "A/B S00-S03 NOT_RUN; no R2 inventory, actual signed head examples or independent review. Run only on approved Pavilion local Linux, preserve full results and copy back.",
+      "material_to_live_scoring": true
+    },
+    {
+      "id": "LIVE_MAP_AND_TRANSPORT_UNVERIFIED",
+      "issue": "Current live IPs/roots/state/ledger/log paths and continuous association evidence transport are unverified. Complete separately authorized discovery; no Pavilion live role. Validate Bash/host commands in approved Linux environment before readiness.",
+      "material_to_live_scoring": true
+    },
+    {
+      "id": "NO_FINAL_FREEZE_OR_PHASE_AUTHORIZATION",
+      "issue": "Final narrow R01/R02 scored claim, resolved run manifest, canonical lock and matching packet copies do not exist. Rehearsal/scored authorization and accepted rehearsal evidence are also absent. No freeze before successful R2 review.",
+      "material_to_live_scoring": true
+    }
+  ],
+  "next": "Run approved local Pavilion R2, copy full evidence back, independently review, then resolve final lock/operator packet before any live phase.",
+  "no_live_rehearsal": true,
+  "no_scored_run": true,
+  "no_GitHub_mutation": true
+}

@@ -1,0 +1,17 @@
+{
+  "status": "NOT_READY",
+  "R3_review": "PASS_ALL_12_TESTED_CASES",
+  "unresolved": [
+    {
+      "id": "CURRENT_LIVE_TOPOLOGY_PATHS_AND_TRANSPORT_UNVERIFIED",
+      "issue": "Physical roles known; current live hostname/IP map, OS/Python/filesystem, runtime roots/hashes/deployment status, state/ledger/execution paths, association placement/log transport, relay endpoints and per-role evidence-copy paths must be supplied by later separately authorized discovery. No host/service contacted during review.",
+      "material_to_live_scoring": true
+    },
+    {
+      "id": "FINAL_LIVE_FREEZE_AND_PHASE_AUTHORIZATIONS_ABSENT",
+      "issue": "R3 technical review passed. Finish resolved live configuration and narrow R01/R02 final claim/packet, verify final lock and copied files. No live rehearsal authorized; scoring additionally requires accepted rehearsal and explicit scored session authorization.",
+      "material_to_live_scoring": true
+    }
+  ],
+  "no_live_phase_authorized": true
+}

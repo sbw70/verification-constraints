@@ -1,0 +1,4 @@
+RESOLVED: operator confirmed registry SHA256 transcription correction on 2026-10-19.
+Canonical expected registry SHA256: 59d739588427d87313e3434982d943a9c82bad26c3fe3deb7d5488efadb6088d
+Pinned commit: fa541618b1a3bc58700a81b29129b17b35b1e0fc
+Correction is to the handoff only. All 17 selected implementation/key files verified against pinned published Git blob identities before copying. Original MP003/MP004 unchanged. No laboratory hosts contacted.
