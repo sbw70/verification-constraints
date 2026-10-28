@@ -1,4 +1,3 @@
-```markdown
 # MP005 — Provider-Controlled Authority Persistence Across Process Restart
 
 **Project:** Xer0trust / Neutral Unified Verification Layer (NUVL)
