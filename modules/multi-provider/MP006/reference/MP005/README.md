@@ -1,181 +1,342 @@
-# MP005 — Frozen Reference Dependencies
+# MP006 — Physical Power-Loss Authority Persistence
 
 ## Purpose
 
-This directory contains the frozen MP005 implementation and supporting files reused by MP006.
+MP006 evaluates whether provider-controlled, single-use execution authority remains consumed after complete physical power loss and host recovery.
 
-MP006 extends the earlier process-restart experiment to physical power-loss recovery.
+The experiment extends MP005's process-restart durability testing to a different failure condition.
 
-It reuses the MP005 provider authorization, durable consumption ledger, signature verification, boundary signaling, and evidence-validation functions.
+**Primary question:**
 
-MP006 does not introduce a replacement authorization or persistence algorithm.
+Can a provider lose power, restart using its existing persistent state, and continue rejecting previously consumed authority without preventing separately authorized fresh execution?
 
-The reference files must remain distinguishable from MP006-specific code and experimental evidence.
+The experiment tests that property without transferring authorization or execution authority to the NUVL intermediary.
+
+## Recorded Result
+
+**Session:** `MP006_R01_RUN001`
+
+**Date:** October 31, 2026
+
+**Target:** Provider A — Dell Linux Mint
+
+**Status:** `PASS`
+
+**Safety result:**
+
+`REPLAY_REJECTED_WITHOUT_ADDITIONAL_CONSUMPTION_OR_EXECUTION`
+
+### Observed Behavior
+
+| Phase | Recorded result |
+|---|---|
+| Initial state | No consumed authorizations |
+| Original authorization | Accepted and executed once |
+| Initial consumption ledger | Advanced to sequence 1 |
+| Physical power interruption | Operator-attested; network loss independently observed |
+| Host recovery | Different boot ID; original persistent history recovered |
+| Original authorization replay | Denied — `auth_spent` |
+| Replay execution | No additional execution |
+| Replay consumption ledger | Unchanged at sequence 1 |
+| Separate fresh authorization | Accepted and executed once |
+| Final consumption ledger | Advanced to sequence 2 |
+
+The scorer reported PASS across all seven verification groups:
+
+- Initial consumption.
+- Recovery.
+- State continuity.
+- Replay rejection.
+- Fresh execution.
+- Physical-interruption procedure.
+- Preserved request integrity.
+
+[View scored results](evidence/MP006_R01_RUN001/R01/case_results.json)
+
+## Experimental Method
+
+The experiment followed a controlled sequence.
+
+### 1. Establish Fresh State
+
+Provider A started with a new, isolated consumption ledger and spent-authority snapshot.
+
+A provider-issued authorization was prepared for one operation.
+
+### 2. Consume Authority
+
+The original authorization was submitted through the NUVL relay.
+
+Provider A validated the authorization, recorded its consumption, executed once, and emitted signed boundary events.
+
+The consumption ledger advanced to sequence 1.
+
+### 3. Interrupt Power
+
+The provider was confirmed idle.
+
+Initial state and execution evidence were independently preserved.
+
+The operator physically disconnected the Dell's power.
+
+An independent reachability witness recorded the transition from reachable to unreachable.
+
+### 4. Restore and Capture
+
+After power restoration, the persistent state was copied before Provider A restarted.
+
+The raw capture preserved:
+
+- Consumption-ledger bytes.
+- Spent-state snapshot bytes.
+- Execution-log bytes.
+- SHA-256 identities.
+- Recovery boot identity.
+
+The preserved files were checked against the pre-interruption evidence.
+
+The capture process did not repair the persistent state.
+
+### 5. Replay Original Authority
+
+Provider A restarted using the existing persistent state.
+
+The original authorization was submitted again using its preserved bytes.
+
+Provider A emitted a signed denial identifying the authorization as already spent.
+
+The ledger, spent-state snapshot, and execution log remained unchanged.
+
+### 6. Execute Fresh Authority
+
+A separate authorization was issued for a new operation.
+
+Provider A accepted and executed it once.
+
+The consumption ledger advanced to sequence 2 while preserving the original consumption history.
 
 ## Directory Structure
 
-| Directory | Purpose |
+| Path | Contents |
 |---|---|
-| [provider_a/](provider_a/) | Provider A authorization, consumption, execution, and signed boundary signaling |
-| [provider_b/](provider_b/) | Independent Provider B implementation and policy enforcement |
-| [intermediary/](intermediary/) | Stateless NUVL multi-provider forwarding |
-| [association/](association/) | Signed boundary-event verification and recording |
-| [harness/](harness/) | Shared verification, evidence, and scoring functions |
-| [configs/](configs/) | Frozen source identities, contracts, manifests, and historical locks |
-| [simulation/](simulation/) | Historical R3 simulation and independent-review implementation |
+| [mp006.py](mp006.py) | MP006 orchestration, recovery capture, verification, and scoring |
+| [test_local.py](test_local.py) | Offline implementation tests |
+| [Watch-MP006Reachability.ps1](Watch-MP006Reachability.ps1) | Independent network reachability witness |
+| [OPERATING_PROCEDURE.md](OPERATING_PROCEDURE.md) | Original operator procedure and approval checkpoints |
+| [SOURCE_REVIEW.md](SOURCE_REVIEW.md) | Pre-deployment source inspection and limitations |
+| [LOCAL_VALIDATION.json](LOCAL_VALIDATION.json) | Historical offline validation record |
+| [configs/](configs/) | Reviewed MP006 configuration |
+| [authorizations/](authorizations/) | Explicit operator authorization |
+| [reference/](reference/) | Frozen MP005 implementation dependencies |
+| [manifests/](manifests/) | Historical build and deployment inventories |
+| [evidence/](evidence/) | Completed experiment evidence |
 
-Each component has its own documentation.
+Each directory contains more detailed documentation.
 
-## Frozen Source Identity
+## Implementation
 
-The original MP006 build records identify 48 unchanged reference files copied from MP005.
+MP006 uses a narrow Python adapter around the frozen MP005 implementation.
 
-**Reference commit:**
+The adapter adds:
+
+- Experiment-specific paths and configuration.
+- Operator authorization checks.
+- Controlled provider launch and identity capture.
+- Pre-start raw recovery preservation.
+- Changed-boot verification.
+- Physical-interruption evidence checks.
+- Replay and fresh-execution scoring.
+- Evidence inventories and result classification.
+
+The underlying provider authorization and persistence functions remain unchanged.
+
+### Frozen Provider Identity
+
+**MP005 reference commit:**
 
 `73713f6e9ed9c95251cc69ec88ef816cab771ac0`
 
-### Primary Implementation Hashes
+**Provider A SHA-256:**
 
-| Component | SHA-256 |
-|---|---|
-| Provider A | `79e4994c955ca842af04a8fd650a33d49de040bab95b821ded9e63e16866f2b6` |
-| Provider B | `618ec76ef5dd3bfa3ba7b1ad3941ed0516a7511b72957d7efb82ec565905b605` |
-| NUVL relay | `09d458cc8e3e13706b5463deffea0e14fcd784011a629623a09b9bd5ee04d6f4` |
-| Association recorder | `fad60dfc8df53337d2e41288c2c4973442258cae4240945ebbd0aa8920550bfc` |
+`79e4994c955ca842af04a8fd650a33d49de040bab95b821ded9e63e16866f2b6`
 
-Complete identities are retained in the frozen manifests.
+The adapter verifies the frozen source and harness identities.
 
-[Original MP006 build inventory](../../manifests/original/SHA256SUMS.txt)
+It does not replace Provider A's authorization, signature-verification, durable-consumption, or execution methods.
 
-Documentation added after the original inventory is not part of that historical manifest.
+See [Frozen MP005 reference](reference/MP005/).
 
-## MP006 Dependency Use
+## Authority Separation
 
-The MP006 adapter is located at:
+The experiment preserves four distinct responsibilities.
 
-[mp006.py](../../mp006.py)
+**Provider A**
 
-It imports the frozen MP005 harness functions from:
-
-- `harness/common.py`
-- `harness/ledger_evidence.py`
-
-The adapter invokes the frozen source and harness verification functions before normal operations.
-
-For Provider A execution, it imports:
-
-`provider_a/provider_a.py`
-
-The adapter changes only the deployment-specific runtime values:
-
-- Listening host.
-- Listening port.
-- Association endpoint.
-- Consumption-ledger path.
-- Spent-state path.
-- Execution-log path.
-
-It does not replace Provider A's authorization, signature, consumption, or execution methods.
-
-## Historical R3 Authorization Record
-
-The root also contains:
-
-[MP005_SCORED_20261026_R3.scored.json](MP005_SCORED_20261026_R3.scored.json)
-
-This file preserves a historical MP005 scored-session authorization record.
-
-It identifies:
-
-**Session:** `MP005_SCORED_20261026_R3`
-
-**Scope:** `R01_R02_SCORED_FULL`
-
-**Scope enforcement:** `OPERATOR_ONLY_NOT_ENFORCED_BY_HARNESS`
-
-The record is historical.
-
-It is not authorization to launch MP006, reuse MP005 state, or repeat scored experiments.
-
-MP006 has its own configuration and operator authorization.
-
-## Authority Boundaries
-
-The frozen implementation preserves separate responsibilities.
-
-**Providers**
-
-Validate their own authorization artifacts, enforce consumption constraints, and control execution.
+Controls authorization validation, consumption, replay enforcement, and execution.
 
 **NUVL intermediary**
 
-Forwards provider-specific material without acquiring execution authority.
+Forwards provider-specific requests without independently authorizing execution.
 
 **Association recorder**
 
-Verifies and records signed boundary events without authorizing execution.
+Receives and verifies signed provider boundary events.
 
-**Test harness**
+**MP006 harness**
 
-Collects and evaluates evidence without overriding provider decisions.
+Controls the experimental procedure and evaluates recorded evidence.
 
-The intermediary must not receive provider signing keys.
+The operator authorization permits specified test operations.
 
-A successful HTTP response must not be interpreted as proof of provider execution.
+It does not replace provider-issued execution authorization.
 
-## Laboratory Cryptographic Material
+Neither the relay nor the recorder acquires authority to create, enlarge, or reuse provider authorization.
 
-The provider directories include Ed25519 laboratory key pairs.
+### Provider B
 
-These are published testing fixtures.
+The relay continued forwarding to both configured providers.
 
-They are not production credentials.
+Provider B produced `auth_missing` denials because the R01 requests did not include authorization for Provider B.
 
-The association directory contains the corresponding boundary-verification public keys.
+Provider B was not the scored execution target.
 
-Authorization-issuance keys and boundary-signing keys serve different purposes and must not be interchanged.
+Its observations do not establish power-loss durability for Provider B.
 
-## MP005 and MP006 Scope
+## Evidence
 
-### MP005
+The original scored evidence is preserved at:
 
-The final scored R3 experiment tested whether consumed authority remained spent across an idle forced provider-process restart.
+[evidence/MP006_R01_RUN001/R01/](evidence/MP006_R01_RUN001/R01/)
 
-Its recorded result was PASS for Provider A and Provider B within the defined scope.
+### Primary Records
 
-### MP006
+| Evidence | Purpose |
+|---|---|
+| [case_results.json](evidence/MP006_R01_RUN001/R01/case_results.json) | Official scoring result |
+| [SHA256SUMS.txt](evidence/MP006_R01_RUN001/R01/SHA256SUMS.txt) | Original 79-file scored inventory |
+| [recovered_before_start/](evidence/MP006_R01_RUN001/R01/recovered_before_start/) | Raw persistent state preserved before provider restart |
+| [association_recorder.jsonl](evidence/MP006_R01_RUN001/R01/association_recorder.jsonl) | Signed provider boundary observations |
+| [reachability.jsonl](evidence/MP006_R01_RUN001/R01/reachability.jsonl) | Independent network reachability witness |
+| [power_procedure.json](evidence/MP006_R01_RUN001/R01/power_procedure.json) | Operator physical-interruption record |
 
-MP006 separately tested whether Provider A retained consumed authority after physical power interruption and host recovery.
+Additional evidence is preserved separately:
 
-The R01 experiment recorded:
+[evidence/MP006_R01_RUN001/supplemental/](evidence/MP006_R01_RUN001/supplemental/)
 
-- Original authorization consumed.
-- Persistent state preserved across the observed interruption.
-- Original authorization replay denied.
-- No additional execution caused by replay.
-- Separate fresh authorization executed successfully.
+Supplemental records do not replace files in the original scored inventory.
 
-**MP006-R01 status:** `PASS`
+### Evidence Integrity
 
-The MP006 result is established by its own evidence, not by the historical MP005 result.
+The original R01 SHA-256 inventory contains 79 scored files.
 
-## Preservation Rules
+From the R01 evidence directory:
 
-- Do not modify frozen provider or harness implementation files.
-- Do not replace laboratory keys to make verification pass.
-- Do not repair historical persistent state.
-- Do not execute historical simulation scripts inside this reference tree.
-- Do not reuse historical MP005 authorization records.
-- Do not redirect MP006 writes into MP005 evidence directories.
-- Do not update historical source hashes after documentation changes.
-- Preserve mismatches and verification failures for review.
+```bash
+sha256sum -c SHA256SUMS.txt
+```
 
-This directory is a dependency reference, not an independent MP006 execution environment.
+Historical evidence and checksum manifests must remain unchanged.
 
-## Related Documentation
+New documentation is not retroactively included in original scored inventories.
 
-- [MP006 source adapter](../../mp006.py)
-- [MP006 configuration](../../configs/)
-- [MP006 operator authorization](../../authorizations/)
-- [MP006 original build manifests](../../manifests/original/)
-- [MP006-R01 scored evidence](../../evidence/MP006_R01_RUN001/)
+## Distinguishing MP005 From MP006
+
+| Property | MP005 R3 | MP006 R01 |
+|---|---|---|
+| Provider-process termination | Tested | Occurs as part of host power interruption |
+| Same persistent state after restart | Tested | Tested |
+| Physical power disconnection | Not tested | Operator-attested |
+| Changed host boot ID | Not required | Verified |
+| Independent network reachability witness | Not required | Recorded |
+| Original authority replay rejection | Tested | Tested |
+| Separate fresh authority execution | Tested | Tested |
+| Scored providers | A and B | A only |
+
+MP005 established process-restart behavior.
+
+MP006 adds evidence for persistence across the documented physical power-loss and reboot cycle.
+
+The experiments support different claims and retain separate evidence.
+
+## Historical Development Records
+
+[LOCAL_VALIDATION.json](LOCAL_VALIDATION.json) records eight successful offline tests.
+
+Its `NOT_RUN` and `NOT_DEPLOYED` fields reflect the earlier local-build validation stage.
+
+Similarly, [SOURCE_REVIEW.md](SOURCE_REVIEW.md) documents pre-deployment source inspection, not the subsequent live experiment.
+
+These records remain unchanged.
+
+The final R01 disposition is established by the scored evidence rather than retroactive changes to earlier documentation.
+
+## Limitations
+
+The recorded PASS supports the tested Provider A behavior during this specific experiment.
+
+It does not establish:
+
+- Physical power loss measured by an independent electrical instrument.
+- Resistance to replacement of the complete persistent history.
+- Correctness across every crash or interrupted-write window.
+- Concurrent double-spend resistance.
+- Equivalent behavior on Provider B.
+- Independent hardware actuation.
+- Security against an attacker controlling every evidence source.
+- Protection against arbitrary modification of local authorization or configuration files.
+
+The network witness independently observed connectivity loss and restoration.
+
+The physical disconnection itself was documented by the operator.
+
+The experiment also recorded different operating-system boot identifiers.
+
+These observations are complementary, not interchangeable.
+
+The scorer explicitly records:
+
+`"timestamp_comparisons_scored": false`
+
+Cross-machine timestamp ordering was not used to determine PASS.
+
+Signed provider events and persistent software records provide execution evidence, not independent hardware execution attestation.
+
+## Reproduction and Preservation
+
+The published files preserve the completed experiment.
+
+They do not constitute standing permission to repeat it.
+
+A separate experiment requires:
+
+- Explicit operator approval.
+- Verified implementation and configuration identities.
+- New session-specific authorization.
+- Fresh, isolated persistent state.
+- Separate evidence paths.
+- Reviewed network and process configuration.
+- Preservation of previous results.
+
+Do not reset historical consumption ledgers or overwrite evidence to manufacture a fresh test condition.
+
+Do not alter frozen MP005 dependencies to make a new test pass.
+
+The original operator procedure is preserved for review:
+
+[OPERATING_PROCEDURE.md](OPERATING_PROCEDURE.md)
+
+Its historical instructions must not be interpreted as authorization for another live run.
+
+## Conclusion
+
+MP006-R01 recorded successful retention of provider-controlled, consumed authority across the documented physical power-loss and reboot cycle.
+
+The original authorization remained spent.
+
+Exact replay produced a signed denial without additional consumption or execution.
+
+Separate fresh authority remained executable.
+
+The result supports the tested persistence and replay-enforcement property without requiring the intermediary to acquire provider execution authority.
+
+**Recorded classification: PASS — within the tested scope.**
