@@ -1,0 +1,1 @@
+{"command":["nohup","/usr/bin/python3","-u","-B","/home/seth/MULTI_PROVIDER_006/mp006.py","_serve","--authorization","/home/seth/MULTI_PROVIDER_006/authorizations/MP006_R01_RUN001.json","--provider","provider_a","--state-dir","/home/seth/MULTI_PROVIDER_006/state/MP006_R01_RUN001/provider_a"],"pid":113976}

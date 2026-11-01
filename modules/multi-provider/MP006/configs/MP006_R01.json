@@ -1,0 +1,16 @@
+{
+  "status": "REVIEWED_FOR_OPERATOR_RUN",
+  "session": "MP006_R01_RUN001",
+  "source_commit": "73713f6e9ed9c95251cc69ec88ef816cab771ac0",
+  "baseline": "MP005_SCORED_20261026_R3",
+  "provider_sha256": "79e4994c955ca842af04a8fd650a33d49de040bab95b821ded9e63e16866f2b6",
+  "windows_root": "C:\\Users\\holiw\\esp32-main\\MULTI_PROVIDER_006",
+  "linux_root": "/home/seth/MULTI_PROVIDER_006",
+  "provider_host": "192.168.1.118",
+  "provider_port": 9090,
+  "relay_url": "http://192.168.1.100:8080/nuvl",
+  "association_url": "http://192.168.1.102:9191/boundary",
+  "addresses_verified": true,
+  "autostart_reviewed_disabled": true,
+  "operator_preflight_complete": true
+}
