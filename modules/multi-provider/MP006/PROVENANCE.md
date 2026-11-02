@@ -580,6 +580,8 @@ Because the original build manifests were archived under a different directory a
 
 Do not rewrite the original inventories to match the current documentation tree.
 
+The original 56-file build inventory records configuration SHA-256 7e0ffeb1ee67840ee50392e5e9610cad26b5af4429df6846db2ba2f22e336a88. Following the reviewed STOP 1 procedure, the deployment configuration was updated and a separate 57-file deployment inventory was generated. This inventory records SHA-256 d7b4be8a0b42fed64f7ca2a17fc412280a84d7ea20d2421c0c786873756a63ea. The published operator authorization binds to the latter hash, and the MP006 adapter checks this binding before permitting ordinary authorized test actions. The exact historical configuration-edit timestamp and field-level differences are not independently preserved in the published evidence. The scored result does not separately record a configuration hash. Both inventories are retained unchanged.
+
 ## 16. Scored Result Identity
 
 The official result is:
