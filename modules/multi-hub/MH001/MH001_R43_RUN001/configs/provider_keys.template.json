@@ -1,0 +1,8 @@
+{
+  "session": "MH001_R43_RUN001",
+  "status": "AWAITING_PROVIDER_HOST_KEYS",
+  "providers": {
+    "PROVIDER_A": {"issuance_key_id": null, "boundary_key_id": null},
+    "PROVIDER_B": {"issuance_key_id": null, "boundary_key_id": null}
+  }
+}

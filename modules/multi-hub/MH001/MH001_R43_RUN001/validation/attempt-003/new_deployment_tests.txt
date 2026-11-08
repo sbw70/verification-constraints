@@ -1,0 +1,28 @@
+test_actual_live_routes_preserve_bytes_without_network (test_deployment.ConfigurationIntegration.test_actual_live_routes_preserve_bytes_without_network) ... ok
+test_failure_has_one_attempt_no_reroute (test_deployment.ConfigurationIntegration.test_failure_has_one_attempt_no_reroute) ... ok
+test_historical_run_root_rejected (test_deployment.ConfigurationIntegration.test_historical_run_root_rejected) ... ok
+test_inspection_does_not_import_provider (test_deployment.ConfigurationIntegration.test_inspection_does_not_import_provider) ... ok
+test_observer_config_is_preparation_only (test_deployment.ConfigurationIntegration.test_observer_config_is_preparation_only) ... ok
+test_overrides_are_configuration_only (test_deployment.ConfigurationIntegration.test_overrides_are_configuration_only) ... ok
+test_provider_plans_distinct_and_direct_observer (test_deployment.ConfigurationIntegration.test_provider_plans_distinct_and_direct_observer) ... ok
+test_requester_actual_approved_destinations_only (test_deployment.ConfigurationIntegration.test_requester_actual_approved_destinations_only) ... ok
+test_start_without_approval_rejects_before_import (test_deployment.ConfigurationIntegration.test_start_without_approval_rejects_before_import) ... ok
+test_static_routes_and_compatibility (test_deployment.ConfigurationIntegration.test_static_routes_and_compatibility) ... ok
+test_three_reviewed_config_hashes (test_deployment.ConfigurationIntegration.test_three_reviewed_config_hashes) ... ok
+test_T03_auth_spent_required_both_providers (test_deployment.ObserverFixtures.test_T03_auth_spent_required_both_providers) ... ok
+test_fresh_start_complete_both_independent_providers (test_deployment.ObserverFixtures.test_fresh_start_complete_both_independent_providers) ... ok
+test_historical_key_ids_and_unready_trust_rejected (test_deployment.ObserverFixtures.test_historical_key_ids_and_unready_trust_rejected) ... ok
+test_hub_origin_is_not_direct_provider_evidence (test_deployment.ObserverFixtures.test_hub_origin_is_not_direct_provider_evidence) ... ok
+test_missing_signed_evidence_cannot_pass (test_deployment.ObserverFixtures.test_missing_signed_evidence_cannot_pass) ... ok
+test_prehistory_truncation_detected (test_deployment.ObserverFixtures.test_prehistory_truncation_detected) ... ok
+test_previous_denial_blocks_replay_checkpoint (test_deployment.ObserverFixtures.test_previous_denial_blocks_replay_checkpoint) ... ok
+test_replay_new_execution_cannot_pass (test_deployment.ObserverFixtures.test_replay_new_execution_cannot_pass) ... ok
+test_signature_tampering_rejected (test_deployment.ObserverFixtures.test_signature_tampering_rejected) ... ok
+test_valid_signature_wrong_ledger_head_fails (test_deployment.ObserverFixtures.test_valid_signature_wrong_ledger_head_fails) ... ok
+test_validly_signed_wrong_binding_does_not_correlate (test_deployment.ObserverFixtures.test_validly_signed_wrong_binding_does_not_correlate) ... ok
+test_wrong_denial_reason_is_not_T03_success (test_deployment.ObserverFixtures.test_wrong_denial_reason_is_not_T03_success) ... ok
+
+----------------------------------------------------------------------
+Ran 23 tests in 0.662s
+
+OK

@@ -1,0 +1,45 @@
+{
+  "status": "LOCAL_DEPLOYMENT_PACKAGE_VALIDATED_NOT_DEPLOYED",
+  "started_utc": "2026-11-05T04:38:53.218276+00:00",
+  "completed_utc": "2026-11-05T04:39:06.236307+00:00",
+  "groups": {
+    "original_R43_29_tests": {
+      "tests": 29,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    "new_deployment_tests": {
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    }
+  },
+  "original_workspace_unchanged": true,
+  "keys_generated": false,
+  "fixed_RFC8032_fixture_seed_loading": true,
+  "actual_provider_imports": false,
+  "provider_state_initialized": false,
+  "observer_started": false,
+  "lab_hosts_contacted": false,
+  "deployed": false,
+  "STOP_1": "ACTIVE",
+  "live_review_hashes": {
+    "hub_a.json": "f4e50329e17949365f7c3aef96a33853b5b0d1a33a2b851c107f1601453ec083",
+    "hub_b.json": "f6c8fa3e0e7a3368ca4bd615aafd89b1f4149ccdb2bb7b799179ef6fc5569936",
+    "approved_hubs.json": "4588635b63ebc1dee6ca15b3de930726edb503cd3032a93d66bf79ba8b2c54b8"
+  },
+  "network_policy": "Only original loopback mock hubs; actual live configs exercised with in-memory transports",
+  "pending": [
+    "Explicit STOP 1 approval",
+    "Provider-host fresh keys and approved public trust",
+    "Sanctioned new durable state on each provider",
+    "Actual installed hashes and isolated ports",
+    "Dell MP006 indirect autostart chain still requires live preflight",
+    "Independent provider ingress capture",
+    "Observer live readiness and authorized rehearsal latency"
+  ]
+}

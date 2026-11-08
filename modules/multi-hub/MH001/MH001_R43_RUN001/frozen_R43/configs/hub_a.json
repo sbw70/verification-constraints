@@ -1,0 +1,9 @@
+{
+  "hub_id": "HUB_A",
+  "listen": {"host": "127.0.0.1", "port": 18080},
+  "timeout_seconds": 15,
+  "routes": {
+    "PROVIDER_A": {"next_hop": "PROVIDER_A", "endpoint": {"host": "127.0.0.1", "port": 18090}},
+    "PROVIDER_B": {"next_hop": "HUB_B", "endpoint": {"host": "127.0.0.1", "port": 18081}}
+  }
+}

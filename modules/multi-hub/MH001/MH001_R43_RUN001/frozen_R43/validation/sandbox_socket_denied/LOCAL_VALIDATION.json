@@ -1,0 +1,97 @@
+{
+  "status": "LOCAL_BUILD_VALIDATION_FAILED",
+  "started_utc": "2026-11-04T02:35:49.076966+00:00",
+  "completed_utc": "2026-11-04T02:35:50.989574+00:00",
+  "python": "3.14.3",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "tests_run": 18,
+  "failures": 1,
+  "errors": 18,
+  "skipped": 0,
+  "submissions": "SEQUENTIAL_LOOPBACK_MOCKS_ONLY",
+  "hub_a_timeout_seconds": 15,
+  "hub_b_timeout_seconds": 10,
+  "actual_provider_keys_generated": false,
+  "mock_signing_keys_generated": false,
+  "lab_hosts_contacted": false,
+  "scored_transactions_executed": false,
+  "deployed": false,
+  "published": false,
+  "configuration_sha256": {
+    "hub_a.json": "68e6d6630af220f1743fa04827c9ba37ba87af126b5d0fec0216a69cf1af3788",
+    "hub_b.json": "a066f9c0b5182423bd4707a5c8f02bfed4424e23a52ecb370b954a928bb2dff2"
+  },
+  "source_sha256": {
+    "hub.py": "37bd590d23d2daf3bf8b9713139a27b09333252f62d87c94fa2a3e1477a043a2",
+    "requester.py": "c9285cd4f057a15b0ab207bca8b3de6b904dc02aa94626ec3f17ad6165401646",
+    "routes.py": "627de0618ecba71655a107a6fb6b1c8776f8a1f6983fd778470405855e0e8969",
+    "test_offline.py": "a52e77dc64880660ff832bc1cb130a9cc0a085d6a72100c5fc757bdb1c77939f",
+    "validate_local.py": "a6be67418de33d609c1d92211605b2684c7cb6e223e3a93a33522c61d587ad5a",
+    "verify_provider_sources.py": "2fd2b83489ff561119f7dc8bf2ce9381b11f0210d74f8b26e0a0e8d1a0754944",
+    "wire.py": "8a668ab4af072ad2c24a0af5d0baca0a22f0e8946fa40f57ad92330894fac87f"
+  },
+  "provider_source_identity": {
+    "published_commit": "73713f6e9ed9c95251cc69ec88ef816cab771ac0",
+    "providers": [
+      {
+        "role": "provider_a",
+        "sha256": "79e4994c955ca842af04a8fd650a33d49de040bab95b821ded9e63e16866f2b6",
+        "bytes": 24705,
+        "historical_sha256": "79e4994c955ca842af04a8fd650a33d49de040bab95b821ded9e63e16866f2b6",
+        "published_url": "https://api.github.com/repos/sbw70/verification-constraints/contents/modules/multi-provider/MP005/provider_a/provider_a.py?ref=73713f6e9ed9c95251cc69ec88ef816cab771ac0",
+        "published_matches": true,
+        "host_in_binding": false,
+        "destination_header_ignored": true,
+        "request_headers_inspected": [
+          "Content-Length"
+        ],
+        "method_path_query_in_signed_binding": false
+      },
+      {
+        "role": "provider_b",
+        "sha256": "618ec76ef5dd3bfa3ba7b1ad3941ed0516a7511b72957d7efb82ec565905b605",
+        "bytes": 24969,
+        "historical_sha256": "618ec76ef5dd3bfa3ba7b1ad3941ed0516a7511b72957d7efb82ec565905b605",
+        "published_url": "https://api.github.com/repos/sbw70/verification-constraints/contents/modules/multi-provider/MP005/provider_b/provider_b.py?ref=73713f6e9ed9c95251cc69ec88ef816cab771ac0",
+        "published_matches": true,
+        "host_in_binding": false,
+        "destination_header_ignored": true,
+        "request_headers_inspected": [
+          "Content-Length"
+        ],
+        "method_path_query_in_signed_binding": false
+      }
+    ],
+    "support": [
+      {
+        "path": "providers/provider_a/mint_authorization_a.py",
+        "sha256": "1a485e8a5d3de854cb31303b8d3bf1339ef72cb9b42f308490bd02519e76d7ec",
+        "published_matches": true,
+        "published_url": "https://api.github.com/repos/sbw70/verification-constraints/contents/modules/multi-provider/MP005/provider_a/mint_authorization_a.py?ref=73713f6e9ed9c95251cc69ec88ef816cab771ac0"
+      },
+      {
+        "path": "providers/provider_b/mint_authorization_b.py",
+        "sha256": "1b3ba1314761a5489817c660cdc4d62e65ba77deae2bfce2fdce48c228f98deb",
+        "published_matches": true,
+        "published_url": "https://api.github.com/repos/sbw70/verification-constraints/contents/modules/multi-provider/MP005/provider_b/mint_authorization_b.py?ref=73713f6e9ed9c95251cc69ec88ef816cab771ac0"
+      },
+      {
+        "path": "provider_support/ledger_evidence.py",
+        "sha256": "3f5e27dac5a8e1ae88974effb4b3e82c626ba8345ea6524e6d2c33edd8e39637",
+        "published_matches": true,
+        "published_url": "https://api.github.com/repos/sbw70/verification-constraints/contents/modules/multi-provider/MP005/harness/ledger_evidence.py?ref=73713f6e9ed9c95251cc69ec88ef816cab771ac0"
+      }
+    ],
+    "status": "PASS"
+  },
+  "pending": [
+    "STOP 1 approval",
+    "Authorized host/Python/process/listener/autostart inventory",
+    "Provider-host key generation and sanctioned new state",
+    "Live endpoint configuration and new hashes",
+    "Observer trust, independent ingress capture and signed-denial freshness gates",
+    "Authorized rehearsal latency measurement; STOP at approach to 8 seconds",
+    "STOP 2 immediately before scored Hub A termination"
+  ],
+  "initial_validation_attempt": "Windows sandbox denied OS temp-file writes; rerun with explicit execution approval passed before final recorded run"
+}

@@ -1,0 +1,54 @@
+{
+  "published_commit": "73713f6e9ed9c95251cc69ec88ef816cab771ac0",
+  "providers": [
+    {
+      "role": "provider_a",
+      "sha256": "79e4994c955ca842af04a8fd650a33d49de040bab95b821ded9e63e16866f2b6",
+      "bytes": 24705,
+      "historical_sha256": "79e4994c955ca842af04a8fd650a33d49de040bab95b821ded9e63e16866f2b6",
+      "published_url": "https://api.github.com/repos/sbw70/verification-constraints/contents/modules/multi-provider/MP005/provider_a/provider_a.py?ref=73713f6e9ed9c95251cc69ec88ef816cab771ac0",
+      "published_matches": true,
+      "host_in_binding": false,
+      "destination_header_ignored": true,
+      "request_headers_inspected": [
+        "Content-Length"
+      ],
+      "method_path_query_in_signed_binding": false
+    },
+    {
+      "role": "provider_b",
+      "sha256": "618ec76ef5dd3bfa3ba7b1ad3941ed0516a7511b72957d7efb82ec565905b605",
+      "bytes": 24969,
+      "historical_sha256": "618ec76ef5dd3bfa3ba7b1ad3941ed0516a7511b72957d7efb82ec565905b605",
+      "published_url": "https://api.github.com/repos/sbw70/verification-constraints/contents/modules/multi-provider/MP005/provider_b/provider_b.py?ref=73713f6e9ed9c95251cc69ec88ef816cab771ac0",
+      "published_matches": true,
+      "host_in_binding": false,
+      "destination_header_ignored": true,
+      "request_headers_inspected": [
+        "Content-Length"
+      ],
+      "method_path_query_in_signed_binding": false
+    }
+  ],
+  "support": [
+    {
+      "path": "providers/provider_a/mint_authorization_a.py",
+      "sha256": "1a485e8a5d3de854cb31303b8d3bf1339ef72cb9b42f308490bd02519e76d7ec",
+      "published_matches": true,
+      "published_url": "https://api.github.com/repos/sbw70/verification-constraints/contents/modules/multi-provider/MP005/provider_a/mint_authorization_a.py?ref=73713f6e9ed9c95251cc69ec88ef816cab771ac0"
+    },
+    {
+      "path": "providers/provider_b/mint_authorization_b.py",
+      "sha256": "1b3ba1314761a5489817c660cdc4d62e65ba77deae2bfce2fdce48c228f98deb",
+      "published_matches": true,
+      "published_url": "https://api.github.com/repos/sbw70/verification-constraints/contents/modules/multi-provider/MP005/provider_b/mint_authorization_b.py?ref=73713f6e9ed9c95251cc69ec88ef816cab771ac0"
+    },
+    {
+      "path": "provider_support/ledger_evidence.py",
+      "sha256": "3f5e27dac5a8e1ae88974effb4b3e82c626ba8345ea6524e6d2c33edd8e39637",
+      "published_matches": true,
+      "published_url": "https://api.github.com/repos/sbw70/verification-constraints/contents/modules/multi-provider/MP005/harness/ledger_evidence.py?ref=73713f6e9ed9c95251cc69ec88ef816cab771ac0"
+    }
+  ],
+  "status": "PASS"
+}

@@ -1,0 +1,14 @@
+{
+    "status":  "APPROVED_PROVIDER_HOST_KEYS",
+    "providers":  {
+                      "PROVIDER_B":  {
+                                         "boundary_key_id":  "sha256:9ab1cd6d33fea596624f7d2a0e93442746bee9c97ad237d338c23b4385ebb445",
+                                         "issuance_key_id":  "sha256:44a1f266d623faa86487cdc85244f7c95bb8fdb18aa1537e27a17a85fc704022"
+                                     },
+                      "PROVIDER_A":  {
+                                         "boundary_key_id":  "sha256:43938d000689ef68e298d69c19dd2b5879efc7daf27e6af8bd099f577c91c789",
+                                         "issuance_key_id":  "sha256:f80897de6f5693caedf5a63e9da63cfd683b3c9c6a42bbf6d40defed35ab1664"
+                                     }
+                  },
+    "session":  "MH001_R43_RUN001"
+}

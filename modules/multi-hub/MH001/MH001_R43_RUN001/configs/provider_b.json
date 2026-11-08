@@ -1,0 +1,9 @@
+{
+  "project": "MULTI_HUB_001",
+  "session": "MH001_R43_RUN001",
+  "role": "provider_b",
+  "provider_id": "PROVIDER_B",
+  "run_root": "/home/seth/MULTI_HUB_001/MH001_R43_RUN001",
+  "listen": {"host": "192.168.1.107", "port": 18091},
+  "observer_url": "http://192.168.1.102:9191/boundary"
+}

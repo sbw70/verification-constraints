@@ -1,0 +1,34 @@
+test_body_limit_zero_and_full_64k (test_offline.Offline.test_body_limit_zero_and_full_64k) ... ok
+test_destination_header_name_case_insensitive (test_offline.Offline.test_destination_header_name_case_insensitive) ... ok
+test_destination_rejections (test_offline.Offline.test_destination_rejections) ... ok
+test_direct_and_chained_opaque_bytes_and_headers (test_offline.Offline.test_direct_and_chained_opaque_bytes_and_headers) ... ok
+test_hub_b_transport_error_preserved_through_hub_a (test_offline.Offline.test_hub_b_transport_error_preserved_through_hub_a) ... ok
+test_hub_has_no_authority_or_execution_processing (test_offline.Offline.test_hub_has_no_authority_or_execution_processing) ... ok
+test_identical_body_sequences_and_hashes_no_secrets (test_offline.Offline.test_identical_body_sequences_and_hashes_no_secrets) ... ok
+test_methods_queries_versions_and_head (test_offline.Offline.test_methods_queries_versions_and_head) ... ok
+test_provider_204_without_length (test_offline.Offline.test_provider_204_without_length) ... ok
+test_real_downstream_read_timeout_no_retry (test_offline.Offline.test_real_downstream_read_timeout_no_retry) ... ok
+test_request_framing_rejections (test_offline.Offline.test_request_framing_rejections) ... ok
+test_requester_constructs_only_outer_binding_from_issued_bytes (test_offline.Offline.test_requester_constructs_only_outer_binding_from_issued_bytes) ... ok
+test_response_status_reason_headers_and_body (test_offline.Offline.test_response_status_reason_headers_and_body) ... ok
+test_static_config_duplicate_keys_reverse_routes_and_loops (test_offline.Offline.test_static_config_duplicate_keys_reverse_routes_and_loops) ... ok
+test_timeout_classification_fixed_values (test_offline.Offline.test_timeout_classification_fixed_values) ... ok
+test_two_separate_hub_processes (test_offline.Offline.test_two_separate_hub_processes) ... ok
+test_unreachable_no_retry (test_offline.Offline.test_unreachable_no_retry) ... ok
+test_unsupported_response_framing_and_no_retry (test_offline.Offline.test_unsupported_response_framing_and_no_retry) ... ok
+test_approved_mock_transmits_exact_request_once (test_requester.RequesterAllowlist.test_approved_mock_transmits_exact_request_once) ... ok
+test_cli_denies_remote_without_config_or_with_empty_config (test_requester.RequesterAllowlist.test_cli_denies_remote_without_config_or_with_empty_config) ... ok
+test_cli_optional_approved_config_and_unchanged_bytes (test_requester.RequesterAllowlist.test_cli_optional_approved_config_and_unchanged_bytes) ... ok
+test_connect_send_and_response_failures_never_retry (test_requester.RequesterAllowlist.test_connect_send_and_response_failures_never_retry) ... ok
+test_exact_approved_ip_port_passes_validation (test_requester.RequesterAllowlist.test_exact_approved_ip_port_passes_validation) ... ok
+test_invalid_configuration_fails_closed (test_requester.RequesterAllowlist.test_invalid_configuration_fails_closed) ... ok
+test_literal_addresses_and_valid_ports_only (test_requester.RequesterAllowlist.test_literal_addresses_and_valid_ports_only) ... ok
+test_loopback_continues_without_configuration (test_requester.RequesterAllowlist.test_loopback_continues_without_configuration) ... ok
+test_remote_denied_by_default_before_io (test_requester.RequesterAllowlist.test_remote_denied_by_default_before_io) ... ok
+test_shipped_configuration_is_empty (test_requester.RequesterAllowlist.test_shipped_configuration_is_empty) ... ok
+test_unapproved_ip_and_changed_port_rejected (test_requester.RequesterAllowlist.test_unapproved_ip_and_changed_port_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 29 tests in 12.339s
+
+OK

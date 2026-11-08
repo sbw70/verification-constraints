@@ -1,0 +1,375 @@
+test_body_limit_zero_and_full_64k (test_offline.Offline.test_body_limit_zero_and_full_64k) ... ERROR
+test_destination_header_name_case_insensitive (test_offline.Offline.test_destination_header_name_case_insensitive) ... ERROR
+test_destination_rejections (test_offline.Offline.test_destination_rejections) ... ERROR
+test_direct_and_chained_opaque_bytes_and_headers (test_offline.Offline.test_direct_and_chained_opaque_bytes_and_headers) ... 
+  test_direct_and_chained_opaque_bytes_and_headers (test_offline.Offline.test_direct_and_chained_opaque_bytes_and_headers) (destination=b'PROVIDER_A') ... ERROR
+  test_direct_and_chained_opaque_bytes_and_headers (test_offline.Offline.test_direct_and_chained_opaque_bytes_and_headers) (destination=b'PROVIDER_B') ... ERROR
+test_direct_and_chained_opaque_bytes_and_headers (test_offline.Offline.test_direct_and_chained_opaque_bytes_and_headers) ... FAIL
+test_hub_b_transport_error_preserved_through_hub_a (test_offline.Offline.test_hub_b_transport_error_preserved_through_hub_a) ... ERROR
+test_hub_has_no_authority_or_execution_processing (test_offline.Offline.test_hub_has_no_authority_or_execution_processing) ... ERROR
+test_identical_body_sequences_and_hashes_no_secrets (test_offline.Offline.test_identical_body_sequences_and_hashes_no_secrets) ... ERROR
+test_methods_queries_versions_and_head (test_offline.Offline.test_methods_queries_versions_and_head) ... ERROR
+test_provider_204_without_length (test_offline.Offline.test_provider_204_without_length) ... ERROR
+test_real_downstream_read_timeout_no_retry (test_offline.Offline.test_real_downstream_read_timeout_no_retry) ... ERROR
+test_request_framing_rejections (test_offline.Offline.test_request_framing_rejections) ... ERROR
+test_requester_constructs_only_outer_binding_from_issued_bytes (test_offline.Offline.test_requester_constructs_only_outer_binding_from_issued_bytes) ... ERROR
+test_response_status_reason_headers_and_body (test_offline.Offline.test_response_status_reason_headers_and_body) ... ERROR
+test_static_config_duplicate_keys_reverse_routes_and_loops (test_offline.Offline.test_static_config_duplicate_keys_reverse_routes_and_loops) ... ok
+test_timeout_classification_fixed_values (test_offline.Offline.test_timeout_classification_fixed_values) ... ERROR
+test_two_separate_hub_processes (test_offline.Offline.test_two_separate_hub_processes) ... ERROR
+test_unreachable_no_retry (test_offline.Offline.test_unreachable_no_retry) ... ERROR
+test_unsupported_response_framing_and_no_retry (test_offline.Offline.test_unsupported_response_framing_and_no_retry) ... ERROR
+test_approved_mock_transmits_exact_request_once (test_requester.RequesterAllowlist.test_approved_mock_transmits_exact_request_once) ... ok
+test_cli_denies_remote_without_config_or_with_empty_config (test_requester.RequesterAllowlist.test_cli_denies_remote_without_config_or_with_empty_config) ... ok
+test_cli_optional_approved_config_and_unchanged_bytes (test_requester.RequesterAllowlist.test_cli_optional_approved_config_and_unchanged_bytes) ... ok
+test_connect_send_and_response_failures_never_retry (test_requester.RequesterAllowlist.test_connect_send_and_response_failures_never_retry) ... ok
+test_exact_approved_ip_port_passes_validation (test_requester.RequesterAllowlist.test_exact_approved_ip_port_passes_validation) ... ok
+test_invalid_configuration_fails_closed (test_requester.RequesterAllowlist.test_invalid_configuration_fails_closed) ... ok
+test_literal_addresses_and_valid_ports_only (test_requester.RequesterAllowlist.test_literal_addresses_and_valid_ports_only) ... ok
+test_loopback_continues_without_configuration (test_requester.RequesterAllowlist.test_loopback_continues_without_configuration) ... ok
+test_remote_denied_by_default_before_io (test_requester.RequesterAllowlist.test_remote_denied_by_default_before_io) ... ok
+test_shipped_configuration_is_empty (test_requester.RequesterAllowlist.test_shipped_configuration_is_empty) ... ok
+test_unapproved_ip_and_changed_port_rejected (test_requester.RequesterAllowlist.test_unapproved_ip_and_changed_port_rejected) ... ok
+
+======================================================================
+ERROR: test_body_limit_zero_and_full_64k (test_offline.Offline.test_body_limit_zero_and_full_64k)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 220, in test_body_limit_zero_and_full_64k
+    self.send(self.packet(body=body))
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 127, in send
+    with loopback_connect(address(server or self.a), 25) as sock:
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 32, in loopback_connect
+    return REAL_CONNECT(address, timeout)
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\wire.py", line 113, in connect
+    sock.connect((address["host"], address["port"]))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions
+
+======================================================================
+ERROR: test_destination_header_name_case_insensitive (test_offline.Offline.test_destination_header_name_case_insensitive)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 193, in test_destination_header_name_case_insensitive
+    self.send(self.packet().replace(b"X-MH-Destination", b"x-mH-deSTination"))
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 127, in send
+    with loopback_connect(address(server or self.a), 25) as sock:
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 32, in loopback_connect
+    return REAL_CONNECT(address, timeout)
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\wire.py", line 113, in connect
+    sock.connect((address["host"], address["port"]))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions
+
+======================================================================
+ERROR: test_destination_rejections (test_offline.Offline.test_destination_rejections)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 197, in test_destination_rejections
+    self.error(self.packet().replace(b"X-MH-Destination: PROVIDER_A\r\n", b""))
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 140, in error
+    response = self.send(packet, server)
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 127, in send
+    with loopback_connect(address(server or self.a), 25) as sock:
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 32, in loopback_connect
+    return REAL_CONNECT(address, timeout)
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\wire.py", line 113, in connect
+    sock.connect((address["host"], address["port"]))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions
+
+======================================================================
+ERROR: test_direct_and_chained_opaque_bytes_and_headers (test_offline.Offline.test_direct_and_chained_opaque_bytes_and_headers) (destination=b'PROVIDER_A')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 156, in test_direct_and_chained_opaque_bytes_and_headers
+    response = self.send(packet)
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 127, in send
+    with loopback_connect(address(server or self.a), 25) as sock:
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 32, in loopback_connect
+    return REAL_CONNECT(address, timeout)
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\wire.py", line 113, in connect
+    sock.connect((address["host"], address["port"]))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions
+
+======================================================================
+ERROR: test_direct_and_chained_opaque_bytes_and_headers (test_offline.Offline.test_direct_and_chained_opaque_bytes_and_headers) (destination=b'PROVIDER_B')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 156, in test_direct_and_chained_opaque_bytes_and_headers
+    response = self.send(packet)
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 127, in send
+    with loopback_connect(address(server or self.a), 25) as sock:
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 32, in loopback_connect
+    return REAL_CONNECT(address, timeout)
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\wire.py", line 113, in connect
+    sock.connect((address["host"], address["port"]))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions
+
+======================================================================
+ERROR: test_hub_b_transport_error_preserved_through_hub_a (test_offline.Offline.test_hub_b_transport_error_preserved_through_hub_a)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 287, in test_hub_b_transport_error_preserved_through_hub_a
+    response = self.send(self.packet(b"PROVIDER_B"))
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 127, in send
+    with loopback_connect(address(server or self.a), 25) as sock:
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 32, in loopback_connect
+    return REAL_CONNECT(address, timeout)
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\wire.py", line 113, in connect
+    sock.connect((address["host"], address["port"]))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions
+
+======================================================================
+ERROR: test_hub_has_no_authority_or_execution_processing (test_offline.Offline.test_hub_has_no_authority_or_execution_processing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 363, in test_hub_has_no_authority_or_execution_processing
+    self.send(self.packet(body=b"not even JSON", extra=b"Authorization: garbage.invalid.signature\r\n"))
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 127, in send
+    with loopback_connect(address(server or self.a), 25) as sock:
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 32, in loopback_connect
+    return REAL_CONNECT(address, timeout)
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\wire.py", line 113, in connect
+    sock.connect((address["host"], address["port"]))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions
+
+======================================================================
+ERROR: test_identical_body_sequences_and_hashes_no_secrets (test_offline.Offline.test_identical_body_sequences_and_hashes_no_secrets)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 175, in test_identical_body_sequences_and_hashes_no_secrets
+    self.send(packet)
+    ~~~~~~~~~^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 127, in send
+    with loopback_connect(address(server or self.a), 25) as sock:
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 32, in loopback_connect
+    return REAL_CONNECT(address, timeout)
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\wire.py", line 113, in connect
+    sock.connect((address["host"], address["port"]))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions
+
+======================================================================
+ERROR: test_methods_queries_versions_and_head (test_offline.Offline.test_methods_queries_versions_and_head)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 225, in test_methods_queries_versions_and_head
+    self.send(self.packet(method=method, version=b"1.0"))
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 127, in send
+    with loopback_connect(address(server or self.a), 25) as sock:
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 32, in loopback_connect
+    return REAL_CONNECT(address, timeout)
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\wire.py", line 113, in connect
+    sock.connect((address["host"], address["port"]))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions
+
+======================================================================
+ERROR: test_provider_204_without_length (test_offline.Offline.test_provider_204_without_length)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 247, in test_provider_204_without_length
+    self.assertEqual(self.send(self.packet()), self.pa.reply.replace(b"HTTP/1.0", b"HTTP/1.1"))
+                     ~~~~~~~~~^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 127, in send
+    with loopback_connect(address(server or self.a), 25) as sock:
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 32, in loopback_connect
+    return REAL_CONNECT(address, timeout)
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\wire.py", line 113, in connect
+    sock.connect((address["host"], address["port"]))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions
+
+======================================================================
+ERROR: test_real_downstream_read_timeout_no_retry (test_offline.Offline.test_real_downstream_read_timeout_no_retry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 307, in test_real_downstream_read_timeout_no_retry
+    reply = self.send(self.packet(), self.b)
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 127, in send
+    with loopback_connect(address(server or self.a), 25) as sock:
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 32, in loopback_connect
+    return REAL_CONNECT(address, timeout)
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\wire.py", line 113, in connect
+    sock.connect((address["host"], address["port"]))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions
+
+======================================================================
+ERROR: test_request_framing_rejections (test_offline.Offline.test_request_framing_rejections)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 207, in test_request_framing_rejections
+    self.error(packet.replace(b"Content-Length: 1\r\n", b""), 411)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 140, in error
+    response = self.send(packet, server)
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 127, in send
+    with loopback_connect(address(server or self.a), 25) as sock:
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 32, in loopback_connect
+    return REAL_CONNECT(address, timeout)
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\wire.py", line 113, in connect
+    sock.connect((address["host"], address["port"]))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions
+
+======================================================================
+ERROR: test_requester_constructs_only_outer_binding_from_issued_bytes (test_offline.Offline.test_requester_constructs_only_outer_binding_from_issued_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 344, in test_requester_constructs_only_outer_binding_from_issued_bytes
+    reply = requester.submit(packet, address(self.a), self.root / "receipt.jsonl")
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\requester.py", line 94, in submit
+    with wire.connect(endpoint, 20) as sock:
+         ~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\holiw\AppData\Local\Programs\Python\Python314\Lib\unittest\mock.py", line 1175, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\AppData\Local\Programs\Python\Python314\Lib\unittest\mock.py", line 1179, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\AppData\Local\Programs\Python\Python314\Lib\unittest\mock.py", line 1240, in _execute_mock_call
+    result = effect(*args, **kwargs)
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 32, in loopback_connect
+    return REAL_CONNECT(address, timeout)
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\wire.py", line 113, in connect
+    sock.connect((address["host"], address["port"]))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions
+
+======================================================================
+ERROR: test_response_status_reason_headers_and_body (test_offline.Offline.test_response_status_reason_headers_and_body)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 237, in test_response_status_reason_headers_and_body
+    result = self.send(self.packet())
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 127, in send
+    with loopback_connect(address(server or self.a), 25) as sock:
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 32, in loopback_connect
+    return REAL_CONNECT(address, timeout)
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\wire.py", line 113, in connect
+    sock.connect((address["host"], address["port"]))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions
+
+======================================================================
+ERROR: test_timeout_classification_fixed_values (test_offline.Offline.test_timeout_classification_fixed_values)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 277, in test_timeout_classification_fixed_values
+    self.error(self.packet(), 504, "downstream_timeout", server)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 140, in error
+    response = self.send(packet, server)
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 127, in send
+    with loopback_connect(address(server or self.a), 25) as sock:
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 32, in loopback_connect
+    return REAL_CONNECT(address, timeout)
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\wire.py", line 113, in connect
+    sock.connect((address["host"], address["port"]))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions
+
+======================================================================
+ERROR: test_two_separate_hub_processes (test_offline.Offline.test_two_separate_hub_processes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 383, in test_two_separate_hub_processes
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                               creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+  File "C:\Users\holiw\AppData\Local\Programs\Python\Python314\Lib\subprocess.py", line 1038, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\AppData\Local\Programs\Python\Python314\Lib\subprocess.py", line 1548, in _execute_child
+    sys.audit("subprocess.Popen", executable, args, cwd, env)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\validate_review.py", line 27, in guard
+    raise RuntimeError('OFFLINE_GUARD_BLOCKED_EXTERNAL_COMMAND')
+RuntimeError: OFFLINE_GUARD_BLOCKED_EXTERNAL_COMMAND
+
+======================================================================
+ERROR: test_unreachable_no_retry (test_offline.Offline.test_unreachable_no_retry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 270, in test_unreachable_no_retry
+    self.error(self.packet(), 502, "downstream_unreachable_or_io")
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 140, in error
+    response = self.send(packet, server)
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 127, in send
+    with loopback_connect(address(server or self.a), 25) as sock:
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 32, in loopback_connect
+    return REAL_CONNECT(address, timeout)
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\wire.py", line 113, in connect
+    sock.connect((address["host"], address["port"]))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions
+
+======================================================================
+ERROR: test_unsupported_response_framing_and_no_retry (test_offline.Offline.test_unsupported_response_framing_and_no_retry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 261, in test_unsupported_response_framing_and_no_retry
+    response = self.send(self.packet())
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 127, in send
+    with loopback_connect(address(server or self.a), 25) as sock:
+         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 32, in loopback_connect
+    return REAL_CONNECT(address, timeout)
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\wire.py", line 113, in connect
+    sock.connect((address["host"], address["port"]))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [WinError 10013] An attempt was made to access a socket in a way forbidden by its access permissions
+
+======================================================================
+FAIL: test_direct_and_chained_opaque_bytes_and_headers (test_offline.Offline.test_direct_and_chained_opaque_bytes_and_headers)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MH001_DEPLOYMENT_REVIEW_R43\frozen_R43\test_offline.py", line 166, in test_direct_and_chained_opaque_bytes_and_headers
+    self.assertEqual((len(self.pa.deliveries), len(self.pb.deliveries)), (1, 1))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (0, 0) != (1, 1)
+
+First differing element 0:
+0
+1
+
+- (0, 0)
++ (1, 1)
+
+----------------------------------------------------------------------
+Ran 29 tests in 1.569s
+
+FAILED (failures=1, errors=18)

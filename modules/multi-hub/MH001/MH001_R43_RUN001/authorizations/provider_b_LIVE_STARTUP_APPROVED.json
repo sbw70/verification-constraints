@@ -1,0 +1,20 @@
+{
+    "authorized":  true,
+    "session":  "MH001_R43_RUN001",
+    "trust_sha256":  "d9c304ff67316c7f91b6be5225519cdd7f899a18c972edb4bf2e2fe052a14b86",
+    "phase":  "LIVE_STARTUP",
+    "source_sha256":  {
+                          "frozen_R43/requester.py":  "d65db8ab4ec484be398954a315fe2da6157cc5428289c1a3abbed922080e5190",
+                          "provider_launcher.py":  "828618174dbded03296c4ac4ad502e0d29a7ff2ef5382a8c639b17d25f5e546c",
+                          "frozen_R43/hub.py":  "37bd590d23d2daf3bf8b9713139a27b09333252f62d87c94fa2a3e1477a043a2",
+                          "observer_launcher.py":  "aa55f49fee2a2053d7ddfdcab2c5ebc7af076cb7b842d273460814e66266c128",
+                          "deployment.py":  "1e057b86db0330ab23a2e6ec92141943c375f00c9ee048ddd9910191b775574f",
+                          "frozen_R43/wire.py":  "8a668ab4af072ad2c24a0af5d0baca0a22f0e8946fa40f57ad92330894fac87f",
+                          "frozen_R43/provider_support/ledger_evidence.py":  "3f5e27dac5a8e1ae88974effb4b3e82c626ba8345ea6524e6d2c33edd8e39637",
+                          "observer.py":  "eadf9bd1d303e7810aca68956700726d775c94c66092076a96b78532cae50c80",
+                          "observer_support/association_recorder.py":  "fad60dfc8df53337d2e41288c2c4973442258cae4240945ebbd0aa8920550bfc",
+                          "observer_support/common.py":  "6dd965501e8266bf7315570b9101b1da0b68e9cd6c7a65072170eaba01bd164c",
+                          "frozen_R43/routes.py":  "627de0618ecba71655a107a6fb6b1c8776f8a1f6983fd778470405855e0e8969"
+                      },
+    "config_sha256":  "661754ab55105b4fa154b77b8cc16a5da52809269140d185115fab00888ebfcf"
+}

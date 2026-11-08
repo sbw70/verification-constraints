@@ -1,0 +1,6 @@
+{
+  "providers": {
+    "PROVIDER_A": {"key_id": null, "public_key_file": "trust/provider_a_public.pem"},
+    "PROVIDER_B": {"key_id": null, "public_key_file": "trust/provider_b_public.pem"}
+  }
+}

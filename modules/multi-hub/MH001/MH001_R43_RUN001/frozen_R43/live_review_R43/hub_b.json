@@ -1,0 +1,24 @@
+{
+    "hub_id":  "HUB_B",
+    "listen":  {
+                   "host":  "192.168.1.106",
+                   "port":  18081
+               },
+    "timeout_seconds":  10,
+    "routes":  {
+                   "PROVIDER_A":  {
+                                      "next_hop":  "PROVIDER_A",
+                                      "endpoint":  {
+                                                       "host":  "192.168.1.118",
+                                                       "port":  18090
+                                                   }
+                                  },
+                   "PROVIDER_B":  {
+                                      "next_hop":  "PROVIDER_B",
+                                      "endpoint":  {
+                                                       "host":  "192.168.1.107",
+                                                       "port":  18091
+                                                   }
+                                  }
+               }
+}

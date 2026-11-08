@@ -1,0 +1,12 @@
+{
+    "providers":  {
+                      "PROVIDER_B":  {
+                                         "key_id":  "sha256:9ab1cd6d33fea596624f7d2a0e93442746bee9c97ad237d338c23b4385ebb445",
+                                         "public_key_file":  "trust/provider_b_public.pem"
+                                     },
+                      "PROVIDER_A":  {
+                                         "key_id":  "sha256:43938d000689ef68e298d69c19dd2b5879efc7daf27e6af8bd099f577c91c789",
+                                         "public_key_file":  "trust/provider_a_public.pem"
+                                     }
+                  }
+}

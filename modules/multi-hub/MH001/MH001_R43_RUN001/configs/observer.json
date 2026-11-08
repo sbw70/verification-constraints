@@ -1,0 +1,6 @@
+{
+  "project": "MULTI_HUB_001",
+  "session": "MH001_R43_RUN001",
+  "run_root": "C:/Users/holiw/esp32-main/MULTI_HUB_001/MH001_R43_RUN001",
+  "listen": {"host": "192.168.1.102", "port": 9191}
+}

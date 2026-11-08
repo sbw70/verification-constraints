@@ -1,0 +1,8 @@
+{
+  "authorized": false,
+  "phase": "LIVE_STARTUP",
+  "session": "MH001_R43_RUN001",
+  "config_sha256": null,
+  "trust_sha256": null,
+  "source_sha256": {}
+}

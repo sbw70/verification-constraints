@@ -1,0 +1,54 @@
+{
+  "status": "LOCAL_BUILD_VALIDATED_NOT_DEPLOYED",
+  "revision": "MH001_REQUESTER_APPROVED_HUBS_LOCAL_ONLY",
+  "started_utc": "2026-11-04T16:26:56.412060+00:00",
+  "completed_utc": "2026-11-04T16:27:08.756021+00:00",
+  "python": "3.14.3",
+  "tests_run": 29,
+  "existing_offline_tests": 18,
+  "new_requester_tests": 11,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "execution_environment": "Explicitly approved outside read-only/network-restricted sandbox",
+  "connections": "Original suite: sequential loopback mocks only; new remote endpoint checks: mocked connector only, RFC5737 documentation addresses",
+  "lab_hosts_contacted": false,
+  "deployed": false,
+  "provider_keys_generated": false,
+  "scored_transactions_executed": false,
+  "approved_hubs_shipped": [],
+  "requester_default": "Loopback only; remote requires exact approved literal IP/port pair",
+  "modified_existing_files": [
+    "OPERATOR_GATES.md",
+    "README.md",
+    "requester.py",
+    "SOURCE_REVIEW.md",
+    "validation/README.md"
+  ],
+  "unchanged_hubs_providers_and_prior_validation": true,
+  "previous_manifest_sha256": "c7e367c91b4c5b851cdd5bf8f0331476b5328ce8c6e8ad77c26cd79af1bcaecc",
+  "previous_validation_path": "validation/final/LOCAL_VALIDATION.json",
+  "previous_validation_sha256": "ba4b2543ef6694542829f38b6e5a2c0f5b768711f2d6697b4bc3647fe5590059",
+  "source_sha256": {
+    "hub.py": "37bd590d23d2daf3bf8b9713139a27b09333252f62d87c94fa2a3e1477a043a2",
+    "requester.py": "d65db8ab4ec484be398954a315fe2da6157cc5428289c1a3abbed922080e5190",
+    "routes.py": "627de0618ecba71655a107a6fb6b1c8776f8a1f6983fd778470405855e0e8969",
+    "test_offline.py": "a52e77dc64880660ff832bc1cb130a9cc0a085d6a72100c5fc757bdb1c77939f",
+    "test_requester.py": "3fa9ebec99d50b9a1398f7c5e27d69e914a651f077e2f8016e5c4c1f66c3a0a0",
+    "validate_local.py": "a6be67418de33d609c1d92211605b2684c7cb6e223e3a93a33522c61d587ad5a",
+    "verify_provider_sources.py": "2fd2b83489ff561119f7dc8bf2ce9381b11f0210d74f8b26e0a0e8d1a0754944",
+    "wire.py": "8a668ab4af072ad2c24a0af5d0baca0a22f0e8946fa40f57ad92330894fac87f"
+  },
+  "configuration_sha256": {
+    "approved_hubs.json": "cadadb6db873ae2ce9074662e94d8e66e06788cb65c1ed7d7209aaa6ac7211b1",
+    "hub_a.json": "68e6d6630af220f1743fa04827c9ba37ba87af126b5d0fec0216a69cf1af3788",
+    "hub_b.json": "a066f9c0b5182423bd4707a5c8f02bfed4424e23a52ecb370b954a928bb2dff2"
+  },
+  "remaining_prerequisites": [
+    "Authorized read-only live address/process/service/Python inventory",
+    "Verify actual Pi/Pavilion IP/port pairs before populating requester allowlist",
+    "Hash and review populated allowlist and live hub configurations before STOP 1",
+    "Provider-controlled keys/state, observer trust and independent ingress capture",
+    "Authorized rehearsal latency measurement; STOP 2 before scored Hub A termination"
+  ]
+}

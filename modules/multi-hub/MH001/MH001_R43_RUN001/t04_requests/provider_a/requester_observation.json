@@ -1,0 +1,9 @@
+{
+  "destination": "PROVIDER_A",
+  "body_sha256": "c6591697c79a356b8ccf9ccb16da2dca2f379789ecfbf53fa6fbc3a1de605f39",
+  "packet_sha256": "d28618c574cc1867aa8cf5d696fcfb97908b6dcda709857d6679bdc7291d1139",
+  "operation_sha256": "c65f9a3bfbcdfc3046f8b5c9951da7da2d4a19803f9df15cca50614e2ceafeea",
+  "issued_package_sha256": "2da52f8aa6ce03d926138d4300b9f2addb0caab95f7e8c3285c87ba1ec7d4f39",
+  "binding": "25f846c28dec489b275579c26cad72ad77ea218409bbe0ff4e1e9f0dab9ad98f",
+  "signature_verified_by_adapter": false
+}
