@@ -2,200 +2,190 @@
 
 ## Overview
 
-The Stateless Intermediation Architecture for Multi-Hub Systems defines a coordination model for routing, dispatching, and relaying operation requests across multiple independent provider systems and multiple coordination hubs.
+The Stateless Intermediation Architecture for Multi-Hub Systems defines a coordination model in which requests can traverse multiple forwarding hubs without transferring execution authority to those hubs.
 
-Each coordination hub performs mechanical routing and forwarding based on routing configuration.  
-It does not execute provider logic, retain execution state, interpret provider-specific semantics, or determine execution outcomes.
+Each hub performs mechanical routing and forwarding according to its configuration.
 
-Execution authority resides exclusively within provider-controlled systems.
+The hub does not authorize requests, execute provider operations, or maintain authoritative provider consumption state.
 
-This repository provides a minimal executable reference implementation in Python.
+Execution authority remains exclusively within provider-controlled systems.
 
-The architectural constraints are language-agnostic.
-
----
-
-## Design Goals
-
-The architecture is designed to:
-
-- Preserve exclusive execution authority within provider-controlled systems
-- Enable routing and fan-out across multiple independent providers
-- Support relay between multiple coordination hubs
-- Prevent migration of execution logic into coordination layers
-- Operate without retaining provider execution state
-- Allow routing configuration to be versioned and independently managed
-
----
-
-## Non-Goals
-
-The architecture does not:
-
-- Execute provider logic
-- Enforce authorization or policy decisions
-- Interpret provider-specific execution semantics
-- Retain provider execution state
-- Resolve conflicts between provider outcomes
-- Centralize outcome determination
-- Replace provider security controls
-- Protect against denial-of-service conditions
-
-The coordination hub constrains authority boundaries.  
-It does not standardize provider execution behavior.
-
----
+The architecture is language-agnostic. This module includes a Python reference implementation and separately documented experimental implementations.
 
 ## Architectural Model
 
-### Execution Flow
+Requests may pass through one or more coordination hubs before reaching a provider-controlled execution boundary.
 
-Requester → Coordination Hub A → Provider Systems  
-                             → Coordination Hub B  
-                             → Additional Coordination Hubs  
+```text id="k2aw27"
+Requester
+    |
+    v
+  Hub A
+    |
+    v
+  Hub B
+    |
+    v
+Provider-Controlled Boundary
+    |
+    v
+Provider Authorization / Execution
+```
 
-Provider Systems → Coordination Hub(s) (Outcome Relay)
+Multiple providers may receive related requests through different configured paths.
 
-1. A requester submits an operation request to a coordination hub.
-2. The coordination hub applies routing configuration mechanically.
-3. The request is forwarded to one or more provider systems.
-4. The request may be relayed to additional coordination hubs.
-5. Each provider independently evaluates the request.
-6. Each provider independently determines execution behavior.
-7. Providers may emit outcome signals.
-8. Coordination hubs relay outcome signals without interpreting them.
+Each provider independently evaluates its own authorization.
 
-No coordination hub determines authoritative execution results.
-
----
+A decision by one provider does not authorize another provider to execute.
 
 ## Authority Boundaries
 
-### Coordination Hub
+### Coordination Hubs
 
-- Receives operation requests
-- Applies routing configuration mechanically
-- Forwards requests to provider systems
-- May relay requests to other coordination hubs
-- May relay outcome signals
+A hub may:
 
-The coordination hub:
+- Receive and forward requests.
+- Apply mechanical routing configuration.
+- Relay requests to another hub.
+- Preserve opaque request artifacts.
+- Maintain transient transport information.
+- Relay provider-originated signals without making them authoritative.
 
-- Does not execute provider logic
-- Does not retain execution state
-- Does not evaluate authorization
-- Does not interpret provider-specific semantics
-- Does not determine execution success or failure
+A hub must not:
 
-### Provider-Controlled System
+- Issue provider authorization.
+- Evaluate provider-specific authorization policy.
+- Modify or regenerate provider-bound authority.
+- Restore previously consumed authority.
+- Execute provider operations.
+- Maintain authoritative provider execution state.
+- Substitute its own decision for a provider's decision.
 
-Each provider:
+### Provider-Controlled Systems
 
-- Independently evaluates received operation requests
-- Executes or declines operations using provider-defined logic
-- Generates provider-specific outcome signals
-- Maintains exclusive control over execution lifecycle
+Each provider retains responsibility for:
 
-Compromise of a coordination hub does not confer execution authority.
+- Authorization issuance and verification.
+- Policy evaluation.
+- Execution decisions.
+- Single-use or otherwise bounded authority enforcement.
+- Persistent consumption state where required.
+- Provider-originated execution and denial evidence.
 
----
+The provider's execution boundary remains authoritative regardless of which forwarding path delivered the request.
 
-## Routing Configuration
+## Stateless Coordination
 
-Routing configuration may specify:
+Coordination hubs may maintain transient information needed to forward requests.
 
-- Eligible provider systems
-- Fan-out behavior
-- Ordering or selection constraints
-- Relay targets (additional hubs)
-- Version identifiers
+That information must not become a source of provider execution authority.
 
-Routing configuration is applied mechanically.  
-It does not encode provider execution logic or authorization semantics.
+Routing position, transport visibility, and possession of an artifact do not independently confer permission to execute an operation.
 
-Routing configuration may be versioned and activated independently of request processing.
+A forwarding hub is not an authorization authority merely because requests pass through it.
 
----
+## Routing and Topology
 
-## Multi-Hub Topology
+The architecture supports mechanically configured forwarding arrangements, including:
 
-Multiple coordination hubs may operate independently within a distributed environment.
+- Direct forwarding to providers.
+- Forwarding through additional hubs.
+- Multiple independent provider destinations.
+- Separate forwarding entry points.
+- Independently managed routing configurations.
 
-A coordination hub may:
+Routing configuration determines where a request is forwarded.
 
-- Receive requests directly from requesters
-- Relay requests to peer coordination hubs
-- Relay outcome signals originating from provider systems
-- Operate across administrative domains
+It does not determine whether the provider must execute that request.
 
-Coordination hubs do not share execution state and do not operate under centralized control authority.
+A topology change must not create, enlarge, or restore provider-controlled authority.
 
----
+## Independent Evidence
 
-## Stateless Coordination Behavior
+Providers may emit signed execution or denial events.
 
-Coordination hubs maintain only minimal transient data necessary for routing and correlation.
+An independent observer may receive and verify those events without acquiring the authority to produce them.
 
-Such data:
+The distinction is fundamental:
 
-- Does not constitute execution state
-- Is not retained as provider execution history
-- Does not determine execution outcomes
+- Forwarding establishes transport.
+- Provider validation determines authorization.
+- Provider execution establishes the recorded software action.
+- Independent verification authenticates and correlates the preserved evidence.
 
-Execution authority remains exclusively provider-controlled.
+Observation does not confer authorization.
 
----
+A successful transport response must not automatically be interpreted as proof of provider execution.
 
-## Language-Agnostic Architecture
+## Reference Implementation
 
-The reference implementation is written in Python for portability and zero-dependency execution.
+**File:** [MH.py](MH.py)
 
-The architecture itself requires only:
+The original Python reference illustrates multi-hub coordination and provider-controlled execution roles in a single-process demonstration.
 
-- Receipt of an operation request
-- Mechanical routing configuration evaluation
-- Forwarding to one or more provider systems
-- Optional relay to peer coordination hubs
-- Relay of outcome signals without interpretation
+It includes example routing, provider handling, and outcome signaling.
 
-The design can be implemented in any programming language or deployment environment.
+The reference is intended for architectural examination, not production deployment.
 
----
+It does not represent every experimental implementation published in this module.
 
-## Running the Reference
+## Experimental Implementations
 
-```bash
-python3 MH.py
-```
---
+Reproducible experiments are maintained in separate, numbered directories.
+
+Each experiment defines its own:
+
+- Test objective and acceptance criteria.
+- Frozen implementation.
+- Laboratory configuration.
+- Test sequence.
+- Evidence requirements.
+- Recorded results.
+- Source and evidence provenance.
+- Limitations.
+
+Where applicable, experiment documentation includes:
+
+| Document | Purpose |
+|---|---|
+| `README.md` | Experiment design and reproduction |
+| `RESULTS.md` | Recorded outcomes and supporting evidence |
+| `PROVENANCE.md` | Source, configuration, and evidence integrity |
+
+Results and provenance belong to their respective experiments, not this module overview.
 
 ## Security Considerations
 
-This reference implementation:
+This architecture constrains the placement of execution authority. It does not replace cryptographic or operational security controls.
 
-- Does not authenticate requesters
-- Does not authorize operations
-- Does not validate provider trust relationships
-- Does not secure network transport
-- Does not prevent denial-of-service conditions
+The reference implementation does not provide comprehensive:
 
-Security controls are the responsibility of deployment environments and provider-controlled systems.
+- Production authentication.
+- Secure network transport.
+- Denial-of-service protection.
+- Host compromise protection.
+- Provider private-key compromise protection.
+- Deployment hardening.
 
----
+Security properties must be established by each implementation and its supporting evidence.
+
+An architectural constraint is not proof that every implementation satisfies it.
+
+## Development Constraints
+
+Assisted development and integration must preserve the separation between forwarding and provider authority.
+
+See [AI_ASSIST.md](AI_ASSIST.md) for module-specific development constraints.
+
+The central prohibition is against promoting routing, observation, or intermediary behavior into independent execution authority.
 
 ## Intended Scope
 
-This repository demonstrates architectural separation between:
+This module defines a structural approach to multi-hub forwarding in provider-controlled verification architectures.
 
-- Coordination
-- Routing
-- Relay
-- Provider execution
-- Outcome determination
+It permits coordination across multiple forwarding paths while preserving the provider's exclusive responsibility for authorization and execution.
 
-It is a structural reference, not a production coordination framework.
-
----
+**Hubs route. Providers decide. Observation does not authorize.**
 
 ## License
 
@@ -204,3 +194,5 @@ This module is not released under the Apache 2.0 license applied to the reposito
 Commercial licensing terms apply.
 
 Non-commercial research evaluation may be available upon request.
+
+Consult the applicable module licensing notices before reuse or modification.
