@@ -1,0 +1,2 @@
+python3	3.12.3-0ubuntu2.1
+python3-cryptography	41.0.7-4ubuntu0.1

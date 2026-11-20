@@ -1,0 +1,1 @@
+{"port": 63547, "role": "tamper", "pid": 9068, "process_instance": "d9487603939be55f7cb9051e47024508", "started_utc": "2026-11-12T02:59:27.592786+00:00"}

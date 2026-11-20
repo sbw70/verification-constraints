@@ -1,0 +1,14 @@
+{
+  "status": "DESIGN_ONLY_UNAPPROVED_DO_NOT_APPLY",
+  "address_conflict_check_complete": false,
+  "physical_interface_inventory_complete": false,
+  "domain_a": {"address": "10.77.10.10/24", "gateway": "10.77.10.1", "vlan": 10, "switch_port": 2},
+  "domain_b": {"address": "10.77.20.10/24", "gateway": "10.77.20.1", "vlan": 20, "switch_port": 4, "verify_port": 18443},
+  "relay": {"address": "10.77.30.10/24", "gateway": "10.77.30.1", "vlan": 30, "switch_port": 3, "listen_port": 18081},
+  "opnsense_trunk": {"switch_port": 1, "tagged_vlans": [10, 20, 30], "untagged_vlan": 1},
+  "management": {"vlan": 1, "switch_port": 5, "addressing": "retain inspected existing settings; unresolved"},
+  "unused_ports": [6, 7, 8],
+  "ipv6": "no MD001 transit allow rules; inspect and block alternative paths",
+  "relay_destination": "PROVIDER_B",
+  "artifact_transport": "HTTP/1.1 POST /verify, Content-Length, application/json; no TLS in isolated proposed lab"
+}

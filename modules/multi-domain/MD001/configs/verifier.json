@@ -1,0 +1,10 @@
+{
+  "role": "verifier",
+  "listen": {
+    "host": "127.0.0.1",
+    "port": 18444
+  },
+  "allowed_peer": "127.0.0.1",
+  "target": null,
+  "mode": "pass"
+}

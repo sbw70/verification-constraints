@@ -1,0 +1,1 @@
+{"headers":["Host: 127.0.0.1:62073","Accept-Encoding: identity","Content-Length: 332","Content-Type: application/json","X-MH-Destination: PROVIDER_B"],"ingress_sha256":"6c1d5ea1f688bd707dbb30bd3de7b4cf56092e5a2dd9060678f77efc30f655bd","method":"POST","mode":"pass","path":"/verify","peer":["127.0.0.1",62082],"utc":"2026-11-18T03:52:46.318154+00:00"}

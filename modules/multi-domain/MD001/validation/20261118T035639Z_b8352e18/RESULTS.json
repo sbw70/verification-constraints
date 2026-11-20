@@ -1,0 +1,32 @@
+{
+  "mode": "SYNTHETIC_REASSEMBLED_STREAM_UNIT_CHECKS",
+  "checks": [
+    {
+      "name": "valid_one_direction_body_exact",
+      "passed": true
+    },
+    {
+      "name": "truncated_rejected",
+      "passed": true
+    },
+    {
+      "name": "extra_request_rejected",
+      "passed": true
+    },
+    {
+      "name": "wrong_path_rejected",
+      "passed": true
+    },
+    {
+      "name": "wrong_destination_rejected",
+      "passed": true
+    },
+    {
+      "name": "chunked_rejected",
+      "passed": true
+    }
+  ],
+  "passed": 6,
+  "failed": 0,
+  "physical_capture_validated": false
+}

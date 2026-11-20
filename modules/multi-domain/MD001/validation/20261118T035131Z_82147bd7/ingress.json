@@ -1,0 +1,1 @@
+{"role": "ingress", "listen": {"host": "127.0.0.1", "port": 62053}, "target": {"host": "127.0.0.1", "port": 62052}, "mode": "pass", "allowed_peer": "127.0.0.1"}

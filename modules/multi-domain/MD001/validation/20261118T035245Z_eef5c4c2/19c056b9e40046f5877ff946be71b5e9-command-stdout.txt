@@ -1,0 +1,1 @@
+{"http_status": 200, "response": {"accepted": true, "artifact_sha256": "98ceaf5399a656a0913c9158e85aed93692749c6dbc2d6c4faa9e0cc8214379f", "pid": 23956, "process_instance": "0be91cc8306f4e7f9fdeac5f156d26a7", "reason": "accepted", "signature_checks": 1, "utc": "2026-11-18T03:52:46.792172+00:00"}}

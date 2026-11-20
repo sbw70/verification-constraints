@@ -1,0 +1,13 @@
+{
+  "role": "ingress",
+  "listen": {
+    "host": "40.40.40.40",
+    "port": 18443
+  },
+  "allowed_peer": "30.30.30.30",
+  "target": {
+    "host": "127.0.0.1",
+    "port": 18444
+  },
+  "mode": "pass"
+}

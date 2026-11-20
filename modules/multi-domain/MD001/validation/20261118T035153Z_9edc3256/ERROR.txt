@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MD001_DEPLOYMENT_R1\test_local.py", line 55, in main
+    run('produce-send','--key',out/'keys/TEST_ONLY_private.pem','--host','127.0.0.1','--port',rp,'--out',out/'B01')
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MD001_DEPLOYMENT_R1\test_local.py", line 30, in run
+    result.check_returncode()
+    ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\holiw\AppData\Local\Programs\Python\Python314\Lib\subprocess.py", line 508, in check_returncode
+    raise CalledProcessError(self.returncode, self.args, self.stdout,
+                             self.stderr)
+subprocess.CalledProcessError: Command '['C:\\Users\\holiw\\AppData\\Local\\Programs\\Python\\Python314\\python.exe', '-B', 'C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MD001_DEPLOYMENT_R1\\md001.py', 'produce-send', '--key', 'C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MD001_DEPLOYMENT_R1\\validation\\20261118T035153Z_9edc3256\\keys\\TEST_ONLY_private.pem', '--host', '127.0.0.1', '--port', '62064', '--out', 'C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MD001_DEPLOYMENT_R1\\validation\\20261118T035153Z_9edc3256\\B01']' returned non-zero exit status 1.

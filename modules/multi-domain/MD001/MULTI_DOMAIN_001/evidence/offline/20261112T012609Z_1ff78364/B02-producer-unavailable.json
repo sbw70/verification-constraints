@@ -1,0 +1,1 @@
+{"endpoint":{"pid":4432,"port":52554,"process_instance":"1ed03326ccb5db19b8c27c5773ec23c8","role":"producer","started_utc":"2026-11-12T01:26:09.636418+00:00"},"error":"timed out","physical_power_off_observed":false,"simulated":true,"terminated_process_returncode":1}

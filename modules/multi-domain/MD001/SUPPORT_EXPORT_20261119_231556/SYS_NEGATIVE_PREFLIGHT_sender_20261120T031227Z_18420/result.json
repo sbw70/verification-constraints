@@ -1,0 +1,1 @@
+{"http_status":422,"response":{"accepted":false,"artifact_sha256":"00f0d2507757a66c95c0c9e708852dc80e57222e36b4538369fae25503ae37d2","pid":96917,"process_instance":"d4382a4f00024506948faa196a6ccf2e","reason":"invalid_signature","signature_checks":1,"utc":"2026-11-20T03:12:23.732626+00:00"}}

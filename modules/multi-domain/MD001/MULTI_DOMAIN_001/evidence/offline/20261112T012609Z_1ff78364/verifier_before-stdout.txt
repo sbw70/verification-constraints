@@ -1,0 +1,1 @@
+{"port": 52555, "role": "verifier", "pid": 18004, "process_instance": "6d806c7d600f728ff9894445c9058bf9", "started_utc": "2026-11-12T01:26:09.793860+00:00"}

@@ -1,0 +1,12 @@
+{
+  "status": "SOURCE_API_COMPATIBLE_CANDIDATES_HOST_VALIDATION_PENDING",
+  "literal49_pin_satisfied_by_reported_hosts": false,
+  "desktop_probe_passed": 18,
+  "desktop_probe_failed": 0,
+  "python312_grammar_parse": true,
+  "powershell_syntax_parse": true,
+  "powershell_executed": false,
+  "physical_hosts_contacted": false,
+  "original_manifests_verified": true,
+  "application_bundle_sha256": "496e8ccde848599868aee923dff292f2ed9d1994bd06f7a95e8e6233a50987d5"
+}

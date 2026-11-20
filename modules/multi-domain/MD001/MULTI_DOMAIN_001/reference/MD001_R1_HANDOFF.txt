@@ -1,0 +1,975 @@
+
+MD-001 R1 — FINAL DESKTOP BUILD HANDOFF
+MULTI-DOMAIN STATELESS VERIFICATION
+
+PROJECT: Xer0trust / NUVL
+
+INVENTION:
+Stateless Verification Architecture Across Multiple Domains
+
+STATUS:
+LOCAL BUILD AUTHORIZED
+PHYSICAL DEPLOYMENT NOT AUTHORIZED
+
+This document supersedes all previous MD-001 drafts.
+
+============================================================
+1. OBJECTIVE
+============================================================
+
+Build a reproducible demonstration of independently
+controlled technical domains producing, conveying, and
+verifying domain-generated artifacts without requiring:
+
+- Shared execution state
+- Shared authorization logic
+- Disclosure of internal execution logic
+- Centralized verification authority
+- Producer availability during subsequent verification
+- Intermediary participation in verification decisions
+
+MD-001 concerns VERIFICATION EVIDENCE, not execution
+authority.
+
+A verification artifact may be independently verified
+more than once without granting permission to repeat
+the underlying operation.
+
+The baseline contains:
+
+B01 — Cross-domain artifact verification
+B02 — Producer-offline stateless verification
+N01 — Tampered artifact rejection
+X01 — Required disclosure inventory (unscored)
+
+A physical execution-isolation extension is designed
+separately and is not a prerequisite for the baseline.
+
+Do not expand the scope without operator approval.
+
+============================================================
+2. SOURCE INVENTORY — FIRST TASK
+============================================================
+
+Locate and inspect existing implementations.
+
+A. MH001
+   Frozen R4.3 forwarding implementation.
+   Preferred reference for the NUVL relay.
+
+B. MP005
+   Ed25519 signing, canonical encoding, and
+   cryptographic signature verification.
+
+C. MP004
+   Existing verifier logic, if available.
+
+D. MP006
+   Evidence, provenance, and manifest conventions.
+
+E. ESP-LOCAL-008
+   Target-bound execution authority, endpoint firmware,
+   and independent physical witness procedures.
+
+Record:
+
+- Exact source paths
+- Source revisions
+- Existing hashes
+- Dependencies
+- Reusable functions
+- Required adapters
+- Compatibility limitations
+
+CRITICAL VERIFIER RESTRICTION:
+
+Reuse only signing, canonical encoding, and signature
+verification functionality from MP005.
+
+Do not import:
+
+- Consumption tracking
+- SPENT-state logic
+- Replay-denial logic
+- Previously-seen-artifact tracking
+- Single-use authorization enforcement
+
+Domain B must not maintain a history of previously
+verified artifact IDs.
+
+B02 must independently verify the same artifact again.
+
+Artifact IDs provide identification, not single-use
+semantics.
+
+Inspect MP004 for the same restrictions before reuse.
+
+Do not modify frozen source or evidence.
+
+If an existing component is incompatible, report the
+limitation before substituting or rewriting it.
+
+============================================================
+3. ISOLATED WORKSPACE
+============================================================
+
+Create:
+
+MULTI_DOMAIN_001/
+
+Suggested structure:
+
+reference/
+configs/
+src/
+tests/
+evidence/
+README.md
+PROVENANCE.md
+
+Keep separate:
+
+- Frozen reference components
+- New implementation code
+- Test adapters
+- Offline test results
+- Future physical evidence
+
+Do not modify existing MP005, MP006, MH001, MP004,
+or ESP-LOCAL-008 test directories.
+
+Preserve original reference bytes and provenance.
+
+Never overwrite scored evidence.
+
+============================================================
+4. HARDWARE AND DOMAIN ROLES
+============================================================
+
+DOMAIN A — PRODUCER
+
+Dell Latitude E5450
+Linux Mint
+
+Performs a defined local software operation.
+Generates a signed verification artifact.
+
+DOMAIN B — VERIFIER
+
+HP 14-dk1xxx
+Linux Mint
+
+Receives and independently evaluates the artifact.
+
+NUVL RELAY
+
+Raspberry Pi 3B+
+Debian
+
+Conveys the artifact without making verification
+or authorization decisions.
+
+NETWORK ENFORCEMENT
+
+Protectli Vault running OPNsense.
+
+MANAGED SWITCH
+
+NETGEAR GS308Ev4
+8-port Gigabit Ethernet Plus Switch.
+
+Currently unused and unconfigured.
+
+OPERATOR
+
+HP OmniBook
+Windows 11
+
+RESERVED
+
+HP Pavilion
+Potential future Domain C verifier.
+
+PHYSICAL EXTENSION
+
+Existing ESP32-S3 endpoint and independent PWM witness
+from ESP-LOCAL-008.
+
+No physical deployment is authorized at this stage.
+
+============================================================
+5. NETWORK ARCHITECTURE
+============================================================
+
+Proposed logical topology:
+
+                 OPERATOR
+                    |
+                MANAGEMENT
+                    |
+                 OPNsense
+                    |
+                 GS308Ev4
+                    |
+        +-----------+-----------+
+        |           |           |
+     VLAN 10      RELAY      VLAN 20
+        |           |           |
+      DELL         Pi           HP
+        |           |           |
+    DOMAIN A       NUVL      DOMAIN B
+
+Proposed segmentation:
+
+VLAN 10 — Domain A
+VLAN 20 — Domain B
+Separate relay and management connectivity as needed.
+
+The GS308Ev4 provides Layer 2 segmentation.
+
+OPNsense provides routing and firewall enforcement.
+
+OPNsense must not participate in artifact-verification
+decisions.
+
+Required permitted paths:
+
+Domain A -> NUVL approved listener
+NUVL -> Domain B approved verifier listener
+
+Required denied path:
+
+Domain A -> Domain B directly
+
+The direct path must be explicitly denied and logged.
+
+Preflight evidence must include:
+
+- Exported applicable firewall rules
+- A deliberate direct A-to-B connection attempt
+- Corresponding firewall denial log
+- Successful approved A-to-NUVL connectivity
+- Successful approved NUVL-to-B connectivity
+
+A successful routed connection is not proof that the
+traffic actually crossed NUVL.
+
+Demonstrate the intended application-level relay path.
+
+Do not assume VLANs alone enforce that path.
+
+Before configuration, inspect:
+
+- Available OPNsense interfaces
+- Existing network assignments
+- VLAN tagging requirements
+- GS308Ev4 port capabilities
+- Pi network interfaces
+- Management access
+- Existing MP005/MH001 connectivity
+
+Prepare exact switch and firewall configuration
+instructions and a rollback plan.
+
+Do not change network settings before STOP 2.
+
+============================================================
+6. ARTIFACT FORMAT
+============================================================
+
+Domain A performs a defined local software operation.
+
+At a provider-defined event boundary, Domain A produces
+a signed verification artifact.
+
+Minimum proposed signed fields:
+
+- Artifact format version
+- Producer domain identifier
+- Key identifier
+- Unique artifact identifier
+- Operation/event identifier
+- Asserted outcome
+
+Include a cryptographic signature covering the
+canonical representation of those fields.
+
+Additional fields require justification.
+
+Define deterministic canonical encoding.
+
+Specify:
+
+- Exact signed bytes
+- Field types
+- Encoding rules
+- Signature algorithm
+- Key identifier mapping
+- Verification behavior for malformed input
+
+Use Ed25519 where compatible with the frozen reference.
+
+Domain B must validate:
+
+- Artifact structure
+- Cryptographic signature
+- Trusted producer/key binding
+- Artifact integrity
+- Applicable local acceptance criteria
+
+A key identifier is a selector, not proof of trust.
+
+The verifier must use a locally provisioned trusted
+mapping of producer identity to public verification key.
+
+Document how that trust anchor was provisioned.
+
+Trust-anchor provisioning is out-of-band configuration,
+not a shared authorization session.
+
+Domain B must not require:
+
+- Domain A's private key
+- Domain A's internal database
+- Domain A's execution logic
+- Domain A's live session state
+- Online access to Domain A
+
+Timestamps may appear in evidence records.
+
+Do not use wall-clock timestamps as verification inputs
+in this baseline.
+
+Use disposable test signing keys.
+
+Preserve test keys and exact reproducibility bytes
+according to existing Xer0trust publication conventions.
+
+============================================================
+7. VERIFIER STATELESSNESS
+============================================================
+
+Domain B evaluates each artifact independently.
+
+The verifier must not:
+
+- Record previously seen artifact IDs for acceptance
+  or rejection
+- Mark artifacts SPENT
+- Consume artifacts
+- Deny an artifact merely because it was verified before
+- Depend on an earlier verification session
+- Contact Domain A for a fresh decision
+
+Local trust configuration may persist.
+
+Verification results may be written to separate
+evidence logs.
+
+Evidence logging must not influence subsequent
+verification decisions.
+
+B02 must perform a new cryptographic verification,
+not return a cached result.
+
+Repeated artifact verification does not grant
+execution authority.
+
+============================================================
+8. NUVL RELAY
+============================================================
+
+Prefer the frozen MH001 R4.3 forwarder if compatible.
+
+Before reuse, verify:
+
+- Supported request format
+- Routing behavior
+- Request and response handling
+- Payload preservation
+- Required configuration
+- Compatibility with the artifact transport
+
+Do not force an incompatible component into the test.
+
+Do not modify frozen R4.3 source.
+
+NUVL may:
+
+- Receive and forward artifact bytes
+- Generate transport diagnostics
+- Produce separate operational logs
+
+NUVL must not:
+
+- Sign provider artifacts
+- Decide artifact validity
+- Apply Domain B verification criteria
+- Originate or enlarge execution authority
+- Interpret the asserted event outcome
+- Maintain shared execution state
+
+RELAY OBSERVATION:
+
+Use external packet capture on the Pi where feasible.
+
+Capture traffic at the relevant relay ingress and
+egress interfaces.
+
+Reconstruct the application artifact bytes and compute
+SHA-256 values.
+
+Do not modify the forwarder merely to add hashing.
+
+Packet capture alone does not prove payload equality
+unless the artifact bytes can be reconstructed reliably.
+
+If TLS, framing, fragmentation, or interface topology
+prevents reconstruction, document the limitation.
+
+Do not invent relay-side hashes or claim byte-level
+verification that was not actually performed.
+
+Keep the frozen relay's source hash unchanged.
+
+============================================================
+9. B01 — CROSS-DOMAIN VERIFICATION
+============================================================
+
+OBJECTIVE:
+
+Demonstrate independent verification of an artifact
+produced in another technical domain.
+
+PROCEDURE:
+
+1. Domain A performs a defined local operation.
+
+2. Domain A generates a signed artifact representing
+   the operation's asserted outcome.
+
+3. Domain A sends the artifact through NUVL.
+
+4. NUVL forwards the artifact without modifying its
+   signed content.
+
+5. Domain B receives the artifact.
+
+6. Domain B performs independent verification using
+   its locally provisioned trust anchor and criteria.
+
+EXPECTED:
+
+- Artifact arrives unchanged.
+- Signature verification succeeds.
+- Producer/key binding is valid.
+- Domain B accepts the artifact.
+- Domain B requires no producer execution state.
+- NUVL makes no verification decision.
+
+REQUIRED EVIDENCE:
+
+- Producer operation record
+- Original signed artifact
+- Producer-output SHA-256
+- Relay ingress observation
+- Relay egress observation
+- Verifier-ingress SHA-256
+- Verification decision
+- Applicable firewall rule export
+- Logged denied direct A-to-B connection attempt
+- Approved-path connectivity observations
+
+Compare hashes only where the same artifact bytes
+have actually been observed.
+
+PASS requires successful independent verification,
+a demonstrated relay path, and no unexplained artifact
+modification.
+
+============================================================
+10. B02 — PRODUCER-OFFLINE VERIFICATION
+============================================================
+
+PREREQUISITE:
+
+B01 PASS.
+
+OBJECTIVE:
+
+Demonstrate that Domain B can independently verify
+the same artifact after Domain A becomes unavailable
+and the verifier process is restarted.
+
+PHYSICAL PROCEDURE — LATER SCORED RUN:
+
+1. Preserve the B01 artifact.
+
+2. Record the existing verifier process identity.
+
+3. Power off Domain A.
+
+4. Record operator observation of power-off.
+
+5. Attempt a connection to Domain A's expected
+   endpoint and record the failed connection.
+
+6. Restart Domain B's verifier process.
+
+7. Record the new verifier PID and process-start
+   information to establish a fresh process.
+
+8. Verify the original B01 artifact again.
+
+9. Record the new cryptographic verification result.
+
+EXPECTED:
+
+- Domain A remains unavailable.
+- Domain B has no previous verification session.
+- Original artifact verifies successfully again.
+- The verifier performs a fresh signature check.
+- No producer connection is required.
+- No previously-seen-artifact rule is applied.
+
+Persistent local trust-anchor configuration is allowed.
+
+Verification evidence logs may persist but must not
+be consulted to determine acceptance.
+
+OFFLINE BUILD:
+
+Simulate producer unavailability and verifier restart.
+
+Clearly label simulation results.
+
+Do not claim that offline simulation proves physical
+power-loss behavior.
+
+============================================================
+11. N01 — TAMPERED ARTIFACT
+============================================================
+
+OBJECTIVE:
+
+Demonstrate rejection of a modified signed artifact
+without modifying the NUVL relay.
+
+PROCEDURE:
+
+1. Produce a valid signed artifact.
+
+2. Forward the original artifact through NUVL.
+
+3. Pass it to a separate test-only tampering adapter
+   downstream of NUVL.
+
+4. Modify one signed field without producing a
+   replacement valid signature.
+
+5. Deliver the modified artifact to Domain B.
+
+6. Record Domain B's verification decision.
+
+EXPECTED:
+
+- Original artifact verifies successfully.
+- Modified artifact fails verification.
+- Domain B rejects the modified artifact.
+- Original and modified artifact hashes differ.
+- NUVL source remains unchanged.
+
+REQUIRED EVIDENCE:
+
+- Original artifact
+- Modified artifact
+- Mutation description
+- Original SHA-256
+- Modified SHA-256
+- Verification rejection
+- Adapter configuration
+- Relay source integrity check
+
+The tampering adapter is separate test infrastructure.
+
+It must not create an alternate bypass around NUVL.
+
+Do not incorporate the adapter into the frozen forwarder.
+
+============================================================
+12. X01 — DISCLOSURE INVENTORY
+============================================================
+
+REQUIRED DOCUMENTATION.
+NOT A SEPARATE SCORED CASE.
+
+Inventory every artifact field.
+
+Record:
+
+- Field name
+- Data type
+- Origin
+- Purpose
+- Whether externally disclosed
+- Whether required for verification
+- Whether it exposes internal execution logic
+- Whether it exposes internal operational state
+
+Inspect the artifact bytes as transmitted.
+
+Inspect available relay observations.
+
+Document any additional transport metadata visible
+outside Domain A.
+
+Expected:
+
+No internal execution logic or operational state
+is disclosed beyond the deliberately defined artifact
+assertions and necessary transport metadata.
+
+Do not claim absolute confidentiality.
+
+Do not claim that a field inventory alone proves
+the absence of every possible information leak.
+
+Document the actual disclosure boundary.
+
+============================================================
+13. PHYSICAL EXECUTION EXTENSION
+============================================================
+
+DESIGN ONLY DURING LOCAL BUILD.
+
+This extension is not required for the initial
+cross-domain verification baseline.
+
+Reuse the existing ESP-LOCAL-008 endpoint and
+independent PWM witness.
+
+The ESP32 sits behind Domain B's execution path.
+
+Domain B must have a functioning, configured ESP
+command capability available during verification.
+
+The command client must be loaded and configured.
+
+Artifact verification must not invoke that capability.
+
+A disconnected, disabled, absent, or nonfunctional
+command path does not satisfy the intended demonstration.
+
+EXPECTED OBSERVATIONS:
+
+B01:
+Artifact accepted.
+Zero execution-triggered PWM actuations.
+
+B02:
+Same artifact accepted after verifier restart.
+Zero execution-triggered PWM actuations.
+
+N01:
+Modified artifact rejected.
+Zero execution-triggered PWM actuations.
+
+POSITIVE CONTROL:
+
+Issue one independently authorized command using
+ESP-LOCAL-008's existing provider-controlled
+issuance mechanism.
+
+Use its established test keys and target-bound
+authority format unchanged.
+
+Do not derive execution authority from the MDSV
+verification artifact.
+
+Do not permit Domain B's artifact verification
+result to mint, enlarge, or substitute authority.
+
+Expected positive-control observation:
+
+Exactly one authorized actuation.
+
+Use frozen ESP-LOCAL-008 firmware and the established
+witness procedure.
+
+Determine GPIO and witness wiring from the original
+008 documentation.
+
+Do not guess pin assignments.
+
+Inspect and document the separation between:
+
+- Artifact-verification handler
+- Execution-command handler
+- Provider-controlled issuance path
+
+The physical extension must not be described as
+completed until the actual witness evidence exists.
+
+No physical execution before STOP 3.
+
+============================================================
+14. OFFLINE BUILD AND VALIDATION
+============================================================
+
+Build local implementations and tests for:
+
+B01
+B02
+N01
+
+Produce the X01 disclosure inventory.
+
+Required offline checks:
+
+- Valid Ed25519 signature accepted
+- Modified signed field rejected
+- Unknown key identifier rejected
+- Producer/key mismatch rejected
+- Malformed artifact rejected
+- Deterministic canonical encoding
+- Unique artifact identifiers supported
+- Same artifact accepted on repeated verification
+- No SPENT-state or replay-denial dependency
+- Fresh verifier process performs fresh verification
+- Producer availability not required
+- Tampering adapter remains separate from NUVL
+- No verification-driven execution command
+- Evidence outputs match observed test behavior
+
+Additional unit checks are allowed where necessary
+to establish these baseline properties.
+
+Do not expand the scored case matrix.
+
+Simulated network behavior must be labeled as simulated.
+
+Do not manufacture physical network evidence.
+
+Do not manufacture ESP witness evidence.
+
+============================================================
+15. EVIDENCE AND PROVENANCE
+============================================================
+
+Follow existing Xer0trust evidence conventions.
+
+Record:
+
+- Case identifier
+- UTC timestamps for evidence
+- Source revision
+- Source hashes
+- Configuration hashes
+- Artifact bytes and hashes
+- Verification decision
+- Expected and observed behavior
+- PASS/FAIL
+- Process logs
+- Relevant network observations
+- Test dependencies
+- Known limitations
+
+For physical B01, additionally require:
+
+- Firewall rule export
+- Logged denied direct A-to-B attempt
+- Approved relay-path evidence
+
+For physical B02, additionally require:
+
+- Producer power-off observation
+- Failed producer connection attempt
+- Verifier process restart proof
+
+For physical N01, additionally require:
+
+- Mutation adapter provenance
+- Original and modified artifact hashes
+
+Evidence must be append-only or written into new,
+uniquely identified run directories.
+
+Do not overwrite previous scored evidence.
+
+Generate a SHA-256 manifest after local validation.
+
+Preserve exact reproducibility bytes.
+
+Document shared source libraries.
+
+Shared implementation is not the same thing as
+shared operational state.
+
+============================================================
+16. REQUIRED DESKTOP DELIVERABLES
+============================================================
+
+A. Source inventory and reuse map.
+
+B. Isolated MD-001 implementation.
+
+C. Offline B01/B02/N01 harness.
+
+D. Actual offline test results.
+
+E. X01 disclosure inventory.
+
+F. README.md with reproduction instructions.
+
+G. PROVENANCE.md.
+
+H. SHA-256 manifest.
+
+I. Proposed GS308Ev4/OPNsense deployment plan.
+
+J. Network rollback plan.
+
+K. ESP-LOCAL-008 physical extension plan.
+
+L. Known limitations and unresolved blockers.
+
+M. Exact completion status.
+
+Do not create public-facing claims before scored
+evidence exists.
+
+Keep documentation focused on MD-001.
+
+Do not unnecessarily rewrite parent project READMEs.
+
+============================================================
+17. STOP GATES
+============================================================
+
+STOP 1 — LOCAL BUILD VALIDATION
+
+Desktop may:
+
+- Inspect existing local source
+- Copy reusable components into isolated workspace
+- Write new MD-001 code
+- Run offline validation
+- Generate local evidence
+- Prepare deployment instructions
+
+Desktop may not:
+
+- Change live network settings
+- Deploy to Dell, HP, or Pi
+- Reconfigure OPNsense
+- Configure GS308Ev4
+- Trigger physical ESP execution
+- Run scored physical-network tests
+
+After successful local validation, report:
+
+MD001_LOCAL_BUILD_VALIDATED_NOT_DEPLOYED
+
+Use this status only if required checks actually pass.
+
+Otherwise report the specific blocker.
+
+STOP.
+
+------------------------------------------------------------
+
+STOP 2 — NETWORK CONFIGURATION
+
+Before physical deployment, present:
+
+- Exact port assignments
+- VLAN configuration
+- OPNsense firewall changes
+- Relay and verifier endpoints
+- Management access plan
+- Rollback procedure
+- Preflight commands
+
+Wait for explicit operator approval.
+
+Do not disturb existing MP005/MH001 deployments.
+
+------------------------------------------------------------
+
+STOP 3 — SCORED EXECUTION
+
+After successful physical network preflight:
+
+STOP before scored tests.
+
+Require explicit operator authorization.
+
+Physical ESP actuation requires separate approval.
+
+============================================================
+18. CLAIM AND PUBLICATION LIMITATIONS
+============================================================
+
+MD-001 is intended to demonstrate:
+
+- Cross-domain artifact conveyance
+- Independent verification
+- Producer-offline verification
+- Stateless verification behavior
+- Detection of artifact modification
+- Defined disclosure boundaries
+
+It does not independently establish:
+
+- Truth of the asserted underlying event
+- Universal absence of information disclosure
+- Security of all artifact formats
+- Production readiness
+- Authorization replay resistance
+- Physical execution isolation before witness testing
+- General cryptographic security beyond tested behavior
+
+Verification of an artifact is not authorization
+to execute an operation.
+
+A valid signature authenticates signed assertions
+under the trusted key; it does not independently
+prove the underlying event occurred.
+
+Do not describe offline simulations as physical results.
+
+Do not describe future tests as completed.
+
+Map final claims to the actual utility disclosure
+before public publication.
+
+============================================================
+19. REQUIRED COMPLETION REPORT
+============================================================
+
+At STOP 1, provide:
+
+1. Source components located.
+2. Components reused unchanged.
+3. New components created.
+4. Offline tests executed.
+5. PASS/FAIL totals.
+6. Evidence and manifest locations.
+7. SHA-256 hashes.
+8. Any deviations from this specification.
+9. Remaining network prerequisites.
+10. Remaining physical extension prerequisites.
+11. Known blockers.
+12. Current STOP status.
+
+Do not begin the next stage automatically.
+
+============================================================
+
+END — MD-001 R1 FINAL DESKTOP BUILD HANDOFF
+
+AUTHORIZED:
+LOCAL BUILD AND OFFLINE VALIDATION ONLY.
+
+NOT AUTHORIZED:
+NETWORK DEPLOYMENT OR PHYSICAL SCORED EXECUTION.

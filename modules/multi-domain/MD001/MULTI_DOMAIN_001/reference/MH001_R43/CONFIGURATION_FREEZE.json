@@ -1,0 +1,64 @@
+{
+  "project": "MULTI_HUB_001",
+  "revision": "MH001_R4.3",
+  "status": "LOCAL_CONFIGURATIONS_FROZEN_FOR_REVIEW",
+  "scope": "LOOPBACK_LOCAL_BUILD_ONLY_NOT_LIVE_APPROVAL",
+  "utc": "2026-11-04T04:58:15.948132+00:00",
+  "configurations": {
+    "hub_a.json": {
+      "sha256": "68e6d6630af220f1743fa04827c9ba37ba87af126b5d0fec0216a69cf1af3788",
+      "configuration": {
+        "hub_id": "HUB_A",
+        "listen": {
+          "host": "127.0.0.1",
+          "port": 18080
+        },
+        "timeout_seconds": 15,
+        "routes": {
+          "PROVIDER_A": {
+            "next_hop": "PROVIDER_A",
+            "endpoint": {
+              "host": "127.0.0.1",
+              "port": 18090
+            }
+          },
+          "PROVIDER_B": {
+            "next_hop": "HUB_B",
+            "endpoint": {
+              "host": "127.0.0.1",
+              "port": 18081
+            }
+          }
+        }
+      }
+    },
+    "hub_b.json": {
+      "sha256": "a066f9c0b5182423bd4707a5c8f02bfed4424e23a52ecb370b954a928bb2dff2",
+      "configuration": {
+        "hub_id": "HUB_B",
+        "listen": {
+          "host": "127.0.0.1",
+          "port": 18081
+        },
+        "timeout_seconds": 10,
+        "routes": {
+          "PROVIDER_A": {
+            "next_hop": "PROVIDER_A",
+            "endpoint": {
+              "host": "127.0.0.1",
+              "port": 18090
+            }
+          },
+          "PROVIDER_B": {
+            "next_hop": "PROVIDER_B",
+            "endpoint": {
+              "host": "127.0.0.1",
+              "port": 18091
+            }
+          }
+        }
+      }
+    }
+  },
+  "change_rule": "Any source, endpoint, route, or timeout change needs new hashes and STOP 1 approval before live use"
+}
