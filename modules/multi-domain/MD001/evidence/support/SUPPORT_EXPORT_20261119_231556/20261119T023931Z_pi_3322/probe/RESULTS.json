@@ -1,0 +1,122 @@
+{
+  "profile": "pi",
+  "utc": "2026-11-19T02:39:31.957332+00:00",
+  "python": "3.13.5 (main, Aug 10 2026, 12:06:59) [GCC 14.2.0]",
+  "executable": "/usr/bin/python3",
+  "platform": "Linux-6.18.50+rpt-rpi-v8-aarch64-with-glibc2.41",
+  "machine": "aarch64",
+  "ssl_module_openssl": "OpenSSL 3.5.7 9 Jun 2026",
+  "application": "/home/seth/MD001_APPLICATION_R1",
+  "checks": [
+    {
+      "name": "frozen_application_hashes",
+      "passed": true
+    },
+    {
+      "name": "fixture_hash",
+      "passed": true
+    },
+    {
+      "name": "expected_python_and_upstream_crypto_version",
+      "passed": true
+    },
+    {
+      "name": "system_interpreter_and_distro_module",
+      "passed": true
+    },
+    {
+      "name": "all_application_imports_and_runtime_lock",
+      "passed": true
+    },
+    {
+      "name": "all_config_parsers",
+      "passed": true
+    },
+    {
+      "name": "pem_pkcs8_load_and_type",
+      "passed": true
+    },
+    {
+      "name": "raw_public_roundtrip",
+      "passed": true
+    },
+    {
+      "name": "ed25519_generate_sign_verify",
+      "passed": true
+    },
+    {
+      "name": "same_canonical_artifact_and_signature_as_desktop49",
+      "passed": true
+    },
+    {
+      "name": "desktop49_signature_accepted",
+      "passed": true
+    },
+    {
+      "name": "tamper_invalid_signature",
+      "passed": true
+    },
+    {
+      "name": "unknown_key_rejected",
+      "passed": true
+    },
+    {
+      "name": "producer_key_mismatch_rejected",
+      "passed": true
+    },
+    {
+      "name": "malformed_rejected",
+      "passed": true
+    },
+    {
+      "name": "repeat_fresh_checks_no_history_or_producer_network",
+      "passed": true
+    },
+    {
+      "name": "canonical_order_independent",
+      "passed": true
+    },
+    {
+      "name": "frozen_http_framing_and_observer",
+      "passed": true
+    },
+    {
+      "name": "unique_ids",
+      "passed": true
+    },
+    {
+      "name": "application_still_unchanged",
+      "passed": true
+    }
+  ],
+  "mode": "NON_SCORED_NO_NETWORK_NO_SERVICE_RUNTIME_PROBE",
+  "requirement_pin_satisfied": false,
+  "application_sha256": {
+    "COMMANDS.md": "137427a610b97c5e6a88a95f5e927f3f4a65e339c0be4075dcca6366162d5d9f",
+    "README.md": "1cd699f07519cbd4e64d99bc28ced423cdd79e0b91022e5f2b1e152635841cdf",
+    "RUNTIME_LOCK.json": "22503ffeb2ffe9c147bf0b5d2ac8f3e29e18aea3fa7929a218f97869a16eaece",
+    "TEST_PLAN.md": "fedc98f384a932074a8086e37610dace3fc9a94190d7e5d4d4cab7150bfc658f",
+    "VALIDATION.md": "12d528aea1c24472164665fbbd46b9d182614a9070812fb1ae487fb3ebad5e1f",
+    "X01.md": "d93b222d8cc980298f4c07bd734615028352db806e5347c3fdf71060e5b2eabb",
+    "configs/ingress.json": "d776bb971361048dd36799d7e068ee15be1795a697eab5d72f6d0a2e1332a83f",
+    "configs/ingress_N01.json": "203bf811423bee476ded7d3d927811fcd735e005afef45c5f821574faee64519",
+    "configs/relay.json": "14261812fcea1ab562d8ea643a121210f9f15e85488467be95729d6855f95451",
+    "configs/verifier.json": "e96f39f63e1b760606e2f402d7d207f3d28e90e5c6f9d9f53729cafe5e46377e",
+    "md001.py": "38d016c517189af2915c0277152a20d565eb1752509435e5699287b85a89e6f2",
+    "observe.py": "ecae0e7dd6a76cc27fc4d047f5b90644346c18227ab6e678a7c534787ace19d5",
+    "requirements.txt": "3c038ca3f396496b0ba4aa4a58bbda2f036e4796735aec74caa910a07b8b7ad7",
+    "runtime/artifact.py": "f814d37b52d0b3b64a242b0c37d5bcc9d3fe6511f4bf1e4ada2285c7cbac196b",
+    "runtime/hub.py": "37bd590d23d2daf3bf8b9713139a27b09333252f62d87c94fa2a3e1477a043a2",
+    "runtime/routes.py": "627de0618ecba71655a107a6fb6b1c8776f8a1f6983fd778470405855e0e8969",
+    "runtime/wire.py": "8a668ab4af072ad2c24a0af5d0baca0a22f0e8946fa40f57ad92330894fac87f"
+  },
+  "cryptography": "43.0.0",
+  "cryptography_path": "/usr/lib/python3/dist-packages/cryptography/__init__.py",
+  "cryptography_openssl": "OpenSSL 3.5.7 9 Jun 2026",
+  "cryptography_init_sha256": "9ad86e52b4dde0544e0a9518ad322a863cfab3a4fd763019ad5ee7675a0c9b6a",
+  "crypto_binding_path": "/usr/lib/python3/dist-packages/cryptography/hazmat/bindings/_rust.abi3.so",
+  "crypto_binding_sha256": "8cab03f2f2198908ef047ee2b390687786928d3993a563385358a6b06df4896b",
+  "passed": 20,
+  "failed": 0,
+  "status": "PROBE_PASS_NOT_SCORED"
+}

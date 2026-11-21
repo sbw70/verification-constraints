@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "C:\Users\holiw\OneDrive\Documents\ChatGPT\Multi Provider\MD001_DEPLOYMENT_R1\test_local.py", line 85, in main
+    c=http.client.HTTPConnection('127.0.0.1',deny_port,timeout=10);c.request('POST','/verify',raw)
+                                                                   ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\AppData\Local\Programs\Python\Python314\Lib\http\client.py", line 1358, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\AppData\Local\Programs\Python\Python314\Lib\http\client.py", line 1404, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\AppData\Local\Programs\Python\Python314\Lib\http\client.py", line 1353, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\holiw\AppData\Local\Programs\Python\Python314\Lib\http\client.py", line 1152, in _send_output
+    self.send(chunk)
+    ~~~~~~~~~^^^^^^^
+  File "C:\Users\holiw\AppData\Local\Programs\Python\Python314\Lib\http\client.py", line 1077, in send
+    self.sock.sendall(data)
+    ~~~~~~~~~~~~~~~~~^^^^^^
+ConnectionAbortedError: [WinError 10053] An established connection was aborted by the software in your host machine

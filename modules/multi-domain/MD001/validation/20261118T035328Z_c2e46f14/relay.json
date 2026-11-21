@@ -1,0 +1,1 @@
+{"role": "relay", "listen": {"host": "127.0.0.1", "port": 62104}, "target": {"host": "127.0.0.1", "port": 62103}, "mode": "pass", "allowed_peer": null}

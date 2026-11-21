@@ -1,0 +1,255 @@
+{
+  "reference_checkout_commit": "73713f6e9ed9c95251cc69ec88ef816cab771ac0",
+  "parent_revision": "UNBORN_HEAD; content hashes identify local source",
+  "mh001_revision": "MH001_R4.3",
+  "canonical_function_exact_match": true,
+  "files": [
+    {
+      "component": "MH001_R43",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MH001_DEPLOYMENT_REVIEW_R43\\BASELINE.json",
+      "copy_path": "reference/MH001_R43/BASELINE.json",
+      "bytes": 4950,
+      "sha256": "ed0ea258196fdce6e8514d4f1d99591a173742de75c28bf1a048ce54e2bd8aa0",
+      "existing_baseline_sha256": null
+    },
+    {
+      "component": "MH001_R43",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MH001_DEPLOYMENT_REVIEW_R43\\HASHES.json",
+      "copy_path": "reference/MH001_R43/HASHES.json",
+      "bytes": 6307,
+      "sha256": "1cb9d2c446d5ceef3147b866ec8dc3641cabd391a51ca136636f92380a0b2425",
+      "existing_baseline_sha256": null
+    },
+    {
+      "component": "MH001_R43",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MH001_DEPLOYMENT_REVIEW_R43\\frozen_R43\\hub.py",
+      "copy_path": "reference/MH001_R43/hub.py",
+      "bytes": 5476,
+      "sha256": "37bd590d23d2daf3bf8b9713139a27b09333252f62d87c94fa2a3e1477a043a2",
+      "existing_baseline_sha256": "37bd590d23d2daf3bf8b9713139a27b09333252f62d87c94fa2a3e1477a043a2"
+    },
+    {
+      "component": "MH001_R43",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MH001_DEPLOYMENT_REVIEW_R43\\frozen_R43\\wire.py",
+      "copy_path": "reference/MH001_R43/wire.py",
+      "bytes": 5149,
+      "sha256": "8a668ab4af072ad2c24a0af5d0baca0a22f0e8946fa40f57ad92330894fac87f",
+      "existing_baseline_sha256": "8a668ab4af072ad2c24a0af5d0baca0a22f0e8946fa40f57ad92330894fac87f"
+    },
+    {
+      "component": "MH001_R43",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MH001_DEPLOYMENT_REVIEW_R43\\frozen_R43\\routes.py",
+      "copy_path": "reference/MH001_R43/routes.py",
+      "bytes": 3771,
+      "sha256": "627de0618ecba71655a107a6fb6b1c8776f8a1f6983fd778470405855e0e8969",
+      "existing_baseline_sha256": "627de0618ecba71655a107a6fb6b1c8776f8a1f6983fd778470405855e0e8969"
+    },
+    {
+      "component": "MH001_R43",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MH001_DEPLOYMENT_REVIEW_R43\\frozen_R43\\SHA256SUMS.txt",
+      "copy_path": "reference/MH001_R43/SHA256SUMS.txt",
+      "bytes": 3392,
+      "sha256": "2396e899e4ede4b4240368e2300174aca9ff7253d7d06993ad05353cc6394167",
+      "existing_baseline_sha256": "2396e899e4ede4b4240368e2300174aca9ff7253d7d06993ad05353cc6394167"
+    },
+    {
+      "component": "MH001_R43",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MH001_DEPLOYMENT_REVIEW_R43\\frozen_R43\\CONFIGURATION_FREEZE.json",
+      "copy_path": "reference/MH001_R43/CONFIGURATION_FREEZE.json",
+      "bytes": 1777,
+      "sha256": "e12b861bf801766408bf59b7b18dd09e2bb5aa570a2483385c2fe8b20018c537",
+      "existing_baseline_sha256": "e12b861bf801766408bf59b7b18dd09e2bb5aa570a2483385c2fe8b20018c537"
+    },
+    {
+      "component": "MH001_R43",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MH001_DEPLOYMENT_REVIEW_R43\\frozen_R43\\SOURCE_REVIEW.md",
+      "copy_path": "reference/MH001_R43/SOURCE_REVIEW.md",
+      "bytes": 10096,
+      "sha256": "040236b02eb7e69b8668a3d075929fa091f6b7bd893bf1968f24d2a599d8e383",
+      "existing_baseline_sha256": "040236b02eb7e69b8668a3d075929fa091f6b7bd893bf1968f24d2a599d8e383"
+    },
+    {
+      "component": "MH001_R43",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MH001_DEPLOYMENT_REVIEW_R43\\frozen_R43\\README.md",
+      "copy_path": "reference/MH001_R43/README.md",
+      "bytes": 3992,
+      "sha256": "3223459a61f14cb587f0d4ad0abe7133bf2c07dc09b1cd85e876abf12c890721",
+      "existing_baseline_sha256": "3223459a61f14cb587f0d4ad0abe7133bf2c07dc09b1cd85e876abf12c890721"
+    },
+    {
+      "component": "MP005",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MP005-reference\\modules\\multi-provider\\MP005\\provider_a\\provider_a.py",
+      "copy_path": "reference/MP005/provider_a/provider_a.py",
+      "bytes": 24705,
+      "sha256": "79e4994c955ca842af04a8fd650a33d49de040bab95b821ded9e63e16866f2b6"
+    },
+    {
+      "component": "MP005",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MP005-reference\\modules\\multi-provider\\MP005\\provider_a\\mint_authorization_a.py",
+      "copy_path": "reference/MP005/provider_a/mint_authorization_a.py",
+      "bytes": 4985,
+      "sha256": "1a485e8a5d3de854cb31303b8d3bf1339ef72cb9b42f308490bd02519e76d7ec"
+    },
+    {
+      "component": "MP005",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MP005-reference\\modules\\multi-provider\\MP005\\requirements.txt",
+      "copy_path": "reference/MP005/requirements.txt",
+      "bytes": 22,
+      "sha256": "94e3b48ad5c9bffdc41455b2871ccb78fdd1d0e6c607234ad4da0e6cd41fd0aa"
+    },
+    {
+      "component": "MP005",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MP005-reference\\modules\\multi-provider\\MP005\\configs\\MP005_SOURCE_MANIFEST.json",
+      "copy_path": "reference/MP005/configs/MP005_SOURCE_MANIFEST.json",
+      "bytes": 33652,
+      "sha256": "751424a9d19e6a4fca02aa6502600647699273a26fb59e909fd51465d3a32ff0"
+    },
+    {
+      "component": "MP005",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MP005-reference\\modules\\multi-provider\\MP005\\configs\\MP005_LOCK_SHA256SUMS.txt",
+      "copy_path": "reference/MP005/configs/MP005_LOCK_SHA256SUMS.txt",
+      "bytes": 502,
+      "sha256": "beb89d3c68e5d83ada267df95b686ecb7cf49e4dd51dfddd18039a00d223804d"
+    },
+    {
+      "component": "MP005",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MP005-reference\\modules\\multi-provider\\MP005\\harness\\ledger_evidence.py",
+      "copy_path": "reference/MP005/harness/ledger_evidence.py",
+      "bytes": 6263,
+      "sha256": "3f5e27dac5a8e1ae88974effb4b3e82c626ba8345ea6524e6d2c33edd8e39637"
+    },
+    {
+      "component": "MP005",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MP005-reference\\modules\\multi-provider\\MP005\\harness\\common.py",
+      "copy_path": "reference/MP005/harness/common.py",
+      "bytes": 18752,
+      "sha256": "6dd965501e8266bf7315570b9101b1da0b68e9cd6c7a65072170eaba01bd164c"
+    },
+    {
+      "component": "MP005",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MP005-reference\\modules\\multi-provider\\MP005\\README.md",
+      "copy_path": "reference/MP005/README.md",
+      "bytes": 16112,
+      "sha256": "6a3fd54ec0bf6df1cae65e75e2674d3fa4481fe130b9481dd7ecfb6adef16071"
+    },
+    {
+      "component": "MP004",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MP005-reference\\modules\\multi-provider\\MP004\\verifier\\verify_mp004.py",
+      "copy_path": "reference/MP004/verifier/verify_mp004.py",
+      "bytes": 15198,
+      "sha256": "452111ef7b7f96e2f42d14a416605ba53ee5b878b3dc05ce2729f6dc9db096c7"
+    },
+    {
+      "component": "MP004",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MP005-reference\\modules\\multi-provider\\MP004\\PROVENANCE.md",
+      "copy_path": "reference/MP004/PROVENANCE.md",
+      "bytes": 3057,
+      "sha256": "870d68167bfcbc58c930f04dc8e64eb328738089671112c0081f0d213f3e16d8"
+    },
+    {
+      "component": "MP004",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MP005-reference\\modules\\multi-provider\\MP004\\README.md",
+      "copy_path": "reference/MP004/README.md",
+      "bytes": 8999,
+      "sha256": "ce65b625d13aae057f0b6729f66efd52d3d855d38e2172c71a4f574fbe7b6cc1"
+    },
+    {
+      "component": "MP004",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MP005-reference\\modules\\multi-provider\\MP004\\SHA256SUMS.txt",
+      "copy_path": "reference/MP004/SHA256SUMS.txt",
+      "bytes": 22213,
+      "sha256": "7facb7f664cf5ecd9c864921cbb92464ee4a0bd85816caaa90addfcd8378dac8"
+    },
+    {
+      "component": "MP006",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MULTI_PROVIDER_006\\mp006.py",
+      "copy_path": "reference/MP006/mp006.py",
+      "bytes": 20693,
+      "sha256": "c11c0af05f30f5d02ef2f96d05d263f712c18659003cfaf0ca821f7398ea4ad6"
+    },
+    {
+      "component": "MP006",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MULTI_PROVIDER_006\\README.md",
+      "copy_path": "reference/MP006/README.md",
+      "bytes": 9493,
+      "sha256": "a7c69633f600485bf481c63884fd7d38e2ff5f851e6f98b6c4be2c0ae803bc88"
+    },
+    {
+      "component": "MP006",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MULTI_PROVIDER_006\\SOURCE_REVIEW.md",
+      "copy_path": "reference/MP006/SOURCE_REVIEW.md",
+      "bytes": 4950,
+      "sha256": "5d2d8047249bf569492de407688d5c4105aa5fb48a078d1df3968968e5daef36"
+    },
+    {
+      "component": "MP006",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MULTI_PROVIDER_006\\SHA256SUMS.txt",
+      "copy_path": "reference/MP006/SHA256SUMS.txt",
+      "bytes": 6255,
+      "sha256": "16e8d9cc0f31bf96fa427c42815cecd1a7d5ec18251b964cafa6ff1b9fbb5381"
+    },
+    {
+      "component": "ESP_LOCAL_008",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MP005-reference\\labs\\nuvl-edge\\esp-local\\ESP_LOCAL_008\\README.md",
+      "copy_path": "reference/ESP_LOCAL_008/README.md",
+      "bytes": 9558,
+      "sha256": "0ba458dacbf5e35d8a881c2721ba055f23b2d5cbd358285ec27a08f5ea33ec35"
+    },
+    {
+      "component": "ESP_LOCAL_008",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MP005-reference\\labs\\nuvl-edge\\esp-local\\ESP_LOCAL_008\\PROVENANCE.md",
+      "copy_path": "reference/ESP_LOCAL_008/PROVENANCE.md",
+      "bytes": 36523,
+      "sha256": "9d7d70cfdd5add65179956453848beaea84398895c93d21029d59be8918dd9df"
+    },
+    {
+      "component": "ESP_LOCAL_008",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MP005-reference\\labs\\nuvl-edge\\esp-local\\ESP_LOCAL_008\\RESULTS.md",
+      "copy_path": "reference/ESP_LOCAL_008/RESULTS.md",
+      "bytes": 20616,
+      "sha256": "3a438577348b854e97aa49b5750fa9a7de492e2b73d685fa990bc3cf5f1cc3eb"
+    },
+    {
+      "component": "ESP_LOCAL_008",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MP005-reference\\labs\\nuvl-edge\\esp-local\\ESP_LOCAL_008\\SHA256SUMS.txt",
+      "copy_path": "reference/ESP_LOCAL_008/SHA256SUMS.txt",
+      "bytes": 7368,
+      "sha256": "775c8f0e481575591e9e96c16a1bf9b9ed5204aba263e0f67919060947482bf2"
+    },
+    {
+      "component": "ESP_LOCAL_008",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MP005-reference\\labs\\nuvl-edge\\esp-local\\ESP_LOCAL_008\\witness\\README.md",
+      "copy_path": "reference/ESP_LOCAL_008/witness/README.md",
+      "bytes": 16592,
+      "sha256": "0f86c097469b202a1c3eb42a86f25dc91520cd190dd8138eb83b7b35bf6b3d2e"
+    },
+    {
+      "component": "ESP_LOCAL_008",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MP005-reference\\labs\\nuvl-edge\\esp-local\\ESP_LOCAL_008\\coordinator\\esp_local_008_presenter.py",
+      "copy_path": "reference/ESP_LOCAL_008/coordinator/esp_local_008_presenter.py",
+      "bytes": 17280,
+      "sha256": "cfdeb383e2181983bcce5c165737e3fceee53330199ea24eed4392b4e5df9baf"
+    },
+    {
+      "component": "ESP_LOCAL_008",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MP005-reference\\labs\\nuvl-edge\\esp-local\\ESP_LOCAL_008\\provider\\esp_local_008_provider.py",
+      "copy_path": "reference/ESP_LOCAL_008/provider/esp_local_008_provider.py",
+      "bytes": 7284,
+      "sha256": "5430312e6626687015060e22ec0cd0b8cf74b05ba8952a8d0787cd6ed96328d3"
+    },
+    {
+      "component": "ESP_LOCAL_008",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MP005-reference\\labs\\nuvl-edge\\esp-local\\ESP_LOCAL_008\\firmware\\endpoint-runtime\\project\\main\\ESP_LOCAL_008_ENDPOINT.c",
+      "copy_path": "reference/ESP_LOCAL_008/firmware/endpoint-runtime/project/main/ESP_LOCAL_008_ENDPOINT.c",
+      "bytes": 47822,
+      "sha256": "873a15db09df51d4a8bf430df5c11ae51cfcfc31daefda7bff4a8f27d6dceed3"
+    },
+    {
+      "component": "ESP_LOCAL_008",
+      "source_path": "C:\\Users\\holiw\\OneDrive\\Documents\\ChatGPT\\Multi Provider\\MP005-reference\\labs\\nuvl-edge\\esp-local\\ESP_LOCAL_008\\witness\\ESP_LOCAL_008_WITNESS_RMT_V1\\main\\witness_rmt_v1.c",
+      "copy_path": "reference/ESP_LOCAL_008/witness/ESP_LOCAL_008_WITNESS_RMT_V1/main/witness_rmt_v1.c",
+      "bytes": 46801,
+      "sha256": "fe1bba2c8b15d437ff7bfaf255a77cc3efde085b47f79689473c3a953832ee42"
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+{"decision":{"accepted":false,"artifact_sha256":"5b747613a2baa19ef6f2f69cf936c528c4f4b4c7ad9674ec014e5bda5b614b64","pid":20908,"process_instance":"c13332f5be96901e5ce0662b249357d7","reason":"invalid_signature","signature_checks":1,"utc":"2026-11-12T02:59:27.818163+00:00"},"http_status":422}
