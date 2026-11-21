@@ -1,2 +1,0 @@
-# Actual desktop validation used cryptography 49.0.0, Python 3.14.3.
-cryptography==49.0.0

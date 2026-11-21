@@ -1,1 +1,0 @@
-{"port": 52564, "role": "relay", "pid": 10164, "process_instance": null, "started_utc": "2026-11-12T01:26:10.641321+00:00"}

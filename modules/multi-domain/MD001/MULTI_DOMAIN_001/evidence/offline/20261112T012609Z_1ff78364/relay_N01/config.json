@@ -1,1 +1,0 @@
-{"hub_id":"HUB_B","listen":{"host":"127.0.0.1","port":0},"routes":{"PROVIDER_A":{"endpoint":{"host":"127.0.0.1","port":1},"next_hop":"PROVIDER_A"},"PROVIDER_B":{"endpoint":{"host":"127.0.0.1","port":52563},"next_hop":"PROVIDER_B"}},"timeout_seconds":10}

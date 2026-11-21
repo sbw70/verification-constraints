@@ -1,1 +1,0 @@
-{"port": 52545, "role": "producer", "pid": 4340, "process_instance": "54f159ee7cc2bc207855d8c5a40a2602", "started_utc": "2026-11-12T01:25:48.312018+00:00"}
