@@ -33,7 +33,7 @@ Modern distributed systems frequently distribute responsibility across intermedi
 
 The frameworks in this repository define structural constraints that prevent authority migration.
 
-These architectures do not introduce new trust anchors, centralized coordinators, or additional verification roles. Instead, they formally constrain what external systems are prohibited from assuming about execution meaning.
+These architectures do not introduce new trust anchors, centralized coordinators, or additional verification roles. Instead, they constrain what external systems are prohibited from assuming about execution meaning.
 
 Execution authority remains execution-scoped.  
 Observation does not confer authorization.  
