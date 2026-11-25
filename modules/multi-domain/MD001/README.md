@@ -42,7 +42,7 @@ MD001 evaluates this property within a defined laboratory configuration.
 | [RESULTS.md](RESULTS.md) | Consolidated physical scored results, supporting observations, and experimental limitations |
 | [PROVENANCE.md](PROVENANCE.md) | Source identities, evidence origins, runtime conditions, historical integrity records, and publication exclusions |
 | [ORIGINAL_HASH_REFERENCES.tsv](ORIGINAL_HASH_REFERENCES.tsv) | Individual historical checksum coverage classifications for all 110 scored evidence files |
-| [SHA256SUMS.txt](SHA256SUMS.txt) | Consolidated publication-time SHA-256 inventory |
+| [SHA256SUMS.txt](SHA256SUMS.txt) | Consolidated 602-entry publication-time SHA-256 inventory |
 
 The publication records consolidate retained experimental evidence without replacing the original observations.
 
@@ -574,17 +574,63 @@ The associated limitations are documented in [PROVENANCE.md](PROVENANCE.md).
 
 ### Publication Integrity
 
+The consolidated publication manifest was finalized on November 25, 2026.
+
 [SHA256SUMS.txt](SHA256SUMS.txt) provides the consolidated checksum inventory for the selected experimental evidence, implementation files, configurations, historical records, and supporting publication documentation.
 
-Repository navigation READMEs are outside the consolidated checksum scope.
+| Inventory component | Files |
+|---|---:|
+| Preserved original publication files | 599 |
+| Additional publication documents | 3 |
+| **Total consolidated checksum entries** | **602** |
+
+The three additional publication documents included in the inventory are:
+
+- `RESULTS.md`
+- `PROVENANCE.md`
+- `ORIGINAL_HASH_REFERENCES.tsv`
+
+The consolidated manifest covers all 110 retained scored evidence files.
+
+| Scored collection | Checksum coverage |
+|---|---:|
+| B01 | 31/31 |
+| N01 | 34/34 |
+| B02 | 45/45 |
+| **Total** | **110/110** |
+
+Repository navigation READMEs and the consolidated manifest itself are outside the defined checksum scope.
+
+All original historical manifests remain unchanged.
 
 The consolidated manifest does not replace the original integrity records.
+
+### Publication Verification
+
+The final publication verification recorded:
+
+```text
+Checksum entries: 602
+Verified:         602
+Missing files:      0
+Mismatches:         0
+
+Result: PASS
+```
+
+This verification was performed during publication reconciliation, separately from the physical scored experiments.
+
+No experiment was rerun and no original evidence or implementation file was modified during manifest finalization.
+
+### Independent Checksum Verification
 
 From the MD001 directory, a reviewer using GNU coreutils can check the listed files with:
 
 ```bash
 sha256sum -c SHA256SUMS.txt
 ```
+
+The expected result is successful verification of all 602 listed files.
 
 Successful checksum verification establishes consistency with the publication inventory.
 
@@ -600,8 +646,8 @@ Recommended sequence:
 
 1. Review [RESULTS.md](RESULTS.md) for the consolidated scored observations.
 2. Review [PROVENANCE.md](PROVENANCE.md) for source identities, collection conditions, and limitations.
-3. Verify the selected publication files against `SHA256SUMS.txt`.
-4. Review `ORIGINAL_HASH_REFERENCES.tsv` for historical checksum coverage.
+3. Verify the selected publication files against [SHA256SUMS.txt](SHA256SUMS.txt).
+4. Review [ORIGINAL_HASH_REFERENCES.tsv](ORIGINAL_HASH_REFERENCES.tsv) for historical checksum coverage.
 5. Review the original B01 artifact and accepted decision.
 6. Compare the B01 artifact at the recorded observation points.
 7. Review the N01 mutation and retained original signature.
