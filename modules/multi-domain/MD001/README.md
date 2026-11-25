@@ -1,13 +1,5 @@
 # MD001 — Multi-Domain Stateless Verification
 
-**Organization:** Xer0trust LLC  
-**Experiment:** MD001  
-**Technology:** Multi-Domain Stateless Verification (MDSV)  
-**Scored date:** November 19, 2026  
-**Status:** THREE PHYSICAL-NETWORK SCORED CASES COMPLETED
-
----
-
 ## 1. Overview
 
 MD001 evaluates whether an assertion originating in one technical domain can be independently verified in another domain without requiring shared operational state, shared authorization authority, or continued availability of the originating provider.
