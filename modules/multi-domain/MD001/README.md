@@ -35,7 +35,26 @@ MD001 evaluates this property within a defined laboratory configuration.
 
 ---
 
-## 2. Architecture
+## 2. Publication Records
+
+| Record | Purpose |
+|---|---|
+| [RESULTS.md](RESULTS.md) | Consolidated physical scored results, supporting observations, and experimental limitations |
+| [PROVENANCE.md](PROVENANCE.md) | Source identities, evidence origins, runtime conditions, historical integrity records, and publication exclusions |
+| [ORIGINAL_HASH_REFERENCES.tsv](ORIGINAL_HASH_REFERENCES.tsv) | Individual historical checksum coverage classifications for all 110 scored evidence files |
+| [SHA256SUMS.txt](SHA256SUMS.txt) | Consolidated publication-time SHA-256 inventory |
+
+The publication records consolidate retained experimental evidence without replacing the original observations.
+
+Historical checksum references and publication-time checksums serve different purposes.
+
+Historical references document previously recorded artifact and file identities. Publication-time checksums establish byte consistency against the selected publication inventory.
+
+Publication-time checksums do not establish retrospective collection-time integrity.
+
+---
+
+## 3. Architecture
 
 ```text
 DOMAIN A — PRODUCER
@@ -90,7 +109,7 @@ The experiment does not introduce a shared authorization ledger.
 
 ---
 
-## 3. Operation Under Test
+## 4. Operation Under Test
 
 Domain A performs a local sorting operation.
 
@@ -135,7 +154,7 @@ It does not independently prove that the underlying operation occurred.
 
 ---
 
-## 4. Experimental Questions
+## 5. Experimental Questions
 
 MD001 evaluates three primary questions.
 
@@ -157,7 +176,7 @@ Each has its own scored evidence directory.
 
 ---
 
-## 5. Scored Results
+## 6. Scored Results
 
 | Case | Condition | Expected | Observed | Result |
 |---|---|---|---|---|
@@ -233,21 +252,21 @@ signature_checks = 1
 
 The original B01 artifact was preserved outside Domain A.
 
-The operator disconnected power from Domain A.
+The retained operator record documents shutdown initiation, physical power disconnection, and subsequent producer unavailability.
 
 The recorded observations include:
 
 ```text
-Power disconnected:
+Shutdown initiation:
 2026-11-19 22:52:33 EST
 
-Producer connectivity failed:
+Producer connectivity failure observation:
 2026-11-19 22:55:07 EST
 ```
 
 The original assertion was resubmitted through the relay.
 
-The verifier accepted it after a fresh signature check.
+A fresh verifier process accepted it after performing an independent signature check.
 
 The artifact SHA-256 remained:
 
@@ -259,9 +278,11 @@ The artifact SHA-256 remained:
 
 [Review B02 evidence](evidence/B02_SCORED_20261119_225126/)
 
+The consolidated results and associated observations are documented in [RESULTS.md](RESULTS.md).
+
 ---
 
-## 6. Evidence Index
+## 7. Evidence Index
 
 The primary evidence is organized under:
 
@@ -285,11 +306,12 @@ evidence/
 
 ### Primary Scored Evidence
 
-| Directory | Contents |
-|---|---|
-| `B01_SCORED_20261119_223940` | Valid assertion, packet capture, artifact comparisons, verification response |
-| `N01_SCORED_20261119_224654` | Modified assertion, signature rejection, packet capture, artifact comparisons |
-| `B02_SCORED_20261119_225126` | Original assertion, producer shutdown observations, fresh verification, packet capture |
+| Directory | Contents | Retained files |
+|---|---|---:|
+| `B01_SCORED_20261119_223940` | Valid assertion, packet capture, artifact comparisons, verification response | 31 |
+| `N01_SCORED_20261119_224654` | Modified assertion, signature rejection, packet capture, artifact comparisons | 34 |
+| `B02_SCORED_20261119_225126` | Original assertion, producer shutdown observations, fresh verification, packet capture | 45 |
+| **Total** | | **110** |
 
 ### Supporting Evidence
 
@@ -303,12 +325,18 @@ evidence/
 
 ---
 
-## 7. Implementation
+## 8. Implementation
 
 The MD001 implementation is preserved in the project directory.
 
 ```text
 MD001/
+|
+|-- README.md
+|-- RESULTS.md
+|-- PROVENANCE.md
+|-- ORIGINAL_HASH_REFERENCES.tsv
+|-- SHA256SUMS.txt
 |
 |-- md001.py
 |-- observe.py
@@ -375,9 +403,11 @@ RUNTIME_LOCK.json
 
 These records preserve source identities used during implementation and validation.
 
+Additional source and runtime provenance is documented in [PROVENANCE.md](PROVENANCE.md).
+
 ---
 
-## 8. Development and Validation History
+## 9. Development and Validation History
 
 MD001 was developed through several distinct stages.
 
@@ -444,7 +474,7 @@ The desktop runtime probe recorded:
 0 FAIL
 ```
 
-Subsequent supporting evidence recorded successful Raspberry Pi and HP runtime probes.
+Saved Linux runtime probes recorded 20 successful checks on each of the Dell, Raspberry Pi, and HP hosts.
 
 [Review runtime compatibility](support/MD001_RUNTIME_REVIEW_R1/)
 
@@ -481,7 +511,7 @@ B02 PASS
 
 ---
 
-## 9. Trust Provisioning
+## 10. Trust Provisioning
 
 Domain B verifies assertions using locally provisioned public-key material.
 
@@ -505,25 +535,82 @@ The trust configuration is an input to verification.
 
 It is not an execution authorization.
 
+The disclosed laboratory signing material is not intended for operational use.
+
 [Review trust configuration](support/MD001_TRUST_20261118_215250/)
 
 ---
 
-## 10. Independent Evidence Review
+## 11. Evidence Integrity
+
+MD001 preserves original integrity records alongside a consolidated publication inventory.
+
+### Historical Integrity Records
+
+The historical records include original manifests, artifact comparisons, packet capture checksum references, stream identities, and public-key material identities.
+
+The historical coverage of the 110 scored evidence files is classified as follows:
+
+| Historical coverage classification | Files |
+|---|---:|
+| Direct original manifest entry | 9 |
+| Explicit historical file checksum reference | 15 |
+| Shared artifact-content identity | 7 |
+| Shared stream-content identity | 6 |
+| Public-trust content identity | 4 |
+| No historical whole-file checksum located | 68 |
+| Intentional manifest self-exclusion | 1 |
+| **Total** | **110** |
+
+These classifications distinguish direct historical file checksums from shared content identities.
+
+The absence of a located historical whole-file checksum does not establish that a file was never hashed.
+
+Complete original scored-case collection manifests were not located during publication reconciliation.
+
+The individual classifications and their reference sources are preserved in [ORIGINAL_HASH_REFERENCES.tsv](ORIGINAL_HASH_REFERENCES.tsv).
+
+The associated limitations are documented in [PROVENANCE.md](PROVENANCE.md).
+
+### Publication Integrity
+
+[SHA256SUMS.txt](SHA256SUMS.txt) provides the consolidated checksum inventory for the selected experimental evidence, implementation files, configurations, historical records, and supporting publication documentation.
+
+Repository navigation READMEs are outside the consolidated checksum scope.
+
+The consolidated manifest does not replace the original integrity records.
+
+From the MD001 directory, a reviewer using GNU coreutils can check the listed files with:
+
+```bash
+sha256sum -c SHA256SUMS.txt
+```
+
+Successful checksum verification establishes consistency with the publication inventory.
+
+It does not independently validate the experimental conclusions, authenticate the historical collection process, or establish complete collection-time checksum coverage.
+
+---
+
+## 12. Independent Evidence Review
 
 A reviewer can examine the published evidence without deploying the application.
 
 Recommended sequence:
 
-1. Review the original B01 artifact and accepted decision.
-2. Compare the B01 artifact at the recorded observation points.
-3. Review the N01 mutation and retained original signature.
-4. Confirm the N01 invalid-signature rejection.
-5. Review the B02 producer shutdown and connectivity observations.
-6. Confirm B02 reused the original B01 artifact.
-7. Confirm the B02 verification result and fresh signature check.
-8. Review the supporting preflight and runtime evidence.
-9. Compare the recorded source and configuration identities.
+1. Review [RESULTS.md](RESULTS.md) for the consolidated scored observations.
+2. Review [PROVENANCE.md](PROVENANCE.md) for source identities, collection conditions, and limitations.
+3. Verify the selected publication files against `SHA256SUMS.txt`.
+4. Review `ORIGINAL_HASH_REFERENCES.tsv` for historical checksum coverage.
+5. Review the original B01 artifact and accepted decision.
+6. Compare the B01 artifact at the recorded observation points.
+7. Review the N01 mutation and retained original signature.
+8. Confirm the N01 invalid-signature rejection.
+9. Review the B02 producer shutdown and connectivity observations.
+10. Confirm B02 reused the original B01 artifact.
+11. Confirm the B02 verification result and fresh signature check.
+12. Review the supporting preflight and runtime evidence.
+13. Compare the recorded source and configuration identities.
 
 The individual evidence directories provide additional details.
 
@@ -531,7 +618,7 @@ The recorded packet captures and extracted artifacts are preserved for independe
 
 ---
 
-## 11. What MD001 Demonstrates
+## 13. What MD001 Demonstrates
 
 Within the recorded laboratory configuration, MD001 demonstrates three properties.
 
@@ -551,7 +638,7 @@ These observations support separation between assertion production, mechanical t
 
 ---
 
-## 12. What MD001 Does Not Demonstrate
+## 14. What MD001 Does Not Demonstrate
 
 MD001 does not establish:
 
@@ -562,6 +649,7 @@ MD001 does not establish:
 - Durable single-use authority consumption.
 - Resistance to producer signing-key compromise.
 - General resistance to compromised provider hosts.
+- Transport confidentiality.
 - Physical actuation enforcement.
 - Production deployment readiness.
 
@@ -575,7 +663,7 @@ Verification of an assertion must not be confused with authorization to execute 
 
 ---
 
-## 13. Relationship to MDSV
+## 15. Relationship to MDSV
 
 MD001 evaluates a specific implementation of Multi-Domain Stateless Verification.
 
@@ -596,7 +684,7 @@ It does not establish every possible implementation or application of the broade
 
 ---
 
-## 14. Evidence Preservation
+## 16. Evidence Preservation
 
 The scored experiment directories are historical evidence records.
 
@@ -608,11 +696,13 @@ Documentation added after the experiments should not be represented as contempor
 
 The project preserves unsuccessful local validation attempts alongside successful results.
 
-This maintains the distinction between implementation development, preflight, and scored observations.
+Publication reconciliation preserves the distinction between original evidence, historical integrity references, and subsequently generated publication checksums.
+
+This maintains the distinction between implementation development, preflight, scored observations, and publication documentation.
 
 ---
 
-## 15. Conclusion
+## 17. Conclusion
 
 MD001 completed three physical-network scored experiments.
 
