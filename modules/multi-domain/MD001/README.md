@@ -1,5 +1,6 @@
 # MD001 — Multi-Domain Stateless Verification
 
+
 ## 1. Overview
 
 MD001 evaluates whether an assertion originating in one technical domain can be independently verified in another domain without requiring shared operational state, shared authorization authority, or continued availability of the originating provider.
